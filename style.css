@@ -22,3 +22,13 @@
 .source-character b{font:600 16px 'Barlow Condensed';color:#f0dfe0}
 .source-character span{display:block;color:#aaa;font-size:10px}
 .info-panel .detail-copy h3{margin-top:18px}
+
+/* Auric Cell marker and no-donation build filter */
+.build-filters{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 6px}
+.build-filters button{border:1px solid #55404a;background:#211d23;color:#c9bfc2;border-radius:3px;padding:8px 12px;font:600 11px Inter;cursor:pointer}
+.build-filters button.active{background:#642a31;border-color:#c64a50;color:#fff}
+.build-card[hidden]{display:none!important}
+.perk-chips button.perk-chip{position:relative;padding-right:27px}
+.auric-cell-icon{position:absolute;right:5px;bottom:4px;width:17px;height:17px;filter:drop-shadow(0 1px 2px #000)}
+.perk-chip.requires-auric{border-color:#98723b;background:#382d20}
+.perk-chip.requires-auric:hover{border-color:#e8b84d;background:#4a3820}
