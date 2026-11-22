@@ -4,8 +4,8 @@ const TYPES={
 characters:{title:'Персонажи',label:'THE ROSTER',endpoint:'characters',source:SOURCE+'/characters/'},
 perks:{title:'Перки',label:'TEACHABLES & ABILITIES',endpoint:'perks'},
 items:{title:'Предметы',label:'SURVIVAL GEAR',endpoint:'items',source:SOURCE+'/items/'},
-offerings:{title:'Подношения',label:'OFFERINGS',endpoint:'offerings'},
-addons:{title:'Аддоны',label:'ADD-ONS',endpoint:'itemaddons'},
+offerings:{title:'Подношения',label:'OFFERINGS',endpoint:'offerings',source:SOURCE+'/offerings/'},
+addons:{title:'Аддоны',label:'ADD-ONS',endpoint:'itemaddons',source:SOURCE+'/itemaddons/'},
 maps:{title:'Карты',label:'THE REALMS',endpoint:'maps'}
 };
 let tab='characters',all=[],filter='Все',favorites=[];
@@ -26,11 +26,12 @@ async function getData(url){const r=await fetch(url,{cache:'no-store',credential
 async function load(){
  if(tab==='favorites'){render();return}
  $('#notice').textContent='Ищем записи в Тумане…';$('#grid').innerHTML='';
- const cfg=TYPES[tab],sources=[...(cfg.source?[cfg.source]:[]),API+'/'+cfg.endpoint,API+'/'+cfg.endpoint+'?branch=live'];let lastError;
+ const cfg=TYPES[tab],sources=[...(cfg.source?(Array.isArray(cfg.source)?cfg.source:[cfg.source]):[]),...(tab==='addons'?[SOURCE+'/addons/']:[]),API+'/'+cfg.endpoint,API+'/'+cfg.endpoint+'?branch=live'];let lastError;
  for(const url of sources){try{
   let data=arr(await getData(url));if(['items','addons','offerings'].includes(tab))data=data.filter(usableGear);if(!data.length)throw Error('Источник вернул пустой список');
   all=data;$('#connection').textContent=url.startsWith(SOURCE)?'Резервная база подключена':'База подключена';$('#connection').classList.add('ok');render();return;
  }catch(e){lastError=e}}
+ if(tab==='addons'){try{const [chars,items]=await Promise.all([getData(SOURCE+'/characters/'),getData(SOURCE+'/items/')]);const nested=[...arr(chars),...arr(items)].flatMap(x=>x.addons||x.addOns||x.add_ons||x.itemAddons||x.item_addons||x.powerAddons||x.power_addons||[]);if(nested.length){all=nested.filter(usableGear);$('#connection').textContent='Резервная база подключена';$('#connection').classList.add('ok');render();return}}catch(e){lastError=e}}
  all=[];$('#notice').textContent='Не удалось загрузить этот раздел. Источник данных временно недоступен. ('+(lastError?.message||'ошибка')+')';
  $('#connection').textContent='Нет соединения';$('#connection').classList.remove('ok');render();
 }
