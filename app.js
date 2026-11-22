@@ -28,7 +28,7 @@ async function load(){
  $('#notice').textContent='Ищем записи в Тумане…';$('#grid').innerHTML='';
  const cfg=TYPES[tab],sources=[...(cfg.source?[cfg.source]:[]),API+'/'+cfg.endpoint,API+'/'+cfg.endpoint+'?branch=live'];let lastError;
  for(const url of sources){try{
-  const data=arr(await getData(url));if(!data.length)throw Error('Источник вернул пустой список');
+  let data=arr(await getData(url));if(['items','addons','offerings'].includes(tab))data=data.filter(usableGear);if(!data.length)throw Error('Источник вернул пустой список');
   all=data;$('#connection').textContent=url.startsWith(SOURCE)?'Резервная база подключена':'База подключена';$('#connection').classList.add('ok');render();return;
  }catch(e){lastError=e}}
  all=[];$('#notice').textContent='Не удалось загрузить этот раздел. Источник данных временно недоступен. ('+(lastError?.message||'ошибка')+')';
