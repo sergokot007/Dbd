@@ -3,7 +3,9 @@ const SOURCE='https://dbd.source.gs/api';
 const TYPES={
 characters:{title:'Персонажи',label:'THE ROSTER',endpoint:'characters',source:SOURCE+'/characters/'},
 perks:{title:'Перки',label:'TEACHABLES & ABILITIES',endpoint:'perks'},
-items:{title:'Предметы',label:'SURVIVAL GEAR',endpoint:'items',source:SOURCE+'/items/'},\nofferings:{title:'Подношения',label:'OFFERINGS',endpoint:'offerings'},\naddons:{title:'Аддоны',label:'ADD-ONS',endpoint:'itemaddons'},
+items:{title:'Предметы',label:'SURVIVAL GEAR',endpoint:'items',source:SOURCE+'/items/'},
+offerings:{title:'Подношения',label:'OFFERINGS',endpoint:'offerings'},
+addons:{title:'Аддоны',label:'ADD-ONS',endpoint:'itemaddons'},
 maps:{title:'Карты',label:'THE REALMS',endpoint:'maps'}
 };
 let tab='characters',all=[],filter='Все',favorites=[];
@@ -14,7 +16,9 @@ function arr(d){if(Array.isArray(d))return d;for(const k of ['data','results','i
 function name(x){return x.name||x.displayName||x.display_name||x.title||x.killerName||x.id||'Без названия'}
 function desc(x){return x.description||x.desc||x.effect||x.power||x.contentText||x.content||''}
 function image(x){return x.image||x.imageUrl||x.image_url||x.icon||x.iconUrl||x.icon_url||x.iconURL||x.portrait||x.portraitURL||''}
-function category(x){return x.role||x.type||x.category||x.realm||x.faction||x.characterName||x.character||''}\nfunction cosmetic(x){const v=norm([x.type,x.category,x.subcategory,x.kind,x.itemType,x.item_type,x.tags,x.name,x.displayName].join(' '));return /outfit|cosmetic|skin|wardrobe|charm|badge|banner|portrait|headwear|torso|legwear|customization|store outfit/.test(v)}\nfunction usableGear(x){return !cosmetic(x)&&!x.isCosmetic&&!x.is_cosmetic&&!x.cosmetic}
+function category(x){return x.role||x.type||x.category||x.realm||x.faction||x.characterName||x.character||''}
+function cosmetic(x){const v=norm([x.type,x.category,x.subcategory,x.kind,x.itemType,x.item_type,x.tags,x.name,x.displayName].join(' '));return /outfit|cosmetic|skin|wardrobe|charm|badge|banner|portrait|headwear|torso|legwear|customization|store outfit/.test(v)}
+function usableGear(x){return !cosmetic(x)&&!x.isCosmetic&&!x.is_cosmetic&&!x.cosmetic}
 function id(x){return String(x.id||x._id||x.name||name(x))}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function updateFav(){$('#favCount').textContent=favorites.length;localStorage.setItem('dbd-favorites',JSON.stringify(favorites))}
