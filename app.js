@@ -3,18 +3,18 @@ const SOURCE='https://dbd.source.gs/api';
 const TYPES={
 characters:{title:'Персонажи',label:'THE ROSTER',endpoint:'characters',source:SOURCE+'/characters/'},
 perks:{title:'Перки',label:'TEACHABLES & ABILITIES',endpoint:'perks'},
-items:{title:'Предметы',label:'TOOLS OF SURVIVAL',endpoint:'items',source:SOURCE+'/items/'},
+items:{title:'Предметы',label:'SURVIVAL GEAR',endpoint:'items',source:SOURCE+'/items/'},\nofferings:{title:'Подношения',label:'OFFERINGS',endpoint:'offerings'},\naddons:{title:'Аддоны',label:'ADD-ONS',endpoint:'itemaddons'},
 maps:{title:'Карты',label:'THE REALMS',endpoint:'maps'}
 };
 let tab='characters',all=[],filter='Все',favorites=[];
 try{favorites=JSON.parse(localStorage.getItem('dbd-favorites')||'[]')}catch{}
 const $=s=>document.querySelector(s);
 const norm=x=>String(x??'').toLowerCase();
-function arr(d){if(Array.isArray(d))return d;for(const k of ['data','results','items','characters','perks','maps','realms','killers','survivors','offerings','addons'])if(Array.isArray(d?.[k]))return d[k];return []}
+function arr(d){if(Array.isArray(d))return d;for(const k of ['data','results','items','characters','perks','maps','realms','killers','survivors','offerings','addons','itemAddons','item_addons','killerAddons','killer_addons','survivorAddons','survivor_addons','entries','list'])if(Array.isArray(d?.[k]))return d[k];return []}
 function name(x){return x.name||x.displayName||x.display_name||x.title||x.killerName||x.id||'Без названия'}
 function desc(x){return x.description||x.desc||x.effect||x.power||x.contentText||x.content||''}
 function image(x){return x.image||x.imageUrl||x.image_url||x.icon||x.iconUrl||x.icon_url||x.iconURL||x.portrait||x.portraitURL||''}
-function category(x){return x.role||x.type||x.category||x.realm||x.faction||x.characterName||''}
+function category(x){return x.role||x.type||x.category||x.realm||x.faction||x.characterName||x.character||''}\nfunction cosmetic(x){const v=norm([x.type,x.category,x.subcategory,x.kind,x.itemType,x.item_type,x.tags,x.name,x.displayName].join(' '));return /outfit|cosmetic|skin|wardrobe|charm|badge|banner|portrait|headwear|torso|legwear|customization|store outfit/.test(v)}\nfunction usableGear(x){return !cosmetic(x)&&!x.isCosmetic&&!x.is_cosmetic&&!x.cosmetic}
 function id(x){return String(x.id||x._id||x.name||name(x))}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function updateFav(){$('#favCount').textContent=favorites.length;localStorage.setItem('dbd-favorites',JSON.stringify(favorites))}
@@ -22,7 +22,7 @@ async function getData(url){const r=await fetch(url,{cache:'no-store',credential
 async function load(){
  if(tab==='favorites'){render();return}
  $('#notice').textContent='Ищем записи в Тумане…';$('#grid').innerHTML='';
- const cfg=TYPES[tab],sources=[...(cfg.source?[cfg.source]:[]),API+'/'+cfg.endpoint];let lastError;
+ const cfg=TYPES[tab],sources=[...(cfg.source?[cfg.source]:[]),API+'/'+cfg.endpoint,API+'/'+cfg.endpoint+'?branch=live'];let lastError;
  for(const url of sources){try{
   const data=arr(await getData(url));if(!data.length)throw Error('Источник вернул пустой список');
   all=data;$('#connection').textContent=url.startsWith(SOURCE)?'Резервная база подключена':'База подключена';$('#connection').classList.add('ok');render();return;
@@ -36,7 +36,7 @@ function render(){
  if(!cats.includes(filter))filter='Все';
  $('#filters').innerHTML=cats.length>2?cats.map(c=>'<button class="'+(filter===c?'active':'')+'" data-filter="'+esc(c)+'">'+esc(c)+'</button>').join(''):'';
  const shown=data.filter(x=>(filter==='Все'||category(x)===filter)&&(!q||norm(name(x)+' '+desc(x)+' '+category(x)).includes(q)));
- $('#notice').textContent=shown.length?'Найдено: '+shown.length:'Ничего не найдено';
+ $('#notice').textContent=shown.length?'Найдено: '+shown.length+(tab==='items'?' • скины и косметика исключены':''):'Ничего не найдено';
  $('#grid').innerHTML=shown.map(x=>{const key=id(x),src=image(x),saved=favorites.some(f=>f.key===key);return '<article class="item"><div class="art">'+(src?'<img loading="lazy" src="'+esc(src)+'" alt="" onerror="this.remove()">':'<span class="placeholder">✣</span>')+'</div><div class="itembody"><div class="kind">'+esc(category(x)||cfg?.title||'DBD')+'</div><h3>'+esc(name(x))+'</h3><p>'+esc(desc(x)||'Информация об этой записи доступна в игровом справочнике.')+'</p><div class="cardbottom"><small>'+esc(x.realm||x.characterName||x.character||'DEAD BY DAYLIGHT')+'</small><button class="fav '+(saved?'saved':'')+'" data-fav="'+esc(key)+'">'+(saved?'♥':'♡')+'</button></div></div></article>'}).join('')||'<div class="empty">В этой части Тумана пока пусто.</div>';
 }
 function switchTab(t){tab=t;filter='Все';document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));$('#search').value='';load()}
