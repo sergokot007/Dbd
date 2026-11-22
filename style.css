@@ -8,3 +8,17 @@
 .loadout-gear>div{background:#211d23;border:1px solid #40333a;padding:10px;border-radius:3px}
 .loadout-gear b{font:600 14px 'Barlow Condensed';color:#e2a0a2}
 .loadout-gear p{margin:5px 0 0!important;font-size:11px!important;line-height:1.55}
+
+.perk-chips button,.loadout-gear button,.addon-row button{font:inherit;color:#f0dfe0;background:#34242a;border:1px solid #674049;border-radius:3px;padding:7px 9px;cursor:pointer;text-align:left}
+.perk-chips button:hover,.loadout-gear button:hover,.addon-row button:hover{background:#563039;border-color:#c64a50}
+.build-analysis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:8px;margin-top:13px}
+.build-analysis>div{padding:11px;background:#211d23;border:1px solid #40333a;border-radius:3px}
+.build-analysis b{font:600 14px 'Barlow Condensed';color:#e2a0a2}
+.build-analysis p{margin:5px 0 0!important;font-size:11px!important;line-height:1.6}
+.loadout-gear p{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.loadout-gear p span{display:block;width:100%;color:#aaa;font-size:11px;line-height:1.5}
+.source-character{display:flex;align-items:center;gap:10px;margin-top:15px!important;padding:10px;background:#211d23;border:1px solid #40333a}
+.source-character img{width:48px;height:48px;object-fit:contain;border-radius:3px;background:#35252b}
+.source-character b{font:600 16px 'Barlow Condensed';color:#f0dfe0}
+.source-character span{display:block;color:#aaa;font-size:10px}
+.info-panel .detail-copy h3{margin-top:18px}
