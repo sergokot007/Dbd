@@ -10,7 +10,7 @@ let tab='characters',all=[],filter='Все',favorites=[];
 try{favorites=JSON.parse(localStorage.getItem('dbd-favorites')||'[]')}catch{}
 const $=s=>document.querySelector(s);
 const norm=x=>String(x??'').toLowerCase();
-function arr(d){if(Array.isArray(d))return d;for(const k of ['data','results','items','characters','perks','killers','survivors','offerings'])if(Array.isArray(d?.[k]))return d[k];return []}
+function arr(d){if(Array.isArray(d))return d;for(const k of ['data','results','items','characters','perks','maps','realms','killers','survivors','offerings','addons'])if(Array.isArray(d?.[k]))return d[k];return []}
 function name(x){return x.name||x.displayName||x.display_name||x.title||x.killerName||x.id||'Без названия'}
 function desc(x){return x.description||x.desc||x.effect||x.power||x.contentText||x.content||''}
 function image(x){return x.image||x.imageUrl||x.image_url||x.icon||x.iconUrl||x.icon_url||x.iconURL||x.portrait||x.portraitURL||''}
@@ -18,7 +18,7 @@ function category(x){return x.role||x.type||x.category||x.realm||x.faction||x.ch
 function id(x){return String(x.id||x._id||x.name||name(x))}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function updateFav(){$('#favCount').textContent=favorites.length;localStorage.setItem('dbd-favorites',JSON.stringify(favorites))}
-async function getData(url){const r=await fetch(url,{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);return r.json()}
+async function getData(url){const r=await fetch(url,{cache:'no-store',credentials:'omit'});if(!r.ok)throw Error('HTTP '+r.status);return r.json()}
 async function load(){
  if(tab==='favorites'){render();return}
  $('#notice').textContent='Ищем записи в Тумане…';$('#grid').innerHTML='';
