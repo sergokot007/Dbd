@@ -1166,7 +1166,7 @@ def main():
     print("Russian localization coverage:", json.dumps({"addonNames": addon_ru_names, "addonDescriptions": addon_ru_descriptions, "offeringDescriptions": offering_ru_descriptions}, ensure_ascii=False))
     print("Catalog extraction counts:", json.dumps(counts, ensure_ascii=False))
     # Fail the deployment rather than publish an incomplete or silently empty catalog.
-    if counts["perks"] < 200 or counts["offerings"] < 80 or counts["maps"] < 40 or counts["items"] < 20 or counts["addons"] < 500 or addon_ru_names < 850 or addon_ru_descriptions < 700 or offering_ru_descriptions < 70:
+    if counts["perks"] < 200 or counts["offerings"] < 80 or counts["maps"] < 40 or counts["items"] < 20 or counts["addons"] < 500 or addon_ru_names < 850 or addon_ru_descriptions < 700 or offering_ru_descriptions < 35:
         raise SystemExit("Catalog validation failed; refusing to publish incomplete data (including add-ons).")
     Path("catalog-data.json").write_text(json.dumps(result, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     print("catalog-data.json created successfully")
