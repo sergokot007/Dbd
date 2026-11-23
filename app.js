@@ -4,9 +4,9 @@ const TYPES={
 characters:{title:'Персонажи',label:'THE ROSTER',endpoint:'characters',source:SOURCE+'/characters/'},
 perks:{title:'Перки',label:'TEACHABLES & ABILITIES',endpoint:'perks',source:['https://dbd.tricky.lol/api/perks','https://dbd.tricky.lol/api/perks?branch=live',SOURCE+'/perks/']},
 items:{title:'Предметы',label:'SURVIVAL GEAR',endpoint:'items',source:SOURCE+'/items/'},
-offerings:{title:'Подношения',label:'OFFERINGS',endpoint:'offerings',source:SOURCE+'/offerings/'},
-addons:{title:'Аддоны',label:'ADD-ONS',endpoint:'itemaddons',source:SOURCE+'/itemaddons/'},
-maps:{title:'Карты',label:'THE REALMS',endpoint:'maps'}
+offerings:{title:'Подношения',label:'OFFERINGS',endpoint:'offerings',source:['https://dbd.tricky.lol/api/offerings?branch=live','https://dbd.tricky.lol/api/offerings']},
+addons:{title:'Аддоны',label:'ADD-ONS',endpoint:'itemaddons',source:['https://dbd.tricky.lol/api/itemaddons?branch=live','https://dbd.tricky.lol/api/itemaddons']},
+maps:{title:'Карты',label:'THE REALMS',endpoint:'maps',source:['https://dbd.tricky.lol/api/maps?branch=live','https://dbd.tricky.lol/api/maps']}
 };
 let tab='characters',all=[],filter='Все',favorites=[];
 try{favorites=JSON.parse(localStorage.getItem('dbd-favorites')||'[]')}catch{}
