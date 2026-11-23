@@ -621,35 +621,57 @@ def scrape_ru_addon_descriptions(addons, maps):
         if key in descriptions:
             item["description"] = descriptions[key]
             described += 1
-    # Fill remaining names from the maintained per-killer Russian catalog when
-    # its order agrees with the already matched source records.
+    # Align translated add-on names against each killer's Russian catalog using
+    # known names as anchors; this tolerates insertions and different list lengths.
     ordered_fills = 0
     def norm_ru(value):
         return re.sub(r"[^\w]+", "", str(value or "").lower())
     for russian_owner, data in maps.get("KILLERS", {}).items():
         expected = data.get("addons", []) if isinstance(data, dict) else []
         group = [x for x in addons if str(x.get("category") or "") == russian_owner]
-        if not expected or not group or abs(len(group) - len(expected)) > 3:
+        if not expected or not group or abs(len(group) - len(expected)) > 10:
             continue
-        known = [(i, norm_ru(x.get("name"))) for i, x in enumerate(group) if re.search(r"[А-Яа-яЁё]", str(x.get("name") or ""))]
-        if len(known) < 5:
+        known = [norm_ru(x.get("name")) if re.search(r"[А-Яа-яЁё]", str(x.get("name") or "")) else "" for x in group]
+        expected_norm = [norm_ru(x) for x in expected]
+        n, m = len(group), len(expected)
+        dp = [[0] * (m + 1) for _ in range(n + 1)]
+        for i in range(n - 1, -1, -1):
+            for j in range(m - 1, -1, -1):
+                if known[i] and known[i] == expected_norm[j]:
+                    dp[i][j] = 1 + dp[i + 1][j + 1]
+                else:
+                    dp[i][j] = max(dp[i + 1][j], dp[i][j + 1])
+        pairs, i, j = [], 0, 0
+        while i < n and j < m:
+            if known[i] and known[i] == expected_norm[j]:
+                pairs.append((i, j))
+                i += 1
+                j += 1
+            elif dp[i + 1][j] >= dp[i][j + 1]:
+                i += 1
+            else:
+                j += 1
+        anchors = len(pairs)
+        score = anchors / max(1, sum(bool(x) for x in known))
+        if anchors < 4 or score < 0.35:
             continue
-        best_offset, best_score = 0, 0
-        for offset in range(-3, 4):
-            matches = sum(1 for i, name in known if 0 <= i + offset < len(expected) and name == norm_ru(expected[i + offset]))
-            score = matches / len(known)
-            if score > best_score:
-                best_offset, best_score = offset, score
-        if best_score >= 0.7:
-            for i, item in enumerate(group):
+        sentinels = [(-1, -1)] + pairs + [(n, m)]
+        for k in range(len(sentinels) - 1):
+            left_i, left_j = sentinels[k]
+            right_i, right_j = sentinels[k + 1]
+            record_gap = list(range(left_i + 1, right_i))
+            expected_gap = list(range(left_j + 1, right_j))
+            if len(record_gap) != len(expected_gap):
+                continue
+            for record_index, expected_index in zip(record_gap, expected_gap):
+                item = group[record_index]
                 if re.search(r"[А-Яа-яЁё]", str(item.get("name") or "")):
                     continue
-                j = i + best_offset
-                if 0 <= j < len(expected):
-                    english = str(item.get("nameEn") or item.get("name") or "")
-                    item["name"] = expected[j]
-                    item["displayName"] = f"{expected[j]} ({english})"
-                    ordered_fills += 1
+                english = str(item.get("nameEn") or item.get("name") or "")
+                item["name"] = expected[expected_index]
+                item["displayName"] = f"{expected[expected_index]} ({english})"
+                ordered_fills += 1
+        print("Add-on owner alignment:", russian_owner, "records", n, "expected", m, "anchors", anchors, "score", round(score, 2))
     print("Russian wiki add-on names:", translated, "/", len(addons))
     print("Russian wiki add-on descriptions:", described, "/", len(addons))
     print("Additional add-on names filled by owner order:", ordered_fills)
