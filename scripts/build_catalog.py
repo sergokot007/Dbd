@@ -657,8 +657,24 @@ def scrape_ru_maps(records):
     return apply_ru_article_names(records, name_map), name_map
 
 
+
+def probe_ru_wiki_export():
+    """Check whether Fandom's bulk XML export is reachable through the proxy."""
+    try:
+        query = "action=query&export=1&exportnowrap=1&titles=" + quote("Адреналин") + "&format=xml"
+        target = "https://dead-by-daylight.fandom.com/api.php?" + query
+        response = requests.get("https://r.jina.ai/" + target, headers={**HEADERS, "X-Respond-With": "html"}, timeout=15)
+        response.raise_for_status()
+        print("Fandom bulk export probe:", response.status_code, len(response.text), response.text[:180].replace("\\n", " "))
+        return response.text
+    except Exception as exc:
+        print("Fandom bulk export unavailable:", repr(exc))
+        return ""
+
+
 def main():
     ru_maps = fetch_ru_maps()
+    probe_ru_wiki_export()
     perk_ru_map = scrape_perk_ru_map(ru_maps)
     offering_ru_map = scrape_ru_index_name_map("Подношения")
     result = {
