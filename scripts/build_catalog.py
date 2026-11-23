@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Build an offline catalog from the public dbd.source.gs reference pages."""
-import ast, json, re, sys, time
+import ast, json, re, sys, time, xml.etree.ElementTree as ET
 from pathlib import Path
-from urllib.parse import urljoin, quote, unquote
+from urllib.parse import urljoin, quote, unquote, urlencode
 import requests
 from bs4 import BeautifulSoup, Tag, NavigableString
 
@@ -294,6 +294,95 @@ def ru_wiki_soup(title):
     return None
 
 
+def fetch_ru_wiki_export(titles, batch_size=50):
+    """Bulk-download Russian wiki article source in a few proxy requests."""
+    titles = list(dict.fromkeys(str(x).strip() for x in titles if str(x).strip()))
+    result = {}
+    for start in range(0, len(titles), batch_size):
+        batch = titles[start:start + batch_size]
+        params = urlencode({"action": "query", "export": "1", "exportnowrap": "1", "titles": "|".join(batch), "format": "xml"})
+        target = "https://dead-by-daylight.fandom.com/api.php?" + params
+        proxy = "https://r.jina.ai/" + target
+        payload = ""
+        for attempt in range(3):
+            try:
+                response = requests.get(proxy, headers={**HEADERS, "X-Respond-With": "html"}, timeout=25)
+                if response.status_code == 429:
+                    time.sleep(4 + attempt * 3)
+                    continue
+                response.raise_for_status()
+                payload = response.text
+                break
+            except Exception as exc:
+                print("Russian wiki export batch failed:", start, repr(exc))
+                time.sleep(2)
+        if not payload:
+            continue
+        try:
+            root = ET.fromstring(payload)
+            for page_node in root.iter():
+                if page_node.tag.rsplit("}", 1)[-1] != "page":
+                    continue
+                title, wikitext = "", ""
+                for node in page_node.iter():
+                    local = node.tag.rsplit("}", 1)[-1]
+                    if local == "title" and not title:
+                        title = node.text or ""
+                    elif local == "text":
+                        wikitext = node.text or ""
+                if title and wikitext:
+                    result[title.replace("_", " ")] = wikitext
+        except Exception as exc:
+            print("Could not parse Russian wiki export:", repr(exc), payload[:180])
+        print("Russian wiki export batch:", start + 1, "-", start + len(batch), "of", len(titles), "loaded", len(result))
+        if start + batch_size < len(titles):
+            time.sleep(3)
+    return result
+
+def wiki_links(wikitext):
+    found = []
+    for raw in re.findall(r"\[\[([^|\]#]+)(?:\|[^\]]*)?\]\]", wikitext or ""):
+        title = raw.strip().replace("_", " ")
+        if not title or ":" in title or title.startswith("#"):
+            continue
+        if title not in found:
+            found.append(title)
+    return found
+
+def clean_wikitext(value):
+    value = re.sub(r"<!--.*?-->", " ", value or "", flags=re.S)
+    value = re.sub(r"<ref[^>]*>.*?</ref>", " ", value, flags=re.I | re.S)
+    value = re.sub(r"<ref[^>]*/>", " ", value, flags=re.I)
+    value = re.sub(r"<br\s*/?>", " ", value, flags=re.I)
+    for _ in range(5):
+        value = re.sub(r"\{\{[^{}]*\}\}", " ", value)
+    value = re.sub(r"\[\[([^|\]]+)\|([^\]]+)\]\]", r"\2", value)
+    value = re.sub(r"\[\[([^\]]+)\]\]", r"\1", value)
+    value = re.sub(r"\[https?://[^\s\]]+\s+([^\]]+)\]", r"\1", value)
+    value = re.sub(r"'{2,3}", "", value)
+    value = re.sub(r"<[^>]+>", " ", value)
+    lines = []
+    for line in value.splitlines():
+        line = re.sub(r"^\s*[*#;:]+\s*", "", line).strip()
+        if line and not line.startswith(("|", "{|", "|}", "!", "__")):
+            lines.append(line)
+    return re.sub(r"\s+", " ", " ".join(lines)).strip()
+
+def article_english_name_wikitext(wikitext):
+    match = re.search(r'\(англ\.\s*["«]?(.+?)["»]?\)', wikitext or "", re.I)
+    return match.group(1).strip().strip('"«»') if match else ""
+
+def article_description_wikitext(wikitext):
+    headings = list(re.finditer(r"(?m)^==\s*(.*?)\s*==\s*$", wikitext or ""))
+    for i, heading in enumerate(headings):
+        if heading.group(1).strip().lower() == "описание":
+            end = headings[i + 1].start() if i + 1 < len(headings) else len(wikitext)
+            return clean_wikitext(wikitext[heading.end():end])
+    return ""
+
+def norm_en(value):
+    return re.sub(r"[^a-z0-9]+", "", str(value or "").lower())
+
 def scrape_perk_ru_map(maps):
     """Pair live English perk slugs with the maintained Russian client names."""
     killer_map = maps.get("KILLER_EN_RU", {})
@@ -381,48 +470,18 @@ def apply_perk_ru_names(records, id_map):
     return records
 
 def scrape_ru_perk_descriptions(records, ru_maps):
-    """Read the Russian 'Описание' section from each perk article when available."""
-    def read_one(item):
-        russian = item.get("name")
-        if not russian or not re.search(r"[А-Яа-яЁё]", str(russian)):
-            return (item.get("id"), "")
-        url = "https://dead-by-daylight.fandom.com/ru/wiki/" + quote(str(russian).replace(" ", "_"), safe="()")
-        try:
-            soup = ru_wiki_soup(str(russian))
-            if soup is None:
-                return (item.get("id"), "")
-            heading = next((h for h in soup.find_all(["h2", "h3"]) if clean(h).lower() == "описание"), None)
-            if not heading:
-                return (item.get("id"), "")
-            parts = []
-            for sibling in heading.find_next_siblings():
-                if sibling.name in ("h2", "h3", "table"):
-                    break
-                if sibling.name in ("p", "ul", "ol"):
-                    value = clean(sibling)
-                    if value:
-                        parts.append(value)
-            return (item.get("id"), " ".join(parts))
-        except Exception:
-            return (item.get("id"), "")
-    from concurrent.futures import ThreadPoolExecutor
-    by_id = {}
-    probe = ru_wiki_soup("Адреналин")
-    if probe is not None:
-        with ThreadPoolExecutor(max_workers=16) as pool:
-            for perk_id, description in pool.map(read_one, records):
-                if perk_id and description:
-                    by_id[perk_id] = description
-    else:
-        print("Fandom RU wiki blocked; skipping individual perk pages and using catalog fallback.")
+    """Load Russian perk descriptions from bulk wiki exports."""
+    titles = [str(x.get("name")) for x in records if re.search(r"[А-Яа-яЁё]", str(x.get("name") or ""))]
+    exported = fetch_ru_wiki_export(titles)
+    by_title = {norm_en(k): v for k, v in exported.items()}
+    exact_count = 0
     for item in records:
-        if by_id.get(item.get("id")):
-            item["description"] = by_id[item["id"]]
-    print("Russian wiki perk descriptions:", len(by_id), "/", len(records))
-    for item in records:
-        if by_id.get(item.get("id")):
-            item["description"] = by_id[item["id"]]
-    # Fallback: DBDFOG publishes a single searchable Russian catalog with all current perks.
+        source = by_title.get(norm_en(item.get("name") or ""), "")
+        description = article_description_wikitext(source)
+        if description:
+            item["description"] = description
+            exact_count += 1
+    print("Russian wiki perk descriptions:", exact_count, "/", len(records))
     try:
         response = requests.get("https://dbdfog.ru/perks/", headers=HEADERS, timeout=20)
         response.raise_for_status()
@@ -454,65 +513,59 @@ def scrape_ru_perk_descriptions(records, ru_maps):
         print("DBDFOG Russian perk descriptions:", fallback_count, "/", len(records))
     except Exception as exc:
         print("DBDFOG perk catalog unavailable:", repr(exc))
+    missing = [str(x.get("nameEn") or x.get("name")) for x in records if not re.search(r"[А-Яа-яЁё]", str(x.get("name") or ""))]
+    print("Perks without RU names:", missing[:25])
     return records
 
-
 def scrape_ru_addon_descriptions(addons, maps):
-    """Use Russian client-text tables from the RU community wiki when available."""
-    killer_data = maps.get("KILLERS", {})
+    """Bulk-read Russian add-on names and descriptions from power/item wiki tables."""
     pages = []
-    for killer_ru, data in killer_data.items():
+    for data in maps.get("KILLERS", {}).values():
         power = data.get("power")
         if power:
-            pages.append((power + " (улучшения)", killer_ru))
-    item_pages = {
-        "Аптечки": "Аптечка (улучшения)",
-        "Фонарики": "Фонарик (улучшения)",
-        "Ящики с инструментами": "Ящик с инструментами (улучшения)",
-        "Карты": "Карта (улучшения)",
-        "Ключи": "Ключ (улучшения)",
-        "Предметы с туманом": "Флакон с туманом (улучшения)",
-    }
-    pages.extend((title, owner) for owner, title in item_pages.items())
-    def read_page(entry):
-        title, owner = entry
-        url = "https://dead-by-daylight.fandom.com/ru/wiki/" + quote(title.replace(" ", "_"), safe="()")
-        try:
-            soup = ru_wiki_soup(title)
-            if soup is None:
-                return {}
-            found = {}
-            for tr in soup.find_all("tr"):
-                cells = tr.find_all(["td", "th"], recursive=False)
-                if len(cells) < 2:
+            pages.append(power + " (улучшения)")
+    pages.extend(["Аптечка (улучшения)", "Фонарик (улучшения)", "Ящик с инструментами (улучшения)", "Карта (улучшения)", "Ключ (улучшения)", "Флакон с туманом (улучшения)"])
+    exported = fetch_ru_wiki_export(pages)
+    names, descriptions = {}, {}
+    for page_title, source in exported.items():
+        for table in re.findall(r"\{\|.*?\|\}", source, re.S):
+            rows = re.split(r"(?m)^\|-\s*$", table)
+            for row in rows:
+                cells = []
+                for line in row.splitlines():
+                    line = line.strip()
+                    if line.startswith("|") and not line.startswith("|}"):
+                        cells.extend(re.split(r"\s*\|\|\s*", line[1:].strip()))
+                if not cells:
                     continue
-                row = " ".join(clean(c) for c in cells)
-                match = re.search(r"\(англ\.\s*[\"«]?(.+?)[\"»]?\)", row, re.I)
+                combined = " ".join(cells)
+                match = re.search(r'\(англ\.\s*["«]?(.+?)["»]?\)', combined, re.I)
                 if not match:
                     continue
                 english = match.group(1).strip().strip('"«»')
-                description = clean(cells[-1])
-                if english and description:
-                    found[re.sub(r"[^a-z0-9]+", "", english.lower())] = description
-            print("RU add-on descriptions:", title, len(found))
-            return found
-        except Exception as exc:
-            print("RU add-on page unavailable:", title, repr(exc))
-            return {}
-    from concurrent.futures import ThreadPoolExecutor
-    descriptions = {}
-    probe = ru_wiki_soup("Бензопила (улучшения)")
-    if probe is not None:
-        with ThreadPoolExecutor(max_workers=8) as pool:
-            for part in pool.map(read_page, pages):
-                descriptions.update(part)
-    else:
-        print("Fandom RU add-on pages blocked; skipping individual pages.")
+                key = norm_en(english)
+                name_cell = next((c for c in cells if "англ." in c.lower()), "")
+                russian = clean_wikitext(re.sub(r"\(англ\..*", "", name_cell, flags=re.I)).strip()
+                if russian:
+                    names[key] = russian
+                candidates = [clean_wikitext(c) for c in cells if c != name_cell]
+                candidates = [c for c in candidates if len(c) > 12 and not re.search(r"\b(?:Common|Uncommon|Rare|Very Rare|Ultra Rare)\b", c, re.I)]
+                if candidates:
+                    descriptions[key] = max(candidates, key=len)
+    translated = described = 0
     for item in addons:
-        key = re.sub(r"[^a-z0-9]+", "", str(item.get("nameEn") or item.get("name") or "").lower())
+        english = str(item.get("nameEn") or item.get("name") or "")
+        key = norm_en(english)
+        if key in names:
+            item["name"] = names[key]
+            item["nameEn"] = english
+            item["displayName"] = f"{names[key]} ({english})"
+            translated += 1
         if key in descriptions:
             item["description"] = descriptions[key]
-    print("Russian add-on descriptions matched:", sum(1 for x in addons if x.get("description") and any(re.search(r"[А-Яа-яЁё]", x["description"]) for _ in [0])))
+            described += 1
+    print("Russian wiki add-on names:", translated, "/", len(addons))
+    print("Russian wiki add-on descriptions:", described, "/", len(addons))
     return addons
 
 def scrape_addons():
@@ -556,53 +609,37 @@ def article_english_name(soup):
     return match.group(1).strip().strip('"«»') if match else ""
 
 def scrape_ru_index_name_map(index_title):
-    """Resolve English catalog names through Russian wiki index/article titles."""
-    index_soup = ru_wiki_soup(index_title)
-    if index_soup is None:
-        print("Russian index unavailable:", index_title)
-        return {}
-    content = index_soup.find(id="mw-content-text") or index_soup
-    links, seen = [], set()
-    for a in content.find_all("a", href=True):
-        href = a["href"].split("#")[0]
-        title = clean(a)
-        if not href.startswith("/ru/wiki/") or href.startswith("/ru/wiki/Категория:") or not title or len(title) > 100:
-            continue
-        page_title = unquote(href.rsplit("/", 1)[-1].split("?", 1)[0]).replace("_", " ")
-        if page_title not in seen and title.lower() not in {"править", "история", "обсуждение"}:
-            seen.add(page_title)
-            links.append((page_title, title))
-    def read_article(entry):
-        page_title, russian_name = entry
-        soup = ru_wiki_soup(page_title)
-        if soup is None:
-            return None
-        english = article_english_name(soup)
-        if not english:
-            return None
-        return (re.sub(r"[^a-z0-9]+", "", english.lower()), (russian_name, english))
-    from concurrent.futures import ThreadPoolExecutor
+    """Export the Russian index and its linked offering articles in batches."""
+    index_pages = fetch_ru_wiki_export([index_title])
+    source = next(iter(index_pages.values()), "")
+    titles = [x for x in wiki_links(source) if len(x) < 100]
+    print("Russian index article links:", index_title, len(titles))
+    exported = fetch_ru_wiki_export(titles)
     result = {}
-    with ThreadPoolExecutor(max_workers=16) as pool:
-        for found in pool.map(read_article, links):
-            if found:
-                result[found[0]] = found[1]
+    for title, wikitext in exported.items():
+        english = article_english_name_wikitext(wikitext)
+        if english:
+            result[norm_en(english)] = (title, english, article_description_wikitext(wikitext))
     print("Russian index map:", index_title, len(result), "English aliases")
     return result
 
 def apply_ru_article_names(records, name_map):
-    translated = 0
+    translated = descriptions = 0
     for item in records:
         english = str(item.get("nameEn") or item.get("name") or "")
-        match = name_map.get(re.sub(r"[^a-z0-9]+", "", english.lower()))
+        match = name_map.get(norm_en(english))
         if match:
-            russian, english = match
+            russian, english, *extra = match
             item["nameEn"] = english
             item["name"] = russian
             item["displayName"] = f"{russian} ({english})"
             translated += 1
-    print("Russian article names matched:", translated, "/", len(records))
+            if extra and extra[0]:
+                item["description"] = extra[0]
+                descriptions += 1
+    print("Russian article names matched:", translated, "/", len(records), "; descriptions:", descriptions)
     return records
+
 
 REALM_RU = {
     "MacMillan Estate": "Поместье МакМиллан", "Autohaven Wreckers": "Свалка Автохевен",
@@ -619,62 +656,25 @@ REALM_RU = {
 }
 
 def scrape_ru_maps(records):
-    realm_links = {}
-    for item in records:
-        realm = str(item.get("realm") or "")
-        russian_realm = REALM_RU.get(realm)
-        if russian_realm:
-            realm_links.setdefault(russian_realm, set())
-    page_titles = set()
-    if realm_links and ru_wiki_soup("Поместье МакМиллан") is None:
-        print("Fandom RU map pages blocked; leaving English map descriptions.")
-        return records, {}
-    for realm in realm_links:
-        soup = ru_wiki_soup(realm)
-        if soup is None:
-            continue
-        content = soup.find(id="mw-content-text") or soup
-        for a in content.find_all("a", href=True):
-            href = a["href"].split("#")[0]
-            if href.startswith("/ru/wiki/") and not href.startswith("/ru/wiki/Категория:"):
-                title = unquote(href.rsplit("/", 1)[-1].split("?", 1)[0]).replace("_", " ")
-                if title != realm and len(title) < 100:
-                    page_titles.add(title)
-    def read_map(title):
-        soup = ru_wiki_soup(title)
-        if soup is None:
-            return None
-        english = article_english_name(soup)
-        if not english:
-            return None
-        return (re.sub(r"[^a-z0-9]+", "", english.lower()), (title, english))
-    from concurrent.futures import ThreadPoolExecutor
+    realm_titles = list(dict.fromkeys(REALM_RU.values()))
+    realm_export = fetch_ru_wiki_export(realm_titles)
+    map_titles = []
+    for source in realm_export.values():
+        for title in wiki_links(source):
+            if len(title) < 100 and title not in realm_titles and title not in map_titles:
+                map_titles.append(title)
+    print("Russian map article links:", len(map_titles))
+    map_export = fetch_ru_wiki_export(map_titles)
     name_map = {}
-    with ThreadPoolExecutor(max_workers=16) as pool:
-        for found in pool.map(read_map, sorted(page_titles)):
-            if found:
-                name_map[found[0]] = found[1]
+    for title, wikitext in map_export.items():
+        english = article_english_name_wikitext(wikitext)
+        if english:
+            name_map[norm_en(english)] = (title, english, article_description_wikitext(wikitext))
     return apply_ru_article_names(records, name_map), name_map
-
-
-
-def probe_ru_wiki_export():
-    """Check whether Fandom's bulk XML export is reachable through the proxy."""
-    try:
-        query = "action=query&export=1&exportnowrap=1&titles=" + quote("Адреналин") + "&format=xml"
-        target = "https://dead-by-daylight.fandom.com/api.php?" + query
-        response = requests.get("https://r.jina.ai/" + target, headers={**HEADERS, "X-Respond-With": "html"}, timeout=15)
-        response.raise_for_status()
-        print("Fandom bulk export probe:", response.status_code, len(response.text), response.text[:180].replace("\\n", " "))
-        return response.text
-    except Exception as exc:
-        print("Fandom bulk export unavailable:", repr(exc))
-        return ""
 
 
 def main():
     ru_maps = fetch_ru_maps()
-    probe_ru_wiki_export()
     perk_ru_map = scrape_perk_ru_map(ru_maps)
     offering_ru_map = scrape_ru_index_name_map("Подношения")
     result = {
@@ -692,9 +692,9 @@ def main():
         "characters": {**ru_maps.get("KILLER_EN_RU", {}), **ru_maps.get("SURVIVOR_EN_RU", {})},
         "items": {en: ru for ru, en in ru_maps.get("ITEM_RU_EN", {}).items()},
         "addons": {en: ru for variable in ("ADDON_RU_EN", "ITEM_ADDON_RU_EN") for group in ru_maps.get(variable, {}).values() for ru, en in group.items()},
-        "offerings": {en: ru for _, (ru, en) in offering_ru_map.items()},
+        "offerings": {en: ru for _, (ru, en, *_rest) in offering_ru_map.items()},
         "perksById": perk_ru_map,
-        "maps": {en: ru for ru, en in map_ru_map.values()},
+        "maps": {en: ru for ru, en, *_ in map_ru_map.values()},
     }
     try:
         addon_records = scrape_addons()
