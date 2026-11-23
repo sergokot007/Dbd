@@ -881,6 +881,7 @@ def fetch_external_ru_localization():
         "items": "items.json",
         "offerings": "offerings.json",
         "character_names": "character-translations.ru.json",
+        "character_icons": "characters.json",
         "loadout_names": "loadout-translations.ru.json",
         "loadout_descriptions": "loadout-description-ru-raw.json",
     }
@@ -902,9 +903,16 @@ def apply_external_ru_localization(records, kind, source):
     if kind == "characters":
         character_names = source.get("character_names", {})
         character_lookup = {norm_en(k): v for k, v in character_names.items() if k != "_comment"}
+        character_slug_lookup = {}
+        for english_name, icon_path in source.get("character_icons", {}).items():
+            slug = Path(str(icon_path)).stem
+            character_slug_lookup[norm_en(slug)] = english_name
+            character_slug_lookup[norm_en("the-" + slug)] = english_name
         translated = 0
         for item in records:
             english = str(item.get("nameEn") or item.get("name") or "")
+            record_slug = norm_en(item.get("id") or "")
+            english = character_slug_lookup.get(record_slug) or english
             lookup = re.sub(r"^The\\s+", "", english, flags=re.I)
             russian = character_names.get(english) or character_names.get(lookup) or character_lookup.get(norm_en(english)) or character_lookup.get(norm_en(lookup))
             if russian and russian != english:
