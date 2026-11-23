@@ -45,6 +45,76 @@ function render(){
  $('#grid').innerHTML=shown.map(x=>{const key=id(x),src=image(x),saved=favorites.some(f=>f.key===key);return '<article class="item"><div class="art">'+(src?'<img loading="lazy" src="'+esc(src)+'" alt="" onerror="this.remove()">':'<span class="placeholder">✣</span>')+'</div><div class="itembody"><div class="kind">'+esc(category(x)||cfg?.title||'DBD')+'</div><h3>'+esc(name(x))+'</h3><p>'+esc(desc(x)||'Информация об этой записи доступна в игровом справочнике.')+'</p><div class="cardbottom"><small>'+esc(x.realm||x.characterName||x.character||'DEAD BY DAYLIGHT')+'</small><button class="fav '+(saved?'saved':'')+'" data-fav="'+esc(key)+'">'+(saved?'♥':'♡')+'</button></div></div></article>'}).join('')||'<div class="empty">В этой части Тумана пока пусто.</div>';
 }
 function switchTab(t){tab=t;filter='Все';document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));$('#search').value='';load()}
-document.addEventListener('click',e=>{const t=e.target.closest('[data-tab]');if(t){switchTab(t.dataset.tab);return}const f=e.target.closest('[data-filter]');if(f){filter=f.dataset.filter;render();return}const b=e.target.closest('[data-fav]');if(b){const key=b.dataset.fav,item=(tab==='favorites'?favorites.map(x=>x.data):all).find(x=>id(x)===key);if(favorites.some(x=>x.key===key))favorites=favorites.filter(x=>x.key!==key);else if(item)favorites.push({key,data:item});updateFav();render()}});
+
+const DBD_MAP_LAYOUTS={"Azarov’s Resting Place":"Autohaven Wreckers/Azarov’s Resting Place.webp",
+"Blood Lodge":"Autohaven Wreckers/Blood Lodge.webp",
+"Gas Heaven":"Autohaven Wreckers/Gas Heaven.webp",
+"Wreckers' Yard":"Autohaven Wreckers/Wreckers' Yard.webp",
+"Wretched Shop":"Autohaven Wreckers/Wretched Shop.webp",
+"Grim Pantry":"Backwater Swamp/Grim Pantry.webp",
+"The Pale Rose":"Backwater Swamp/The Pale Rose.webp",
+"Fractured Cowshed":"Coldwind Farm/Fractured Cowshed.webp",
+"Rancid Abattoir":"Coldwind Farm/Rancid Abbatoir.webp",
+"Rotten Fields":"Coldwind Farm/Rotten Fields.webp",
+"The Thompson House":"Coldwind Farm/The Thompson House.webp",
+"Torment Creek":"Coldwind Farm/Torment Creek.webp",
+"Disturbed Ward":"Crotus Prenn Asylum/Disturbed Ward.webp",
+"Father Campbell's Chapel":"Crotus Prenn Asylum/Father Campbell's Chapel.webp",
+"Nostromo Wreckage":"Dvarka Deepwood/Nostromo Wreckage.webp",
+"Toba Landing":"Dvarka Deepwood/Toba Landing.webp",
+"Dead Sands":"Forsaken Boneyard/Dead Sands.webp",
+"Eyrie of Crows":"Forsaken Boneyard/Eyrie of Crows.webp",
+"The Game":"Gideon Meat Plant/The Game.webp",
+"Dead Dawg Saloon":"Grave of Glenvale/Dead Dawg Saloon.webp",
+"Lampkin Lane":"Haddonfield/Lampkin Lane.webp",
+"The Underground Complex":"Hawkins National Laboratory/The Underground Complex.webp",
+"Treatment Theatre":"Léry's Memorial Institute/Treatment Theatre.webp",
+"Mount Ormond Resort":"Ormond/Mount Ormond Resort.webp",
+"Ormond Lake Mine":"Ormond/Ormond Lake Mine.webp",
+"Raccoon City Police Station East Wing":"Raccoon City/Raccoon City Police Station East Wing.webp",
+"Raccoon City Police Station West Wing":"Raccoon City/Raccoon City Police Station West Wing.webp",
+"Mother's Dwelling":"Red Forest/Mother's Dwelling.webp",
+"Temple of Purgation":"Red Forest/Temple of Purgation.webp",
+"Midwich Elementary School":"Silent Hill/Midwich Elementary School.webp",
+"Trickster's Delusion":"Sleepless District/Tricksters Delusion.webp",
+"Badham Preschool":"Springwood/Badham Preschool.webp",
+"Forgotten Ruins":"The Decimated Borgo/Forgotten Ruins.webp",
+"The Shattered Square":"The Decimated Borgo/The Shattered Square.webp",
+"Coal Tower":"The MacMillan Estate/Coal Tower.webp",
+"Groaning Storehouse":"The MacMillan Estate/Groaning Storehouse.webp",
+"Ironworks of Misery":"The MacMillan Estate/Ironworks Of Misery.webp",
+"Shelter Woods":"The MacMillan Estate/Shelter Woods.webp",
+"Suffocation Pit":"The MacMillan Estate/Suffocation Pit.webp",
+"Fallen Refuge":"Withered Isle/Fallen Refuge.webp",
+"Freddy Fazbear's Pizza":"Withered Isle/Freddy Fazbear's Pizza.webp",
+"Garden of Joy":"Withered Isle/Garden of Joy.webp",
+"Greenville Square":"Withered Isle/Greenville Square.webp",
+"Family Residence":"Yamaoka Estate/Family Residence.webp",
+"Sanctum of Wrath":"Yamaoka Estate/Sanctum of Wrath.webp"};
+function mapKey(v){return String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]/g,"")}
+function mapLayoutPath(label){
+ const n=mapKey(label);
+ const aliases=[
+  ["raccooncitypolicestationeast","Raccoon City Police Station East Wing"],["raccooncitypolicestationwest","Raccoon City Police Station West Wing"],
+  ["rancid","Rancid Abattoir"],["templeofpurgation","Temple of Purgation"],["ironworksofmisery","Ironworks of Misery"],
+  ["trickstersdelusion","Trickster's Delusion"],["badham","Badham Preschool"],["midwich","Midwich Elementary School"],
+  ["thegame","The Game"],["forgottenruins","Forgotten Ruins"],["shatteredsquare","The Shattered Square"]
+ ];
+ for(const [part,key] of aliases)if(n.includes(part))return DBD_MAP_LAYOUTS[key];
+ for(const key of Object.keys(DBD_MAP_LAYOUTS))if(mapKey(key)===n||n.includes(mapKey(key)))return DBD_MAP_LAYOUTS[key];
+ return "";
+}
+function mapAssetUrl(path){return "https://raw.githubusercontent.com/LucaFontanot/dbd-map-overlay/master/maps/Hens333/"+path.split("/").map(encodeURIComponent).join("/")}
+function openMapTactics(map){
+ const label=name(map),path=mapLayoutPath(label),src=path?mapAssetUrl(path):image(map);
+ let modal=document.getElementById("mapTacticsModal");
+ if(!modal){modal=document.createElement("div");modal.id="mapTacticsModal";modal.className="detail-overlay";document.body.appendChild(modal)}
+ modal.innerHTML='<section class="detail-panel map-tactics-panel"><button class="detail-close" aria-label="Закрыть">×</button><div class="eyebrow">CHASE ROUTE GUIDE</div><h2>'+esc(label)+'</h2><p class="map-tactics-intro">Схема безопасного перемещения между петлями. Красная линия — рекомендуемый путь, значки отмечают типичные зоны окон и паллет.</p><div class="map-route-controls"><button class="active" data-route="safe">Безопасная петля</button><button data-route="chain">Переход между петлями</button><button data-route="reset">Сброс погони</button></div><div class="map-stage">'+(src?'<img class="map-layout-image" src="'+esc(src)+'" alt="План карты '+esc(label)+'" onerror="this.closest(\'.map-stage\').classList.add(\'map-image-missing\')">':'<div class="map-image-fallback">План этой карты пока не найден в библиотеке схем</div>')+'<svg class="map-route-overlay" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-label="Маршрут и возможные окна с паллетами"><defs><filter id="routeGlow"><feGaussianBlur stdDeviation="7" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter><marker id="routeArrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6" fill="#ff4c55"/></marker></defs><path class="route-line route-safe" d="M500 855 C420 820 345 770 300 690 S245 560 315 485 S455 390 555 430 S720 520 760 420 S720 260 600 220" marker-end="url(#routeArrow)"/><path class="route-line route-chain" d="M500 855 C580 790 680 735 735 650 S790 520 700 455 S555 365 460 300 S330 230 250 145" marker-end="url(#routeArrow)"/><path class="route-line route-reset" d="M500 855 C390 800 275 730 205 625 S180 455 275 370 S470 280 600 310 S785 390 830 270" marker-end="url(#routeArrow)"/><g class="route-markers"><g class="map-marker pallet" transform="translate(300 690)"><circle r="20"/><path d="M-11 -10V10M0 -10V10M11 -10V10M-14 -5H14M-14 5H14"/><text y="34">P</text></g><g class="map-marker window" transform="translate(315 485)"><circle r="19"/><path d="M-11 -11H11V11H-11ZM0 -11V11M-11 0H11"/><text y="33">О</text></g><g class="map-marker pallet" transform="translate(555 430)"><circle r="20"/><path d="M-11 -10V10M0 -10V10M11 -10V10M-14 -5H14M-14 5H14"/><text y="34">P</text></g><g class="map-marker window" transform="translate(760 420)"><circle r="19"/><path d="M-11 -11H11V11H-11ZM0 -11V11M-11 0H11"/><text y="33">О</text></g><g class="map-marker pallet" transform="translate(735 650)"><circle r="20"/><path d="M-11 -10V10M0 -10V10M11 -10V10M-14 -5H14M-14 5H14"/><text y="34">P</text></g><g class="map-marker window" transform="translate(600 220)"><circle r="19"/><path d="M-11 -11H11V11H-11ZM0 -11V11M-11 0H11"/><text y="33">О</text></g></g></svg></div><div class="map-legend"><span><i class="legend-pallet">P</i> Возможная паллета</span><span><i class="legend-window">О</i> Возможное окно</span><span><i class="legend-route"></i> Маршрут отхода</span></div><p class="map-warning">Важно: точки и маршрут ориентировочные, а не точная раскладка спавнов матча. Окна и паллеты могут появляться в других тайлах, часть паллет может отсутствовать или быть уже использована. Используй ближайшую безопасную петлю, не пытайся любой ценой добежать до отмеченной точки.</p><div class="map-art-credit">Схема карты: Hens333 / проект <a href="https://github.com/LucaFontanot/dbd-map-overlay" target="_blank" rel="noopener">DBD Map Overlay</a> · <a href="https://discord.gg/hens333" target="_blank" rel="noopener">автор карт</a></div></section>';
+ modal.classList.add("open");document.body.classList.add("modal-open");
+ modal.querySelectorAll("[data-route]").forEach(b=>b.addEventListener("click",()=>{modal.querySelectorAll("[data-route]").forEach(x=>x.classList.toggle("active",x===b));modal.querySelector(".map-route-overlay").dataset.route=b.dataset.route;}));
+ modal.querySelector(".map-route-overlay").dataset.route="safe";
+}
+
+document.addEventListener('click',e=>{const mapCard=e.target.closest('#grid .item');if(tab==='maps'&&mapCard&&!e.target.closest('[data-fav]')){openMapTactics(all.find(x=>name(x)===mapCard.querySelector('h3')?.textContent)||{name:mapCard.querySelector('h3')?.textContent});return}if(e.target.closest('#mapTacticsModal .detail-close')||e.target.id==='mapTacticsModal'){const m=document.getElementById('mapTacticsModal');if(m)m.classList.remove('open');document.body.classList.remove('modal-open');return}const routeBtn=e.target.closest('[data-route]');if(routeBtn&&e.target.closest('#mapTacticsModal'))return;const t=e.target.closest('[data-tab]');if(t){switchTab(t.dataset.tab);return}const f=e.target.closest('[data-filter]');if(f){filter=f.dataset.filter;render();return}const b=e.target.closest('[data-fav]');if(b){const key=b.dataset.fav,item=(tab==='favorites'?favorites.map(x=>x.data):all).find(x=>id(x)===key);if(favorites.some(x=>x.key===key))favorites=favorites.filter(x=>x.key!==key);else if(item)favorites.push({key,data:item});updateFav();render()}});
 $('#search').addEventListener('input',render);$('#refresh').addEventListener('click',load);updateFav();load();
 if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
