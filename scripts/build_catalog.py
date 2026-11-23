@@ -41,7 +41,8 @@ def img_for(node):
     return ""
 
 def page(path):
-    response = requests.get(BASE + path, headers=HEADERS, timeout=40)
+    target = path if str(path).startswith(("https://", "http://")) else BASE + path
+    response = requests.get(target, headers=HEADERS, timeout=40)
     response.raise_for_status()
     return BeautifulSoup(response.text, "html.parser")
 
@@ -577,6 +578,60 @@ def scrape_perk_ru_map(maps):
     return result
 
 
+
+
+
+def fill_missing_perk_images(records):
+    """Resolve missing perk icons from each perk's own page metadata and artwork."""
+    missing = [item for item in records if not item.get("image") and item.get("source")]
+    if not missing:
+        print("Perk icon coverage:", len(records), "/", len(records))
+        return records
+
+    def extract(item):
+        try:
+            soup = page(item["source"])
+            for key in ("og:image", "twitter:image", "og:image:secure_url"):
+                meta = soup.find("meta", attrs={"property": key}) or soup.find("meta", attrs={"name": key})
+                if meta and meta.get("content"):
+                    image = urljoin(item["source"], meta["content"])
+                    if image.startswith("https://"):
+                        return item["id"], image
+            candidates = []
+            for img in soup.find_all("img"):
+                alt = str(img.get("alt") or "").lower()
+                src = img_for(img)
+                if not src or not src.startswith("https://"):
+                    continue
+                score = 0
+                if item.get("id", "").replace("-", " ") in alt:
+                    score += 5
+                if any(token in src.lower() for token in ("/perk", "perk_", "perk-", "icon")):
+                    score += 2
+                if "logo" in src.lower() or "avatar" in src.lower():
+                    score -= 5
+                candidates.append((score, src))
+            if candidates:
+                candidates.sort(reverse=True)
+                if candidates[0][0] > 0:
+                    return item["id"], candidates[0][1]
+        except Exception as exc:
+            print("Perk image page unavailable:", item.get("id"), repr(exc))
+        return item.get("id"), ""
+
+    from concurrent.futures import ThreadPoolExecutor
+    resolved = 0
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        for perk_id, image in pool.map(extract, missing):
+            if image:
+                for item in records:
+                    if item.get("id") == perk_id:
+                        item["image"] = image
+                        resolved += 1
+                        break
+    print("Perk icon coverage:", sum(bool(x.get("image")) for x in records), "/", len(records),
+          "(resolved from detail pages:", resolved, ")")
+    return records
 
 
 def scrape_perk_owner_map():
@@ -1133,7 +1188,7 @@ def main():
     result = {
         "generatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "source": BASE,
-        "perks": apply_external_ru_localization(scrape_ru_perk_descriptions(apply_perk_ru_names(scrape_link_catalog("/perks/", "perks"), perk_ru_map), ru_maps), "perks", external_ru),
+        "perks": apply_external_ru_localization(scrape_ru_perk_descriptions(fill_missing_perk_images(apply_perk_ru_names(scrape_link_catalog("/perks/", "perks"), perk_ru_map)), ru_maps), "perks", external_ru),
         "offerings": apply_external_ru_localization(apply_ru_article_names(scrape_offerings(), offering_ru_map), "offerings", external_ru),
         "maps": scrape_maps(),
         "addons": [],
