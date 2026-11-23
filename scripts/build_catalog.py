@@ -252,7 +252,7 @@ def ru_wiki_soup(title):
     encoded = quote(title.replace(" ", "_"), safe="()")
     direct = "https://dead-by-daylight.fandom.com/ru/wiki/" + encoded
     try:
-        response = requests.get(direct, headers=HEADERS, timeout=12)
+        response = requests.get(direct, headers=HEADERS, timeout=6)
         if response.status_code == 200 and "mw-parser-output" in response.text:
             return BeautifulSoup(response.text, "html.parser")
     except Exception:
@@ -386,10 +386,14 @@ def scrape_ru_perk_descriptions(records, ru_maps):
             return (item.get("id"), "")
     from concurrent.futures import ThreadPoolExecutor
     by_id = {}
-    with ThreadPoolExecutor(max_workers=16) as pool:
-        for perk_id, description in pool.map(read_one, records):
-            if perk_id and description:
-                by_id[perk_id] = description
+    probe = ru_wiki_soup("Адреналин")
+    if probe is not None:
+        with ThreadPoolExecutor(max_workers=16) as pool:
+            for perk_id, description in pool.map(read_one, records):
+                if perk_id and description:
+                    by_id[perk_id] = description
+    else:
+        print("Fandom RU wiki blocked; skipping individual perk pages and using catalog fallback.")
     for item in records:
         if by_id.get(item.get("id")):
             item["description"] = by_id[item["id"]]
@@ -476,9 +480,13 @@ def scrape_ru_addon_descriptions(addons, maps):
             return {}
     from concurrent.futures import ThreadPoolExecutor
     descriptions = {}
-    with ThreadPoolExecutor(max_workers=8) as pool:
-        for part in pool.map(read_page, pages):
-            descriptions.update(part)
+    probe = ru_wiki_soup("Бензопила (улучшения)")
+    if probe is not None:
+        with ThreadPoolExecutor(max_workers=8) as pool:
+            for part in pool.map(read_page, pages):
+                descriptions.update(part)
+    else:
+        print("Fandom RU add-on pages blocked; skipping individual pages.")
     for item in addons:
         key = re.sub(r"[^a-z0-9]+", "", str(item.get("nameEn") or item.get("name") or "").lower())
         if key in descriptions:
@@ -597,6 +605,9 @@ def scrape_ru_maps(records):
         if russian_realm:
             realm_links.setdefault(russian_realm, set())
     page_titles = set()
+    if realm_links and ru_wiki_soup("Поместье МакМиллан") is None:
+        print("Fandom RU map pages blocked; leaving English map descriptions.")
+        return records, {}
     for realm in realm_links:
         soup = ru_wiki_soup(realm)
         if soup is None:
