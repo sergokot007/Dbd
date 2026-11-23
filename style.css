@@ -196,3 +196,13 @@
 /* Tier list cards open the same full dossier as the character catalog. */
 .tier-character-link{border:0;background:transparent;color:inherit;font:inherit;font-weight:700;text-align:left;padding:0;cursor:pointer;text-decoration:underline;text-decoration-color:#8e555a;text-underline-offset:3px}
 .tier-character-link:hover{color:#f0a0a4}
+
+/* Character-owned perk artwork in the character dossier */
+.character-perk-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+.character-perk-card{min-width:0;display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 6px;background:#211d23;border:1px solid #59404a;border-radius:4px;color:#f0dfe0;font:inherit;text-align:center}
+.character-perk-card img,.character-perk-card .build-perk-placeholder{width:64px;height:64px;object-fit:contain;border-radius:4px;background:#17171d}
+.character-perk-card span:last-child{font-size:11px;line-height:1.35}
+.perk-chip .build-perk-icon{width:58px;height:58px;flex:0 0 58px;object-fit:contain}
+.perk-chip{display:inline-flex;align-items:center;gap:10px;min-height:76px}
+.perk-chip .build-perk-name{font-size:13px}
+@media(max-width:420px){.character-perk-grid{gap:6px}.character-perk-card img,.character-perk-card .build-perk-placeholder{width:54px;height:54px}.perk-chip .build-perk-icon{width:50px;height:50px;flex-basis:50px}}
