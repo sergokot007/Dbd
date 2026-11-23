@@ -274,7 +274,7 @@ def scrape_ru_addon_descriptions(addons, maps):
                 if len(cells) < 2:
                     continue
                 row = " ".join(clean(c) for c in cells)
-                match = re.search(r"\\(англ\\.\\s*[\"«]?(.+?)[\"»]?\\)", row, re.I)
+                match = re.search(r"\(англ\.\s*[\"«]?(.+?)[\"»]?\)", row, re.I)
                 if not match:
                     continue
                 english = match.group(1).strip().strip('"«»')
