@@ -192,3 +192,7 @@
 .build-perk-icon{display:flex;align-items:center;justify-content:center;overflow:hidden;object-fit:contain}
 .build-perk-icon img{display:block;width:100%;height:100%;object-fit:contain;border-radius:2px}
 .build-perk-placeholder{font-size:20px}
+
+/* Tier list cards open the same full dossier as the character catalog. */
+.tier-character-link{border:0;background:transparent;color:inherit;font:inherit;font-weight:700;text-align:left;padding:0;cursor:pointer;text-decoration:underline;text-decoration-color:#8e555a;text-underline-offset:3px}
+.tier-character-link:hover{color:#f0a0a4}
