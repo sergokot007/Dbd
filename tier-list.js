@@ -43,7 +43,11 @@ killers:[
 ]};
 const DBD_TIER_ORDER=["S","A","B","C","D","E"];
 const DBD_TIER_LABELS={S:"Очень выгодная покупка",A:"Сильная покупка",B:"Хорошая / ситуативная",C:"Средняя ценность",D:"Низкий приоритет",E:"Почти не стоит ради перков"};
-let dbdTierSide="survivors",dbdTierFilter="Все";
+let dbdTierSide="survivors",dbdTierFilter="Все",tierCatalogPromise=null;
+function loadTierList(){
+ renderTierList();
+ if(!tierCatalogPromise)tierCatalogPromise=localCatalog().then(c=>{allPerks=arr(c.perks);renderTierList();}).catch(()=>{});
+}
 function tierNorm(v){return String(v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]/g,"")}
 function tierFindCharacter(en){return (Array.isArray(all)?all:[]).find(x=>tierNorm(x.nameEn||x.name||x.displayName||x.display_name||x.title)===tierNorm(en))}
 function tierFindPerk(en){return (Array.isArray(allPerks)?allPerks:[]).find(x=>tierNorm(x.nameEn||x.name||x.displayName||x.title)===tierNorm(en))}
@@ -52,7 +56,7 @@ function renderTierList(){
  const visible=side.filter(x=>(dbdTierFilter==="Все"||x.tier===dbdTierFilter)&&(!query||norm(x.en+" "+x.reason+" "+x.perks.join(" ")).includes(query)));
  $("#sectionTitle").textContent="Тир-лист персонажей";$("#sectionLabel").textContent="CHARACTER VALUE / PATCH 10.2.2B";
  $("#filters").innerHTML='<div class="tier-side-tabs"><button data-tier-side="survivors" class="'+(dbdTierSide==="survivors"?"active":"")+'">Выжившие</button><button data-tier-side="killers" class="'+(dbdTierSide==="killers"?"active":"")+'">Убийцы</button></div><div class="tier-rank-filters">'+["Все",...DBD_TIER_ORDER].map(t=>'<button data-tier-rank="'+t+'" class="'+(dbdTierFilter===t?"active":"")+'">'+(t==="Все"?"Все ранги":t)+'</button>').join("")+'</div>';
- $("#notice").textContent="Оценка ценности покупки по силе персонажа и пользе его уникальных перков • "+visible.length+" рекомендаций";
+ $("#notice").textContent="Основные покупки • выжившие оцениваются по перкам (базовые характеристики одинаковы), убийцы — по силе и перкам. E означает низкий приоритет покупки ради навыков, а не бесполезность персонажа. • "+visible.length+" рекомендаций";
  $("#grid").classList.add("tier-grid");
  $("#grid").innerHTML=visible.map(x=>{
   const ch=tierFindCharacter(x.en),portrait=ch?image(ch):"",ruName=ch?(ch.displayName||ch.name||x.en):x.en;
