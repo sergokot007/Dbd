@@ -126,3 +126,5 @@
 .tier-perks{display:flex;gap:6px;flex-wrap:wrap}
 .tier-perk{font-size:10px;line-height:1.35;color:#eee0e0;background:#30242a;border:1px solid #574048;padding:6px 8px;border-radius:3px}
 @media(max-width:600px){.tier-grid{grid-template-columns:1fr}.tier-card{padding:12px}.tier-title h3{font-size:18px}}
+
+.catalog-perk-link,.build-perk-link{border:0;background:transparent;color:inherit;font:inherit;text-align:left;padding:0;cursor:pointer;text-decoration:underline;text-decoration-color:#8e555a;text-underline-offset:3px}.catalog-perk-link:hover,.build-perk-link:hover{color:#f0a0a4}.build-perk-link{font-weight:700}
