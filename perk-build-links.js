@@ -9,7 +9,8 @@
     const modal = document.getElementById("loadoutInfoModal");
     const panel = modal && modal.querySelector(".info-panel");
     if(!panel) return;
-    const catalogPerk = (Array.isArray(window.allPerks) ? window.allPerks : []).find(p =>
+    const perkList = typeof allPerks !== "undefined" && Array.isArray(allPerks) ? allPerks : [];
+    const catalogPerk = perkList.find(p =>
       [p.name,p.displayName,p.display_name,p.nameEn,p.englishName,p.id].some(v=>key(v)===key(label))
     );
     const names = [label,catalogPerk && catalogPerk.name,catalogPerk && catalogPerk.nameEn,catalogPerk && catalogPerk.englishName].filter(Boolean).map(key);
@@ -18,9 +19,9 @@
     const add = (list,role) => (list || []).forEach(build=>{
       if(includes(build.perks || [])) rows.push({title:build.title,role:role,goal:build.goal || build.desc || ""});
     });
-    add(window.survivorBuilds,"Выживший");
-    add(window.killerBuilds,"Убийца");
-    add(window.UNIVERSAL_BUILDS,"Универсальный билд");
+    if(typeof survivorBuilds !== "undefined") add(survivorBuilds,"Выживший");
+    if(typeof killerBuilds !== "undefined") add(killerBuilds,"Убийца");
+    if(typeof UNIVERSAL_BUILDS !== "undefined") add(UNIVERSAL_BUILDS,"Универсальный билд");
     const section = document.createElement("section");
     section.className = "perk-build-usage";
     section.innerHTML = '<div class="eyebrow">BUILD SYNERGY</div><h3>Билды с этим перком</h3>' +
