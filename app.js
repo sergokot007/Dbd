@@ -1,4 +1,4 @@
-const API='https://dbd.tricky.lol/api';
+const API='https://dbd-stats.info/api';
 const SOURCE='https://dbd.source.gs/api';
 const TYPES={
 characters:{title:'Персонажи',label:'THE ROSTER',endpoint:'characters',source:SOURCE+'/characters/'},
@@ -12,10 +12,10 @@ let tab='characters',all=[],filter='Все',favorites=[];
 try{favorites=JSON.parse(localStorage.getItem('dbd-favorites')||'[]')}catch{}
 const $=s=>document.querySelector(s);
 const norm=x=>String(x??'').toLowerCase();
-function arr(d){if(Array.isArray(d))return d;for(const k of ['data','results','items','characters','perks','maps','realms','killers','survivors','offerings','addons','itemAddons','item_addons','killerAddons','killer_addons','survivorAddons','survivor_addons','entries','list'])if(Array.isArray(d?.[k]))return d[k];return []}
+function arr(d){if(Array.isArray(d))return d;for(const k of ['data','results','items','characters','perks','maps','realms','killers','survivors','offerings','addons','itemAddons','item_addons','killerAddons','killer_addons','survivorAddons','survivor_addons','entries','list'])if(Array.isArray(d?.[k]))return d[k];if(d&&typeof d==='object'){const nested=Object.values(d).find(v=>Array.isArray(v));if(nested)return nested}return []}
 function name(x){return x.name||x.displayName||x.display_name||x.title||x.killerName||x.id||'Без названия'}
 function desc(x){return x.description||x.desc||x.effect||x.power||x.contentText||x.content||''}
-function image(x){return x.image||x.imageUrl||x.image_url||x.icon||x.iconUrl||x.icon_url||x.iconURL||x.portrait||x.portraitURL||''}
+function image(x){return x.image||x.imageUrl||x.image_url||x.icon||x.iconUrl||x.icon_url||x.iconURL||x.perkIcon||x.perk_icon||x.iconPath||x.icon_path||x.portrait||x.portraitURL||''}
 function category(x){return x.role||x.type||x.category||x.realm||x.faction||x.characterName||x.character||''}
 function cosmetic(x){const v=norm([x.type,x.category,x.subcategory,x.kind,x.itemType,x.item_type,x.tags,x.name,x.displayName].join(' '));return /outfit|cosmetic|skin|wardrobe|charm|badge|banner|portrait|headwear|torso|legwear|customization|store outfit/.test(v)}
 function usableGear(x){return !cosmetic(x)&&!x.isCosmetic&&!x.is_cosmetic&&!x.cosmetic}
@@ -26,7 +26,7 @@ async function getData(url){const r=await fetch(url,{cache:'no-store',credential
 async function load(){
  if(tab==='favorites'){render();return}
  $('#notice').textContent='Ищем записи в Тумане…';$('#grid').innerHTML='';
- const cfg=TYPES[tab],sources=[...(cfg.source?(Array.isArray(cfg.source)?cfg.source:[cfg.source]):[]),...(tab==='addons'?[SOURCE+'/addons/']:[]),API+'/'+cfg.endpoint,API+'/'+cfg.endpoint+'?branch=live'];let lastError;
+ const cfg=TYPES[tab],sources=[...(cfg.source?(Array.isArray(cfg.source)?cfg.source:[cfg.source]):[]),...(tab==='addons'?[SOURCE+'/addons/']:[]),API+'/'+cfg.endpoint+'?branch=live',API+'/'+cfg.endpoint,API+'/'+cfg.endpoint+'/'];let lastError;
  for(const url of sources){try{
   let data=arr(await getData(url));if(['items','addons','offerings'].includes(tab))data=data.filter(usableGear);if(!data.length)throw Error('Источник вернул пустой список');
   all=data;$('#connection').textContent=url.startsWith(SOURCE)?'Резервная база подключена':'База подключена';$('#connection').classList.add('ok');render();return;
