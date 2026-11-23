@@ -61,7 +61,7 @@ function buildPerkIsPaid(p) {
  const owner=buildPerkOwner(p).toLowerCase();
  return !!(p.isLicensed||p.is_licensed||p.licensed||p.dlc||p.isDlc||p.is_dlc||LICENSED_PERK_OWNERS.some(n=>owner.includes(n.toLowerCase()))||LICENSED_PERK_NAMES.some(n=>norm(name(p))===norm(n)));
 }
-async function loadBuilds(){try{const catalog=await localCatalog();allPerks=arr(catalog.perks);renderBuilds()}catch(e){allPerks=[];renderBuilds();$('#notice').textContent='Каталог перков недоступен — названия сборок всё равно доступны, иконки появятся после загрузки базы.'}}
+async function loadBuilds(){try{const catalog=await localCatalog();allPerks=arr(catalog.perks).map(p=>{const en=p.nameEn||p.name;const ru=p.name||en;return {...p,nameEn:en,displayName:p.displayName||ru+' ('+en+')'}});renderBuilds()}catch(e){allPerks=[];renderBuilds();$('#notice').textContent='Каталог перков недоступен — названия сборок всё равно доступны, иконки появятся после загрузки базы.'}}
 function renderBuilds() {
  const q=norm($('#search').value.trim());
  const groups=UNIVERSAL_BUILDS.filter(b=>norm(b.title+' '+b.tag+' '+b.desc+' '+b.perks.join(' ')).includes(q));
