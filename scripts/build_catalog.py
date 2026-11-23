@@ -227,7 +227,8 @@ def main():
         "source": BASE,
         "perks": scrape_link_catalog("/perks/", "perks"),
         "offerings": scrape_offerings(),
-        "maps": scrape_maps(),\n        "addons": scrape_addons(),
+        "maps": scrape_maps(),
+        "addons": scrape_addons(),
     }
     counts = {k: len(result[k]) for k in ("perks", "offerings", "maps")}
     print("Catalog extraction counts:", json.dumps(counts, ensure_ascii=False))
