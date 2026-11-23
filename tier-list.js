@@ -64,7 +64,7 @@ function renderTierList(){
  $("#grid").classList.add("tier-grid");
  $("#grid").innerHTML=visible.map(x=>{
   const ch=tierFindCharacter(x.en),portrait=ch?image(ch):"",ruName=(DBD_TIER_RU_NAMES[x.en]||ch?.name||x.en)+" ("+x.en+")";
-  const perks=x.perks.map(p=>{const found=tierFindPerk(p);return '<span class="tier-perk">'+esc(found?name(found):p)+'</span>'}).join("");
+  const perks=x.perks.map(p=>{const found=tierFindPerk(p);return '<button type="button" class="tier-perk" data-loadout-type="perk" data-loadout-name="'+esc(found?(found.nameEn||found.englishName||name(found)):p)+'">'+esc(found?name(found):p)+'</button>'}).join("");
   return '<article class="tier-card tier-'+x.tier.toLowerCase()+'"><div class="tier-card-top"><span class="tier-grade">'+x.tier+'</span>'+(portrait?'<img src="'+esc(portrait)+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">':'<span class="tier-portrait-fallback">✣</span>')+'<div class="tier-title"><h3>'+esc(ruName)+'</h3><small>'+esc(x.en)+'</small><span>'+esc(DBD_TIER_LABELS[x.tier])+'</span></div></div><p class="tier-reason">'+esc(x.reason)+'</p><div class="tier-perks-label">УНИКАЛЬНЫЕ ПЕРКИ</div><div class="tier-perks">'+perks+'</div></article>';
  }).join("")||'<div class="empty">По запросу персонажи не найдены.</div>';
 }
