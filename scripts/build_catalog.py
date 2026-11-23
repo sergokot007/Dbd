@@ -77,7 +77,7 @@ def scrape_maps():
         card = ancestor_card(h)
         text = clean(card)
         hooks = re.search(r"(\d+\s+to\s+\d+\s+hooks?)", text, re.I)
-        if not hooks:
+        if h.name != "h3" or not hooks:
             continue
         # Realm is the closest preceding section heading.
         realm = ""
