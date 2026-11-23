@@ -48,17 +48,46 @@ const DBD_TIER_RU_NAMES={
 const DBD_TIER_ORDER=["S","A","B","C","D","E"];
 const DBD_TIER_LABELS={S:"Очень выгодная покупка",A:"Сильная покупка",B:"Хорошая / ситуативная",C:"Средняя ценность",D:"Низкий приоритет",E:"Почти не стоит ради перков"};
 let dbdTierSide="survivors",dbdTierFilter="Все",tierCatalogPromise=null;
+function tierCharacterSide(ch){
+ const hints=[ch.role,ch.type,ch.category,ch.faction,ch.side,ch.characterType,ch.character_type,ch.group,ch.class].filter(Boolean).join(" ").toLowerCase();
+ if(ch.isKiller===true||ch.is_killer===true||/killer|убийц/.test(hints))return "killers";
+ if(ch.isSurvivor===true||ch.is_survivor===true||/survivor|выживш/.test(hints))return "survivors";
+ const power=[ch.power,ch.powerName,ch.power_name,ch.killerPower].filter(Boolean).join(" ");
+ return power?"killers":"survivors";
+}
+function tierEnsureCompleteRoster(){
+ const roster=Array.isArray(all)?all:[];
+ for(const ch of roster){
+  const en=String(ch.nameEn||ch.englishName||ch.name_en||ch.english_name||ch.name||ch.displayName||ch.title||"").trim();
+  if(!en)continue;
+  const side=tierCharacterSide(ch),list=DBD_TIER_DATA[side];
+  if(list.some(x=>tierNorm(x.en)===tierNorm(en)))continue;
+  const owned=(Array.isArray(allPerks)?allPerks:[]).filter(p=>{
+   const owner=String(p.characterName||p.character_name||p.character||p.owner||p.survivor||p.killer||"");
+   return owner&&tierNorm(owner)===tierNorm(en);
+  }).slice(0,3).map(p=>p.nameEn||p.englishName||p.name_en||p.name||p.displayName).filter(Boolean);
+  list.push({
+   en,tier:"C",perks:owned,
+   reason:"Персонаж добавлен из полного игрового каталога. Это предварительная оценка: место в тир-листе ещё требует отдельной проверки силы персонажа, актуальности его перков и ценности покупки. Не считай эту позицию окончательной рекомендацией."
+  });
+ }
+}
 function loadTierList(){
  renderTierList();
- if(!tierCatalogPromise)tierCatalogPromise=localCatalog().then(c=>{allPerks=arr(c.perks);renderTierList();}).catch(()=>{});
+ if(!tierCatalogPromise)tierCatalogPromise=localCatalog().then(c=>{
+  allPerks=arr(c.perks);
+  all=arr(c.characters);
+  tierEnsureCompleteRoster();
+  renderTierList();
+ }).catch(()=>{});
 }
 function tierNorm(v){return String(v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]/g,"")}
 function tierFindCharacter(en){return (Array.isArray(all)?all:[]).find(x=>tierNorm(x.nameEn||x.name||x.displayName||x.display_name||x.title)===tierNorm(en))}
 function tierFindPerk(en){return (Array.isArray(allPerks)?allPerks:[]).find(x=>tierNorm(x.nameEn||x.name||x.displayName||x.title)===tierNorm(en))}
 function renderTierList(){
- const query=norm($("#search").value.trim()),side=DBD_TIER_DATA[dbdTierSide];
+ tierEnsureCompleteRoster();\n const query=norm($("#search").value.trim()),side=DBD_TIER_DATA[dbdTierSide];
  const visible=side.filter(x=>{const ch=tierFindCharacter(x.en);return (dbdTierFilter==="Все"||x.tier===dbdTierFilter)&&(!query||norm(x.en+" "+(ch?.displayName||ch?.name||"")+" "+x.reason+" "+x.perks.join(" ")).includes(query));});
- $("#sectionTitle").textContent="Тир-лист персонажей";$("#sectionLabel").textContent="CHARACTER VALUE / PATCH 10.2.2B";
+ $("#sectionTitle").textContent="Тир-лист персонажей";$("#sectionLabel").textContent="ПОЛНЫЙ СОСТАВ • ПРЕДВАРИТЕЛЬНЫЕ ОЦЕНКИ ДЛЯ НОВЫХ ПЕРСОНАЖЕЙ";
  $("#filters").innerHTML='<div class="tier-side-tabs"><button data-tier-side="survivors" class="'+(dbdTierSide==="survivors"?"active":"")+'">Выжившие</button><button data-tier-side="killers" class="'+(dbdTierSide==="killers"?"active":"")+'">Убийцы</button></div><div class="tier-rank-filters">'+["Все",...DBD_TIER_ORDER].map(t=>'<button data-tier-rank="'+t+'" class="'+(dbdTierFilter===t?"active":"")+'">'+(t==="Все"?"Все ранги":t)+'</button>').join("")+'</div>';
  $("#notice").textContent="Основные покупки • выжившие оцениваются по перкам (базовые характеристики одинаковы), убийцы — по силе и перкам. E означает низкий приоритет покупки ради навыков, а не бесполезность персонажа. • "+visible.length+" рекомендаций";
  $("#grid").classList.add("tier-grid");
