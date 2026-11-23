@@ -697,12 +697,12 @@ def apply_ru_article_names(records, name_map):
 
 
 REALM_RU = {
-    "MacMillan Estate": "Поместье МакМиллан", "Autohaven Wreckers": "Свалка Автохевен",
+    "MacMillan Estate": "Поместье МакМиллан", "The MacMillan Estate": "Поместье МакМиллан", "Autohaven Wreckers": "Свалка Автохевен",
     "Coldwind Farm": "Ферма Колдвинд", "Crotus Prenn Asylum": "Психлечебница Кротус Пренн",
     "Haddonfield": "Хэддонфилд", "Backwater Swamp": "Гнилое болото",
     "Léry's Memorial Institute": "Мемориальный институт Лэри", "Red Forest": "Красный лес",
-    "Springwood": "Спрингвуд", "Gideon Meat Plant": 'Мясокомбинат "Гидеон"',
-    "Yamaoka Estate": "Поместье Ямаоки", "Ormond": "Ормонд",
+    "Springwood": "Спрингвуд", "The Springwood": "Спрингвуд", "Gideon Meat Plant": 'Мясокомбинат "Гидеон"',
+    "Yamaoka Estate": "Поместье Ямаоки", "Ormond": "Ормонд", "The Ormond": "Ормонд",
     "Hawkins National Laboratory": "Национальная лаборатория Хоукинса",
     "Grave of Glenvale": "Могила в Гленвейле", "Silent Hill": "Сайлент Хилл",
     "Raccoon City": "Раккун-Сити", "Forsaken Boneyard": "Заброшенное кладбище",
@@ -766,6 +766,14 @@ def scrape_ru_maps(records):
         if english:
             name_map[norm_en(english)] = (title, english, article_description_wikitext(wikitext))
     result = apply_ru_article_names(records, name_map)
+    map_pages_by_ru = {re.sub(r"[^\\w]+", "", title.lower()): source for title, source in map_export.items()}
+    for item in result:
+        ru_key = re.sub(r"[^\\w]+", "", str(item.get("name") or "").lower())
+        source = map_pages_by_ru.get(ru_key)
+        if source:
+            description = article_description_wikitext(source)
+            if description:
+                item["description"] = description
     for item in result:
         realm_ru = REALM_RU.get(str(item.get("realm") or ""))
         if realm_ru:
