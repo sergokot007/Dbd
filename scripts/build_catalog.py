@@ -518,7 +518,7 @@ def scrape_addons():
 
 def article_english_name(soup):
     text = clean(soup)
-    match = re.search(r"\(англ\.\s*["«]?(.+?)["»]?\)", text, re.I)
+    match = re.search(r'\(англ\.\s*["«]?(.+?)["»]?\)', text, re.I)
     return match.group(1).strip().strip('"«»') if match else ""
 
 def scrape_ru_index_name_map(index_title):
