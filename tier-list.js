@@ -85,7 +85,8 @@ function tierNorm(v){return String(v||"").toLowerCase().normalize("NFD").replace
 function tierFindCharacter(en){return (Array.isArray(all)?all:[]).find(x=>tierNorm(x.nameEn||x.name||x.displayName||x.display_name||x.title)===tierNorm(en))}
 function tierFindPerk(en){return (Array.isArray(allPerks)?allPerks:[]).find(x=>tierNorm(x.nameEn||x.name||x.displayName||x.title)===tierNorm(en))}
 function renderTierList(){
- tierEnsureCompleteRoster();\n const query=norm($("#search").value.trim()),side=DBD_TIER_DATA[dbdTierSide];
+ tierEnsureCompleteRoster();
+ const query=norm($("#search").value.trim()),side=DBD_TIER_DATA[dbdTierSide];
  const visible=side.filter(x=>{const ch=tierFindCharacter(x.en);return (dbdTierFilter==="Все"||x.tier===dbdTierFilter)&&(!query||norm(x.en+" "+(ch?.displayName||ch?.name||"")+" "+x.reason+" "+x.perks.join(" ")).includes(query));});
  $("#sectionTitle").textContent="Тир-лист персонажей";$("#sectionLabel").textContent="ПОЛНЫЙ СОСТАВ • ПРЕДВАРИТЕЛЬНЫЕ ОЦЕНКИ ДЛЯ НОВЫХ ПЕРСОНАЖЕЙ";
  $("#filters").innerHTML='<div class="tier-side-tabs"><button data-tier-side="survivors" class="'+(dbdTierSide==="survivors"?"active":"")+'">Выжившие</button><button data-tier-side="killers" class="'+(dbdTierSide==="killers"?"active":"")+'">Убийцы</button></div><div class="tier-rank-filters">'+["Все",...DBD_TIER_ORDER].map(t=>'<button data-tier-rank="'+t+'" class="'+(dbdTierFilter===t?"active":"")+'">'+(t==="Все"?"Все ранги":t)+'</button>').join("")+'</div>';
