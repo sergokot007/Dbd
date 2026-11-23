@@ -215,12 +215,15 @@ def fetch_ru_maps():
 
 def apply_ru_names(records, maps, kind):
     en_to_ru = {}
-    translated = 0
+    category_map = {}
     if kind == "addons":
         for variable in ("ADDON_RU_EN", "ITEM_ADDON_RU_EN"):
-            for group in maps.get(variable, {}).values():
+            for group_name, group in maps.get(variable, {}).items():
                 for ru, en in group.items():
-                    en_to_ru[re.sub(r"[^a-z0-9]+", "", str(en).lower())] = ru
+                    key = re.sub(r"[^a-z0-9]+", "", str(en).lower())
+                    en_to_ru[key] = ru
+                    if variable == "ITEM_ADDON_RU_EN":
+                        category_map[key] = group_name
     elif kind == "items":
         for ru, en in maps.get("ITEM_RU_EN", {}).items():
             en_to_ru[re.sub(r"[^a-z0-9]+", "", str(en).lower())] = ru
@@ -229,9 +232,13 @@ def apply_ru_names(records, maps, kind):
             for en, ru in maps.get(variable, {}).items():
                 en_to_ru[re.sub(r"[^a-z0-9]+", "", str(en).lower())] = ru
     owner_map = maps.get("KILLER_EN_RU", {})
+    translated = 0
     for item in records:
-        if kind == "addons" and item.get("category") in owner_map:
-            item["category"] = owner_map[item["category"]]
+        if kind == "addons":
+            owner = str(item.get("category") or "")
+            owner_key = re.sub(r"^The\s+", "", owner, flags=re.I)
+            if owner in owner_map or owner_key in owner_map:
+                item["category"] = owner_map.get(owner) or owner_map.get(owner_key)
         english = str(item.get("nameEn") or item.get("name") or "")
         key = re.sub(r"[^a-z0-9]+", "", english.lower())
         russian = en_to_ru.get(key)
@@ -240,11 +247,13 @@ def apply_ru_names(records, maps, kind):
             item["name"] = russian
             item["displayName"] = f"{russian} ({english})"
             translated += 1
+            if kind == "addons" and item.get("category") == "Предметы выжившего":
+                item["category"] = category_map.get(key, item["category"])
         elif english:
             item["nameEn"] = english
             item["displayName"] = english
+    print("Russian", kind, "names:", translated, "/", len(records))
     return records
-
 
 
 def ru_wiki_soup(title):
