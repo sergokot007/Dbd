@@ -2,7 +2,7 @@
 """Build an offline catalog from the public dbd.source.gs reference pages."""
 import ast, json, re, sys, time
 from pathlib import Path
-from urllib.parse import urljoin
+from urllib.parse import urljoin, quote
 import requests
 from bs4 import BeautifulSoup, Tag, NavigableString
 
@@ -146,7 +146,7 @@ def scrape_offerings():
 def addon_section(soup, owner):
     """Read add-on cards from the real DOM; image alt text is not part of get_text()."""
     records = []
-    rarity_re = re.compile(r"\\b(Visceral|Ultra Rare|Very Rare|Rare|Uncommon|Common)\\b", re.I)
+    rarity_re = re.compile(r"\b(Visceral|Ultra Rare|Very Rare|Rare|Uncommon|Common)\b", re.I)
     headings = [h for h in soup.find_all(["h2", "h3"]) if "add-on" in clean(h).lower()]
     for heading in headings:
         for img in heading.find_all_next("img"):
@@ -162,12 +162,12 @@ def addon_section(soup, owner):
                     value = str(node).strip()
                     if value:
                         pieces.append(value)
-            segment = re.sub(r"\\s+", " ", " ".join(pieces)).strip()
+            segment = re.sub(r"\s+", " ", " ".join(pieces)).strip()
             marker = rarity_re.search(segment)
             if not marker:
                 continue
             name = segment[:marker.start()].strip(" •|—-:").strip()
-            name = re.sub(r"^(?:Image\\s*)+", "", name, flags=re.I).strip()
+            name = re.sub(r"^(?:Image\s*)+", "", name, flags=re.I).strip()
             if not name or len(name) > 100:
                 continue
             description = segment[marker.end():].strip(" •|—-")
@@ -180,7 +180,7 @@ def addon_section(soup, owner):
                     description = card_text[card_marker.end():].strip(" •|—-")
             records.append({
                 "id": re.sub(r"[^a-z0-9]+", "-", (owner + "-" + name).lower()).strip("-"),
-                "name": name, "description": description, "image": img.get("src") or img.get("data-src") or "",
+                "name": name, "description": description, "image": urljoin(BASE, img.get("src") or img.get("data-src") or ""),
                 "category": owner, "rarity": marker.group(1), "source": BASE,
             })
     return records
@@ -227,7 +227,10 @@ def apply_ru_names(records, maps, kind):
         for variable in ("KILLER_EN_RU", "SURVIVOR_EN_RU"):
             for en, ru in maps.get(variable, {}).items():
                 en_to_ru[re.sub(r"[^a-z0-9]+", "", str(en).lower())] = ru
+    owner_map = maps.get("KILLER_EN_RU", {})
     for item in records:
+        if kind == "addons" and item.get("category") in owner_map:
+            item["category"] = owner_map[item["category"]]
         english = str(item.get("nameEn") or item.get("name") or "")
         key = re.sub(r"[^a-z0-9]+", "", english.lower())
         russian = en_to_ru.get(key)
@@ -239,6 +242,61 @@ def apply_ru_names(records, maps, kind):
             item["nameEn"] = english
             item["displayName"] = english
     return records
+
+def scrape_ru_addon_descriptions(addons, maps):
+    """Use Russian client-text tables from the RU community wiki when available."""
+    killer_data = maps.get("KILLERS", {})
+    pages = []
+    for killer_ru, data in killer_data.items():
+        power = data.get("power")
+        if power:
+            pages.append((power + " (улучшения)", killer_ru))
+    item_pages = {
+        "Аптечки": "Аптечка (улучшения)",
+        "Фонарики": "Фонарик (улучшения)",
+        "Ящики с инструментами": "Ящик с инструментами (улучшения)",
+        "Карты": "Карта (улучшения)",
+        "Ключи": "Ключ (улучшения)",
+        "Предметы с туманом": "Флакон с туманом (улучшения)",
+    }
+    pages.extend((title, owner) for owner, title in item_pages.items())
+    def read_page(entry):
+        title, owner = entry
+        url = "https://dead-by-daylight.fandom.com/ru/wiki/" + quote(title.replace(" ", "_"), safe="()")
+        try:
+            response = requests.get(url, headers=HEADERS, timeout=18)
+            if response.status_code != 200:
+                return {}
+            soup = BeautifulSoup(response.text, "html.parser")
+            found = {}
+            for tr in soup.find_all("tr"):
+                cells = tr.find_all(["td", "th"], recursive=False)
+                if len(cells) < 2:
+                    continue
+                row = " ".join(clean(c) for c in cells)
+                match = re.search(r"\\(англ\\.\\s*[\"«]?(.+?)[\"»]?\\)", row, re.I)
+                if not match:
+                    continue
+                english = match.group(1).strip().strip('"«»')
+                description = clean(cells[-1])
+                if english and description:
+                    found[re.sub(r"[^a-z0-9]+", "", english.lower())] = description
+            print("RU add-on descriptions:", title, len(found))
+            return found
+        except Exception as exc:
+            print("RU add-on page unavailable:", title, repr(exc))
+            return {}
+    from concurrent.futures import ThreadPoolExecutor
+    descriptions = {}
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        for part in pool.map(read_page, pages):
+            descriptions.update(part)
+    for item in addons:
+        key = re.sub(r"[^a-z0-9]+", "", str(item.get("nameEn") or item.get("name") or "").lower())
+        if key in descriptions:
+            item["description"] = descriptions[key]
+    print("Russian add-on descriptions matched:", sum(1 for x in addons if x.get("description") and any(re.search(r"[А-Яа-яЁё]", x["description"]) for _ in [0])))
+    return addons
 
 def scrape_addons():
     items_soup = page("/items/")
@@ -289,6 +347,7 @@ def main():
     try:
         addon_records = scrape_addons()
         result["addons"] = apply_ru_names(addon_records, ru_maps, "addons")
+        result["addons"] = scrape_ru_addon_descriptions(result["addons"], ru_maps)
         print("Published add-on records:", len(result["addons"]))
     except Exception as exc:
         print("Add-on catalog unavailable; continuing without it:", repr(exc))
