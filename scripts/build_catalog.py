@@ -10,7 +10,7 @@ BASE = "https://dbd.source.gs"
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; DBD-Fog-Companion/1.0)"}
 
 def clean(node):
-    return re.sub(r"\\s+", " ", node.get_text(" ", strip=True)).strip()
+    return re.sub(r"\s+", " ", node.get_text(" ", strip=True)).strip()
 
 def img_for(node):
     img = node.find("img") if node else None
@@ -55,8 +55,8 @@ def scrape_link_catalog(path, kind):
         raw = clean(a)
         name = title_for(a) or a.get("aria-label") or a.get("title") or ""
         if not name:
-            name = re.split(r"\\s+(?:General perk|Very Rare|Ultra Rare|Rare|Uncommon|Common)\\b", raw, maxsplit=1)[0]
-        name = re.sub(r"^Image\\s+", "", name).strip()
+            name = re.split(r"\s+(?:General perk|Very Rare|Ultra Rare|Rare|Uncommon|Common)\b", raw, maxsplit=1)[0]
+        name = re.sub(r"^Image\s+", "", name).strip()
         if not name or name.lower() in seen:
             continue
         seen.add(name.lower())
@@ -76,7 +76,7 @@ def scrape_maps():
             continue
         card = ancestor_card(h)
         text = clean(card)
-        if not re.search(r"\\b\\d+\\s+to\\s+\\d+\\s+hooks?\\b", text, re.I) and h.name != "h3":
+        if not re.search(r"\b\d+\s+to\s+\d+\s+hooks?\b", text, re.I) and h.name != "h3":
             continue
         # Realm is the closest preceding section heading.
         realm = ""
@@ -89,7 +89,7 @@ def scrape_maps():
         if key in seen:
             continue
         seen.add(key)
-        hooks = re.search(r"(\\d+\\s+to\\s+\\d+\\s+hooks?)", text, re.I)
+        hooks = re.search(r"(\d+\s+to\s+\d+\s+hooks?)", text, re.I)
         desc = text.replace(name, "", 1)
         if hooks:
             desc = desc.replace(hooks.group(1), "", 1)
@@ -111,12 +111,12 @@ def scrape_offerings():
                 card = parent
                 break
         raw = clean(card)
-        marker = re.search(r"\\b(?:Ultra Rare|Very Rare|Rare|Uncommon|Common|Event)\\b", raw, re.I)
+        marker = re.search(r"\b(?:Ultra Rare|Very Rare|Rare|Uncommon|Common|Event)\b", raw, re.I)
         if not marker:
             continue
         name = raw[:marker.start()].strip(" •|—-")
-        name = re.sub(r"^(?:Image\\s*)+", "", name).strip()
-        name = re.sub(r"\\s+", " ", name)
+        name = re.sub(r"^(?:Image\s*)+", "", name).strip()
+        name = re.sub(r"\s+", " ", name)
         if not name or len(name) > 100 or name.lower() in seen:
             continue
         seen.add(name.lower())
