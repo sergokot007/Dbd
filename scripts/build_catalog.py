@@ -379,34 +379,144 @@ def article_description_wikitext(wikitext):
         if heading.group(1).strip().lower() == "описание":
             end = headings[i + 1].start() if i + 1 < len(headings) else len(wikitext)
             return clean_wikitext(wikitext[heading.end():end])
+    # Offering pages often put the in-game effect in the lead paragraph instead of a section.
+    for line in (wikitext or "").splitlines():
+        line = line.strip()
+        if not line or line.startswith(("{{", "{|", "|", "==", "[[Категория:")):
+            continue
+        if "англ." in line.lower():
+            line = re.sub(r"^.*?\(англ\..*?\)\s*[-—–:]\s*", "", line, flags=re.I)
+        value = clean_wikitext(line)
+        if len(value) > 20:
+            return value
     return ""
 
 def norm_en(value):
     return re.sub(r"[^a-z0-9]+", "", str(value or "").lower())
 
 def scrape_perk_ru_map(maps):
-    """Invert the maintained Russian-name to game-icon-ID table."""
+    """Combine the Russian icon-ID table with character-owned perk lists."""
     result = {}
     for russian, icon_id in maps.get("PERK_ICON_IDS", {}).items():
         key = norm_en(icon_id)
         if key:
             result[key] = russian
-    print("Russian perk-name map from icon IDs:", len(result), "slugs")
+    killer_map = maps.get("KILLER_EN_RU", {})
+    survivor_map = maps.get("SURVIVOR_EN_RU", {})
+    killer_perks = maps.get("KILLERS", {})
+    survivor_perks = maps.get("SURVIVORS", {})
+    jobs = []
+    for index_path, name_map, perk_map in [
+        ("/killers/", killer_map, killer_perks),
+        ("/survivors/", survivor_map, survivor_perks),
+    ]:
+        try:
+            index = page(index_path)
+            seen = set()
+            for a in index.find_all("a", href=True):
+                href = a["href"].split("#")[0]
+                if re.match(r"^" + re.escape(index_path) + r"[^/]+/?$", href) and href not in seen:
+                    seen.add(href)
+                    jobs.append((href, name_map, perk_map))
+        except Exception as exc:
+            print("Character perk index unavailable:", index_path, repr(exc))
+    def read_character(job):
+        path, name_map, perk_map = job
+        try:
+            soup = page(path)
+            h1 = soup.find("h1")
+            english_owner = clean(h1) if h1 else ""
+            lookup = re.sub(r"^The\s+", "", english_owner, flags=re.I)
+            russian_owner = name_map.get(english_owner) or name_map.get(lookup)
+            if not russian_owner:
+                return {}
+            data = perk_map.get(russian_owner)
+            russian_perks = data.get("perks", []) if isinstance(data, dict) else data
+            if not russian_perks:
+                return {}
+            heading = next((h for h in soup.find_all(["h2", "h3"]) if clean(h).lower() == "perks"), None)
+            if not heading:
+                return {}
+            ids, seen = [], set()
+            for a in heading.find_all_next("a", href=True):
+                if a.find_previous("h2") is not heading and a.find_previous("h3") is not heading:
+                    break
+                match = re.match(r"^/perks/([^/]+)/?$", a["href"].split("#")[0])
+                if match and match.group(1) not in seen:
+                    seen.add(match.group(1))
+                    ids.append(match.group(1))
+            return {norm_en(perk_id): ru for perk_id, ru in zip(ids[:3], russian_perks[:3])}
+        except Exception as exc:
+            print("Character perk map failed:", path, repr(exc))
+            return {}
+    from concurrent.futures import ThreadPoolExecutor
+    character_map = {}
+    with ThreadPoolExecutor(max_workers=12) as pool:
+        for part in pool.map(read_character, jobs):
+            character_map.update(part)
+    result.update(character_map)
+    common = {
+        "hexnooneescapesdeath": "Порча: никому не скрыться от смерти",
+        "hexthrillofthehunt": "Порча: охотничий азарт",
+        "scourgehookmonstrousshrine": "Секущий крюк: чудовищный храм",
+        "bittermurmur": "Тихий шорох",
+        "distressing": "Ужасающая",
+        "kindred": "Родственные души",
+        "thisisnothappening": "Это не происходит",
+        "detectiveshunch": "Интуиция детектива",
+        "stakeout": "Под прицелом",
+        "unnervingpresence": "Пугающее присутствие",
+        "enduring": "Стойкость",
+        "lightborn": "Светорожденный",
+        "tinkerer": "Мастер на все руки",
+        "anursescalling": "Зов медсестры",
+        "hexdevourhope": "Порча: пожирающая надежда",
+    }
+    result.update(common)
+    print("Russian perk-name map combined:", len(result), "slugs; character pages:", len(character_map))
     return result
+
+
+
+def perk_english_from_slug(slug):
+    slug = str(slug or "").lower().strip("/")
+    special = {
+        "deja-vu": "Déjà Vu", "well-make-it": "We'll Make It", "we-ll-make-it": "We'll Make It",
+        "a-nurses-calling": "A Nurse's Calling", "nurses-calling": "A Nurse's Calling",
+        "hex-no-one-escapes-death": "Hex: No One Escapes Death",
+        "hex-thrill-of-the-hunt": "Hex: Thrill of the Hunt",
+        "scourge-hook-monstrous-shrine": "Scourge Hook: Monstrous Shrine",
+        "hex-devour-hope": "Hex: Devour Hope", "this-is-not-happening": "This Is Not Happening",
+        "detectives-hunch": "Detective's Hunch", "stake-out": "Stake Out",
+        "bitter-murmur": "Bitter Murmur",
+    }
+    if slug in special:
+        return special[slug]
+    words = slug.replace("_", "-").split("-")
+    name = " ".join(x.capitalize() for x in words if x)
+    name = re.sub(r"^Hex\s+", "Hex: ", name)
+    name = re.sub(r"^Scourge Hook\s+", "Scourge Hook: ", name)
+    return name
 
 def apply_perk_ru_names(records, id_map):
     translated = 0
     for item in records:
+        perk_id = str(item.get("id") or "")
         english = str(item.get("nameEn") or item.get("name") or "")
-        russian = id_map.get(norm_en(item.get("id"))) or id_map.get(norm_en(english))
+        if len(english) > 90 or len(english.split()) > 9:
+            english = perk_english_from_slug(perk_id)
+        russian = id_map.get(norm_en(perk_id)) or id_map.get(norm_en(english))
         if russian:
             item["nameEn"] = english
             item["name"] = russian
             item["displayName"] = f"{russian} ({english})"
             translated += 1
+        else:
+            item["nameEn"] = english
+            item["displayName"] = english
     print("Russian perk names:", translated, "/", len(records))
     missing = [str(x.get("nameEn") or x.get("name")) for x in records if not re.search(r"[А-Яа-яЁё]", str(x.get("name") or ""))]
-    print("Perks without RU names:", missing[:25])
+    print("Perks without RU names:", missing[:30])
     return records
 
 def scrape_ru_perk_descriptions(records, ru_maps):
@@ -598,19 +708,29 @@ REALM_RU = {
 def scrape_ru_maps(records):
     realm_titles = list(dict.fromkeys(REALM_RU.values()))
     realm_export = fetch_ru_wiki_export(realm_titles)
-    map_titles = []
+    map_titles, name_map = [], {}
+    source_names = {norm_en(x.get("name")): str(x.get("name") or "") for x in records}
     for source in realm_export.values():
+        # Some realm pages expose the English map name as the display text of a Russian link.
+        for target, display in re.findall(r"\[\[([^|\]]+)\|([^\]]+)\]\]", source):
+            russian = target.strip().replace("_", " ")
+            english = clean_wikitext(display)
+            key = norm_en(english)
+            if key in source_names:
+                name_map[key] = (russian, source_names[key], "")
         for title in wiki_links(source):
             if len(title) < 100 and title not in realm_titles and title not in map_titles:
                 map_titles.append(title)
-    print("Russian map article links:", len(map_titles))
+    print("Russian map article links:", len(map_titles), "; direct English aliases:", len(name_map))
     map_export = fetch_ru_wiki_export(map_titles)
-    name_map = {}
     for title, wikitext in map_export.items():
         english = article_english_name_wikitext(wikitext)
         if english:
             name_map[norm_en(english)] = (title, english, article_description_wikitext(wikitext))
-    return apply_ru_article_names(records, name_map), name_map
+    result = apply_ru_article_names(records, name_map)
+    missing = [str(x.get("nameEn") or x.get("name")) for x in result if not x.get("displayName") or x.get("displayName") == x.get("nameEn")]
+    print("Maps without RU names:", missing[:30])
+    return result, name_map
 
 
 def main():
