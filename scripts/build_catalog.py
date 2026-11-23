@@ -244,6 +244,33 @@ def apply_ru_names(records, maps, kind):
     return records
 
 
+
+def ru_wiki_soup(title):
+    """Fandom page fetch with API fallback for runners that cannot access page HTML."""
+    encoded = quote(title.replace(" ", "_"), safe="()")
+    direct = "https://dead-by-daylight.fandom.com/ru/wiki/" + encoded
+    try:
+        response = requests.get(direct, headers=HEADERS, timeout=12)
+        if response.status_code == 200 and "mw-parser-output" in response.text:
+            return BeautifulSoup(response.text, "html.parser")
+    except Exception:
+        pass
+    try:
+        response = requests.get(
+            "https://dead-by-daylight.fandom.com/api.php",
+            params={"action": "parse", "page": title, "prop": "text", "format": "json"},
+            headers=HEADERS, timeout=12,
+        )
+        response.raise_for_status()
+        payload = response.json()
+        html = payload.get("parse", {}).get("text", {}).get("*", "")
+        if html:
+            return BeautifulSoup(html, "html.parser")
+    except Exception as exc:
+        print("Fandom API unavailable for", title, repr(exc))
+    return None
+
+
 def scrape_perk_ru_map(maps):
     """Pair live English perk slugs with the maintained Russian client names."""
     killer_map = maps.get("KILLER_EN_RU", {})
@@ -327,7 +354,7 @@ def apply_perk_ru_names(records, id_map):
             item["displayName"] = f"{russian} ({english})"
     return records
 
-def scrape_ru_perk_descriptions(records):
+def scrape_ru_perk_descriptions(records, ru_maps):
     """Read the Russian 'Описание' section from each perk article when available."""
     def read_one(item):
         russian = item.get("name")
@@ -335,10 +362,9 @@ def scrape_ru_perk_descriptions(records):
             return (item.get("id"), "")
         url = "https://dead-by-daylight.fandom.com/ru/wiki/" + quote(str(russian).replace(" ", "_"), safe="()")
         try:
-            response = requests.get(url, headers=HEADERS, timeout=12)
-            if response.status_code != 200:
+            soup = ru_wiki_soup(str(russian))
+            if soup is None:
                 return (item.get("id"), "")
-            soup = BeautifulSoup(response.text, "html.parser")
             heading = next((h for h in soup.find_all(["h2", "h3"]) if clean(h).lower() == "описание"), None)
             if not heading:
                 return (item.get("id"), "")
@@ -362,7 +388,42 @@ def scrape_ru_perk_descriptions(records):
     for item in records:
         if by_id.get(item.get("id")):
             item["description"] = by_id[item["id"]]
-    print("Russian in-game perk descriptions:", len(by_id), "/", len(records))
+    print("Russian wiki perk descriptions:", len(by_id), "/", len(records))
+    for item in records:
+        if by_id.get(item.get("id")):
+            item["description"] = by_id[item["id"]]
+    # Fallback: DBDFOG publishes a single searchable Russian catalog with all current perks.
+    try:
+        response = requests.get("https://dbdfog.ru/perks/", headers=HEADERS, timeout=20)
+        response.raise_for_status()
+        soup = BeautifulSoup(response.text, "html.parser")
+        owner_names = set()
+        for variable in ("KILLER_EN_RU", "SURVIVOR_EN_RU"):
+            owner_names.update(ru_maps.get(variable, {}).values())
+        fallback_count = 0
+        for item in records:
+            if re.search(r"[А-Яа-яЁё]", item.get("description", "")):
+                continue
+            ru = str(item.get("name") or "")
+            candidates = []
+            for node in soup.find_all(["article", "li", "div"]):
+                value = clean(node)
+                if len(value) <= 1600 and value.count(ru) >= 2:
+                    candidates.append(value)
+            if not candidates:
+                continue
+            value = min(candidates, key=len)
+            rest = value.rsplit(ru, 1)[-1].strip()
+            for owner in sorted(owner_names, key=len, reverse=True):
+                if rest.startswith(owner):
+                    rest = rest[len(owner):].strip()
+                    break
+            if len(rest) > 20 and re.search(r"[А-Яа-яЁё]", rest):
+                item["description"] = rest
+                fallback_count += 1
+        print("DBDFOG Russian perk descriptions:", fallback_count, "/", len(records))
+    except Exception as exc:
+        print("DBDFOG perk catalog unavailable:", repr(exc))
     return records
 
 
@@ -387,10 +448,9 @@ def scrape_ru_addon_descriptions(addons, maps):
         title, owner = entry
         url = "https://dead-by-daylight.fandom.com/ru/wiki/" + quote(title.replace(" ", "_"), safe="()")
         try:
-            response = requests.get(url, headers=HEADERS, timeout=18)
-            if response.status_code != 200:
+            soup = ru_wiki_soup(title)
+            if soup is None:
                 return {}
-            soup = BeautifulSoup(response.text, "html.parser")
             found = {}
             for tr in soup.find_all("tr"):
                 cells = tr.find_all(["td", "th"], recursive=False)
@@ -461,7 +521,7 @@ def main():
     result = {
         "generatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "source": BASE,
-        "perks": scrape_ru_perk_descriptions(apply_perk_ru_names(scrape_link_catalog("/perks/", "perks"), perk_ru_map)),
+        "perks": scrape_ru_perk_descriptions(apply_perk_ru_names(scrape_link_catalog("/perks/", "perks"), perk_ru_map), ru_maps),
         "offerings": scrape_offerings(),
         "maps": scrape_maps(),
         "addons": [],
