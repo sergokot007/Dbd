@@ -128,3 +128,14 @@
 @media(max-width:600px){.tier-grid{grid-template-columns:1fr}.tier-card{padding:12px}.tier-title h3{font-size:18px}}
 
 .catalog-perk-link,.build-perk-link{border:0;background:transparent;color:inherit;font:inherit;text-align:left;padding:0;cursor:pointer;text-decoration:underline;text-decoration-color:#8e555a;text-underline-offset:3px}.catalog-perk-link:hover,.build-perk-link:hover{color:#f0a0a4}.build-perk-link{font-weight:700}
+
+
+/* Perk cards show the title and icon only; the full description stays in the detail view. */
+.item:has(.catalog-perk-link) .itembody>p{display:none}
+.perk-build-usage{padding:20px 0 0;margin-top:20px;border-top:1px solid #393039}
+.perk-build-usage h3{font:600 23px 'Barlow Condensed';margin:6px 0 12px}
+.perk-build-usage-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:9px}
+.perk-build-usage-card{padding:12px;background:#17171d;border:1px solid #393039;border-radius:4px;display:grid;gap:5px}
+.perk-build-usage-card b{font:600 16px 'Barlow Condensed';color:#eee}
+.perk-build-usage-card span{font-size:10px;color:#d58b8f}
+.perk-build-usage-card p,.perk-build-usage-empty{font-size:11px;line-height:1.6;color:#aaa;margin:0}
