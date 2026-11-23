@@ -41,6 +41,10 @@ killers:[
 {en:"The Trapper",tier:"E",perks:["Agitation","Unnerving Presence","Brutal Strength"],reason:"Brutal Strength — полезный общий инструмент для разрушения паллет и генераторов, но остальные перки слишком узкие. Сам Капканщик сильно зависит от подготовки карты и опыта."},
 {en:"The Nightmare",tier:"E",perks:["Fire Up","Remember Me","Blood Warden"],reason:"Blood Warden может выиграть эндгейм, но требует подходящей ситуации; Fire Up и Remember Me редко входят в универсальные сборки. Покупка не в приоритете ради перков."}
 ]};
+const DBD_TIER_RU_NAMES={
+"Meg Thomas":"Мэг Томас",'William "Bill" Overbeck':'Уильям «Билл» Овербек',"Laurie Strode":"Лори Строуд","Zarina Kassir":"Зарина Кассир","Feng Min":"Фэн Мин","David King":"Дэвид Кинг","Kate Denson":"Кейт Денсон","Rebecca Chambers":"Ребекка Чемберс","Jill Valentine":"Джилл Валентайн","Renato Lyra":"Ренато Лира","Gabriel Soma":"Габриэль Сома","Dwight Fairfield":"Дуайт Фэрфилд","Adam Francis":"Адам Фрэнсис","Mikaela Reid":"Микаэла Рид","Jeff Johansen":"Джефф Йохансен","Yui Kimura":"Юи Кимура","Leon Scott Kennedy":"Леон Скотт Кеннеди","Nicolas Cage":"Николас Кейдж","Ace Visconti":"Эйс Висконти","Quentin Smith":"Квентин Смит",
+"The Nurse":"Медсестра","The Blight":"Мор","The Artist":"Художница","The Plague":"Чума","The Clown":"Клоун","The Cenobite":"Сенобит","The Nemesis":"Немезис","The Knight":"Рыцарь","The Cannibal":"Каннибал","The Spirit":"Дух","The Ghost Face":"Гоуст Фейс","The Trickster":"Трюкач","The Wraith":"Призрак","The Doctor":"Доктор","The Legion":"Легион","The Shape":"Майкл Майерс","The Trapper":"Капканщик","The Nightmare":"Кошмар"
+};
 const DBD_TIER_ORDER=["S","A","B","C","D","E"];
 const DBD_TIER_LABELS={S:"Очень выгодная покупка",A:"Сильная покупка",B:"Хорошая / ситуативная",C:"Средняя ценность",D:"Низкий приоритет",E:"Почти не стоит ради перков"};
 let dbdTierSide="survivors",dbdTierFilter="Все",tierCatalogPromise=null;
@@ -53,13 +57,13 @@ function tierFindCharacter(en){return (Array.isArray(all)?all:[]).find(x=>tierNo
 function tierFindPerk(en){return (Array.isArray(allPerks)?allPerks:[]).find(x=>tierNorm(x.nameEn||x.name||x.displayName||x.title)===tierNorm(en))}
 function renderTierList(){
  const query=norm($("#search").value.trim()),side=DBD_TIER_DATA[dbdTierSide];
- const visible=side.filter(x=>(dbdTierFilter==="Все"||x.tier===dbdTierFilter)&&(!query||norm(x.en+" "+x.reason+" "+x.perks.join(" ")).includes(query)));
+ const visible=side.filter(x=>{const ch=tierFindCharacter(x.en);return (dbdTierFilter==="Все"||x.tier===dbdTierFilter)&&(!query||norm(x.en+" "+(ch?.displayName||ch?.name||"")+" "+x.reason+" "+x.perks.join(" ")).includes(query));});
  $("#sectionTitle").textContent="Тир-лист персонажей";$("#sectionLabel").textContent="CHARACTER VALUE / PATCH 10.2.2B";
  $("#filters").innerHTML='<div class="tier-side-tabs"><button data-tier-side="survivors" class="'+(dbdTierSide==="survivors"?"active":"")+'">Выжившие</button><button data-tier-side="killers" class="'+(dbdTierSide==="killers"?"active":"")+'">Убийцы</button></div><div class="tier-rank-filters">'+["Все",...DBD_TIER_ORDER].map(t=>'<button data-tier-rank="'+t+'" class="'+(dbdTierFilter===t?"active":"")+'">'+(t==="Все"?"Все ранги":t)+'</button>').join("")+'</div>';
  $("#notice").textContent="Основные покупки • выжившие оцениваются по перкам (базовые характеристики одинаковы), убийцы — по силе и перкам. E означает низкий приоритет покупки ради навыков, а не бесполезность персонажа. • "+visible.length+" рекомендаций";
  $("#grid").classList.add("tier-grid");
  $("#grid").innerHTML=visible.map(x=>{
-  const ch=tierFindCharacter(x.en),portrait=ch?image(ch):"",ruName=ch?(ch.displayName||ch.name||x.en):x.en;
+  const ch=tierFindCharacter(x.en),portrait=ch?image(ch):"",ruName=(DBD_TIER_RU_NAMES[x.en]||ch?.name||x.en)+" ("+x.en+")";
   const perks=x.perks.map(p=>{const found=tierFindPerk(p);return '<span class="tier-perk">'+esc(found?name(found):p)+'</span>'}).join("");
   return '<article class="tier-card tier-'+x.tier.toLowerCase()+'"><div class="tier-card-top"><span class="tier-grade">'+x.tier+'</span>'+(portrait?'<img src="'+esc(portrait)+'" alt="" loading="lazy" onerror="this.style.display=\'none\'">':'<span class="tier-portrait-fallback">✣</span>')+'<div class="tier-title"><h3>'+esc(ruName)+'</h3><small>'+esc(x.en)+'</small><span>'+esc(DBD_TIER_LABELS[x.tier])+'</span></div></div><p class="tier-reason">'+esc(x.reason)+'</p><div class="tier-perks-label">УНИКАЛЬНЫЕ ПЕРКИ</div><div class="tier-perks">'+perks+'</div></article>';
  }).join("")||'<div class="empty">По запросу персонажи не найдены.</div>';
