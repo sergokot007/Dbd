@@ -22,12 +22,12 @@ function usableGear(x){return !cosmetic(x)&&!x.isCosmetic&&!x.is_cosmetic&&!x.co
 function id(x){return String(x.id||x._id||x.name||name(x))}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 
-function translationKey(v){return String(v||'').toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/[^a-z0-9]+/g,'')}
+function translationKey(v){return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'')}
 function applyCatalogNames(records,catalog,kind){
  const maps=catalog?.translations||{},map=maps[kind]||{};
  return records.map(item=>{
   const en=String(item.nameEn||item.name||item.display_name||item.title||'');
-  const ru=map[translationKey(en)]||maps.perksById?.[String(item.id||'')];
+  const ru=map[translationKey(en)]||Object.entries(map).find(([key])=>translationKey(key)===translationKey(en))?.[1]||maps.perksById?.[String(item.id||'')];
   return ru?{...item,nameEn:en,name:ru,displayName:ru+' ('+en+')'}:item;
  });
 }
