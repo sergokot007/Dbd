@@ -2,7 +2,7 @@
 """Build an offline catalog from the public dbd.source.gs reference pages."""
 import ast, json, re, sys, time
 from pathlib import Path
-from urllib.parse import urljoin, quote
+from urllib.parse import urljoin, quote, unquote
 import requests
 from bs4 import BeautifulSoup, Tag, NavigableString
 
@@ -215,6 +215,7 @@ def fetch_ru_maps():
 
 def apply_ru_names(records, maps, kind):
     en_to_ru = {}
+    translated = 0
     if kind == "addons":
         for variable in ("ADDON_RU_EN", "ITEM_ADDON_RU_EN"):
             for group in maps.get(variable, {}).values():
@@ -238,6 +239,7 @@ def apply_ru_names(records, maps, kind):
             item["nameEn"] = english
             item["name"] = russian
             item["displayName"] = f"{russian} ({english})"
+            translated += 1
         elif english:
             item["nameEn"] = english
             item["displayName"] = english
@@ -345,6 +347,7 @@ def scrape_perk_ru_map(maps):
     return result
 
 def apply_perk_ru_names(records, id_map):
+    translated = 0
     for item in records:
         english = str(item.get("nameEn") or item.get("name") or "")
         russian = id_map.get(str(item.get("id") or ""))
@@ -352,6 +355,8 @@ def apply_perk_ru_names(records, id_map):
             item["nameEn"] = english
             item["name"] = russian
             item["displayName"] = f"{russian} ({english})"
+            translated += 1
+    print("Russian perk names:", translated, "/", len(records))
     return records
 
 def scrape_ru_perk_descriptions(records, ru_maps):
@@ -534,7 +539,7 @@ def scrape_ru_index_name_map(index_title):
         title = clean(a)
         if not href.startswith("/ru/wiki/") or href.startswith("/ru/wiki/Категория:") or not title or len(title) > 100:
             continue
-        page_title = href.rsplit("/", 1)[-1].replace("_", " ")
+        page_title = unquote(href.rsplit("/", 1)[-1].split("?", 1)[0]).replace("_", " ")
         if page_title not in seen and title.lower() not in {"править", "история", "обсуждение"}:
             seen.add(page_title)
             links.append((page_title, title))
@@ -600,7 +605,7 @@ def scrape_ru_maps(records):
         for a in content.find_all("a", href=True):
             href = a["href"].split("#")[0]
             if href.startswith("/ru/wiki/") and not href.startswith("/ru/wiki/Категория:"):
-                title = href.rsplit("/", 1)[-1].replace("_", " ")
+                title = unquote(href.rsplit("/", 1)[-1].split("?", 1)[0]).replace("_", " ")
                 if title != realm and len(title) < 100:
                     page_titles.add(title)
     def read_map(title):
