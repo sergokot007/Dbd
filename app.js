@@ -21,6 +21,16 @@ function cosmetic(x){const v=norm([x.type,x.category,x.subcategory,x.kind,x.item
 function usableGear(x){return !cosmetic(x)&&!x.isCosmetic&&!x.is_cosmetic&&!x.cosmetic}
 function id(x){return String(x.id||x._id||x.name||name(x))}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+function translationKey(v){return String(v||'').toLowerCase().normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').replace(/[^a-z0-9]+/g,'')}
+function applyCatalogNames(records,catalog,kind){
+ const maps=catalog?.translations||{},map=maps[kind]||{};
+ return records.map(item=>{
+  const en=String(item.nameEn||item.name||item.display_name||item.title||'');
+  const ru=map[translationKey(en)]||maps.perksById?.[String(item.id||'')];
+  return ru?{...item,nameEn:en,name:ru,displayName:ru+' ('+en+')'}:item;
+ });
+}
 function updateFav(){$('#favCount').textContent=favorites.length;localStorage.setItem('dbd-favorites',JSON.stringify(favorites))}
 async function getData(url){const r=await fetch(url,{cache:'no-store',credentials:'omit'});if(!r.ok)throw Error('HTTP '+r.status);return r.json()}
 let catalogPromise;async function localCatalog(){if(!catalogPromise)catalogPromise=fetch('./catalog-data.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Локальный каталог ещё не опубликован');return r.json()});return catalogPromise}
@@ -31,7 +41,7 @@ async function load(){
  if(['perks','offerings','maps','addons'].includes(tab)){try{const local=await localCatalog();const data=arr(local[tab]);if(data.length){all=data;$('#connection').textContent='Локальная база загружена';$('#connection').classList.add('ok');render();return}}catch(e){lastError=e}}
  const sources=[...(cfg.source?(Array.isArray(cfg.source)?cfg.source:[cfg.source]):[]),API+'/'+cfg.endpoint+'?branch=live',API+'/'+cfg.endpoint,API+'/'+cfg.endpoint+'/'];
  for(const url of sources){try{
-  let data=arr(await getData(url));if(['items','addons','offerings'].includes(tab))data=data.filter(usableGear);if(!data.length)throw Error('Источник вернул пустой список');
+  let data=arr(await getData(url));if(['items','characters'].includes(tab)){try{data=applyCatalogNames(data,await localCatalog(),tab)}catch(e){}}if(['items','addons','offerings'].includes(tab))data=data.filter(usableGear);if(!data.length)throw Error('Источник вернул пустой список');
   all=data;$('#connection').textContent=url.startsWith(SOURCE)?'Резервная база подключена':'База подключена';$('#connection').classList.add('ok');render();return;
  }catch(e){lastError=e}}
  if(tab==='addons'){try{const [chars,items]=await Promise.all([getData(SOURCE+'/characters/'),getData(SOURCE+'/items/')]);const nested=[...arr(chars),...arr(items)].flatMap(x=>x.addons||x.addOns||x.add_ons||x.itemAddons||x.item_addons||x.powerAddons||x.power_addons||[]);if(nested.length){all=nested.filter(usableGear);$('#connection').textContent='Резервная база подключена';$('#connection').classList.add('ok');render();return}}catch(e){lastError=e}}
@@ -61,7 +71,7 @@ function buildPerkIsPaid(p) {
  const owner=buildPerkOwner(p).toLowerCase();
  return !!(p.isLicensed||p.is_licensed||p.licensed||p.dlc||p.isDlc||p.is_dlc||LICENSED_PERK_OWNERS.some(n=>owner.includes(n.toLowerCase()))||LICENSED_PERK_NAMES.some(n=>norm(name(p))===norm(n)));
 }
-async function loadBuilds(){try{const catalog=await localCatalog();allPerks=arr(catalog.perks).map(p=>{const en=p.nameEn||p.name;const ru=p.name||en;return {...p,nameEn:en,displayName:p.displayName||ru+' ('+en+')'}});renderBuilds()}catch(e){allPerks=[];renderBuilds();$('#notice').textContent='Каталог перков недоступен — названия сборок всё равно доступны, иконки появятся после загрузки базы.'}}
+async function loadBuilds(){try{const catalog=await localCatalog();allPerks=arr(catalog.perks);renderBuilds()}catch(e){allPerks=[];renderBuilds();$('#notice').textContent='Каталог перков недоступен — названия сборок всё равно доступны, иконки появятся после загрузки базы.'}}
 function renderBuilds() {
  const q=norm($('#search').value.trim());
  const groups=UNIVERSAL_BUILDS.filter(b=>norm(b.title+' '+b.tag+' '+b.desc+' '+b.perks.join(' ')).includes(q));
