@@ -140,7 +140,7 @@ def scrape_offerings():
         name = text[:marker.start()].strip(" •|—-")
         name = re.sub(r"^(?:Image\s*)+", "", name).strip()
         name = re.sub(r"\s+", " ", name)
-        if not name or len(name) > 100 or name.lower() in seen:
+        if not name or len(name) > 100 or name.lower() in seen or name.lower().startswith(("only usable", "note:", "only playable")):
             continue
         seen.add(name.lower())
         out.append({"id": re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-"), "name": name, "description": text, "image": img_for(node), "source": BASE + "/offerings/", "category": "Подношение"})
@@ -379,11 +379,13 @@ def article_english_name_wikitext(wikitext):
 
 def article_description_wikitext(wikitext):
     headings = list(re.finditer(r"(?m)^==\s*(.*?)\s*==\s*$", wikitext or ""))
-    for i, heading in enumerate(headings):
-        if heading.group(1).strip().lower() == "описание":
-            end = headings[i + 1].start() if i + 1 < len(headings) else len(wikitext)
-            return clean_wikitext(wikitext[heading.end():end])
-    # Offering pages often put the in-game effect in the lead paragraph instead of a section.
+    for wanted in ("описание", "использование", "эффект"):
+        for i, heading in enumerate(headings):
+            heading_name = re.sub(r"[\[\]]", "", heading.group(1)).strip().lower()
+            if heading_name == wanted:
+                end = headings[i + 1].start() if i + 1 < len(headings) else len(wikitext)
+                return clean_wikitext(wikitext[heading.end():end])
+    # Map pages often put their lore description in the lead paragraph.
     for line in (wikitext or "").splitlines():
         line = line.strip()
         if not line or line.startswith(("{{", "{|", "|", "==", "[[Категория:")):
@@ -707,6 +709,33 @@ def scrape_ru_index_name_map(index_title):
         english = article_english_name_wikitext(wikitext)
         if english:
             result[norm_en(english)] = (title, english, article_description_wikitext(wikitext))
+    if index_title == "Подношения":
+        manual = {
+            "Gruesome Gateau": "Ужасный торт",
+            "Grandma's Cookbook": "Кулинарная книга бабушки",
+            "Children's Book": "Детская книга",
+            "Coldwind Cattle Tag-81": "Бирка № 81 из скотобойни Колдвинд",
+            "Decrepit Clapboard": "Дряхлая доска",
+            "Fuming Welcome Sign": 'Дымящийся знак "Добро пожаловать"',
+            "P. Elliott Lunacy Ticket": "Справка о сумасшествии Ф. Эллиота",
+            "Psychiatric Assessment Report": "Отчет о психическом состоянии",
+            "Signed Ledger Page": "Подписанная страница гроссбуха",
+            "Virginia Plate": "Номерной знак штата Вирджиния",
+            "Cattle Tag-28": "Бирка № 28 из скотобойни",
+            "Emergency Certificate": "Свидетельство о срочной госпитализации",
+            "Fuming Cordage": "Дымящиеся снасти",
+            "Harvest Festival Leaflet": "Листовка фестиваля урожая",
+            "Lunacy Ticket": "Справка о сумасшествии",
+            "MacMillan Ledger Page": "Страница из гроссбуха МакМиллана",
+            "Painted River Rock": "Разукрашенный камень",
+            "Shredded Plate": "Сломанный номерной знак",
+        }
+        def norm_any(value):
+            return re.sub(r"[^\w]+", "", str(value or "").lower())
+        pages_by_ru = {norm_any(title): text for title, text in exported.items()}
+        for english, russian in manual.items():
+            source = pages_by_ru.get(norm_any(russian), "")
+            result[norm_en(english)] = (russian, english, article_description_wikitext(source))
     print("Russian index map:", index_title, len(result), "English aliases")
     return result
 
