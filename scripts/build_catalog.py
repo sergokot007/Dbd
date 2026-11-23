@@ -267,7 +267,7 @@ def scrape_perk_ru_map(maps):
             soup = page(path)
             h1 = soup.find("h1")
             english_owner = clean(h1) if h1 else ""
-            lookup = re.sub(r"^The\\s+", "", english_owner, flags=re.I)
+            lookup = re.sub(r"^The\s+", "", english_owner, flags=re.I)
             russian_owner = name_map.get(english_owner) or name_map.get(lookup)
             if not russian_owner:
                 return {}
