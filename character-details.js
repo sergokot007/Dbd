@@ -4,9 +4,43 @@ const perkIconIndex = new Map();
 let perkIconLoadPromise = null;
 function perkKey(v){return String(v||"").toLowerCase().normalize("NFKD").replace(/[’']/g,"'").replace(/[^a-z0-9]/g,"")}
 function perkIconUrl(p){return p&&(p.icon||p.iconUrl||p.icon_url||p.iconURL||p.image||p.imageUrl||p.image_url||p.perkIcon||p.perk_icon||p.iconPath||p.icon_path)||""}
+function indexPerkIcons(list){
+ if(!Array.isArray(list))return;
+ for(const p of list){
+  const src=perkIconUrl(p);
+  if(!src)continue;
+  for(const n of [p.nameEn,p.name_en,p.englishName,p.english_name,p.name,p.displayName,p.display_name,p.title,p.id]){
+   if(n)perkIconIndex.set(perkKey(n),src);
+  }
+ }
+}
+function refreshVisiblePerkIcons(){
+ const modal=document.getElementById("characterModal");
+ if(modal)modal.querySelectorAll(".perk-chip[data-loadout-name]").forEach(chip=>{
+  const label=chip.dataset.loadoutName,src=buildPerkIcon(label);
+  if(!src||chip.querySelector("img.build-perk-icon"))return;
+  const placeholder=chip.querySelector(".build-perk-placeholder");
+  if(!placeholder)return;
+  const img=document.createElement("img");
+  img.className="build-perk-icon";img.loading="lazy";img.alt="";img.src=src;
+  img.onerror=()=>img.remove();
+  placeholder.replaceWith(img);
+ });
+ if(typeof tab!=="undefined"&&tab==="builds"&&typeof renderBuilds==="function")renderBuilds();
+}
 function loadPerkIcons(){
  if(perkIconLoadPromise)return perkIconLoadPromise;
- perkIconLoadPromise=(async()=>{for(const url of ["https://dbd-stats.info/api/perks?branch=live","https://dbd.tricky.lol/api/perks?branch=live"]){try{const r=await fetch(url,{cache:"force-cache"});if(!r.ok)continue;const d=await r.json();const list=Array.isArray(d)?d:(d.data||d.perks||d.results||[]);for(const p of list){const n=p.name||p.displayName||p.display_name||p.title;if(n&&perkIconUrl(p))perkIconIndex.set(perkKey(n),perkIconUrl(p));}if(perkIconIndex.size)break;}catch{}}})();
+ perkIconLoadPromise=(async()=>{
+  // Prefer the same curated local catalog used by the app, so icons and names
+  // do not depend solely on a third-party endpoint being available.
+  try{if(typeof localCatalog==="function"){const catalog=await localCatalog();indexPerkIcons(catalog?.perks||[]);}}catch{}
+  if(!perkIconIndex.size){
+   for(const url of ["https://dbd-stats.info/api/perks?branch=live","https://dbd.tricky.lol/api/perks?branch=live"]){
+    try{const r=await fetch(url,{cache:"force-cache"});if(!r.ok)continue;const d=await r.json();const list=Array.isArray(d)?d:(d.data||d.perks||d.results||[]);indexPerkIcons(list);if(perkIconIndex.size)break;}catch{}
+   }
+  }
+  refreshVisiblePerkIcons();
+ })();
  return perkIconLoadPromise;
 }
 function buildPerkIcon(name){return perkIconIndex.get(perkKey(name))||""}
