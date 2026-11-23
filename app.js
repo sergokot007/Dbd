@@ -15,7 +15,12 @@ const norm=x=>String(x??'').toLowerCase();
 function arr(d){if(Array.isArray(d))return d;for(const k of ['data','results','items','characters','perks','maps','realms','killers','survivors','offerings','addons','itemAddons','item_addons','killerAddons','killer_addons','survivorAddons','survivor_addons','entries','list'])if(Array.isArray(d?.[k]))return d[k];if(d&&typeof d==='object'){const nested=Object.values(d).find(v=>Array.isArray(v));if(nested)return nested}return []}
 function name(x){return x.displayName||x.name||x.display_name||x.title||x.killerName||x.id||'Без названия'}
 function desc(x){return x.description||x.desc||x.effect||x.power||x.contentText||x.content||''}
-function image(x){return x.image||x.imageUrl||x.image_url||x.icon||x.iconUrl||x.icon_url||x.iconURL||x.perkIcon||x.perk_icon||x.iconPath||x.icon_path||x.portrait||x.portraitURL||''}
+function image(x){
+ const direct=x.image||x.imageUrl||x.image_url||x.icon||x.iconUrl||x.icon_url||x.iconURL||x.perkIcon||x.perk_icon||x.perkIconUrl||x.perk_icon_url||x.iconPath||x.icon_path||x.iconFile||x.icon_file||x.portrait||x.portraitURL||x.imagePath||x.image_path;
+ if(direct)return typeof direct==="string"?direct:(direct.url||direct.src||direct.href||"");
+ const nested=x.assets||x.media||x.images||{};
+ return nested.icon||nested.perk||nested.image||nested.url||"";
+}
 function category(x){return x.role||x.type||x.category||x.realm||x.faction||x.characterName||x.character||''}
 function cosmetic(x){const v=norm([x.type,x.category,x.subcategory,x.kind,x.itemType,x.item_type,x.tags,x.name,x.displayName].join(' '));return /outfit|cosmetic|skin|wardrobe|charm|badge|banner|portrait|headwear|torso|legwear|customization|store outfit/.test(v)}
 function usableGear(x){return !cosmetic(x)&&!x.isCosmetic&&!x.is_cosmetic&&!x.cosmetic}
@@ -90,9 +95,32 @@ const UNIVERSAL_BUILDS = [
 {id:"escape",title:"Выживание любой ценой",tag:"LAST SURVIVOR",desc:"Больше шансов пережить опасную ситуацию, скрыться после удара и дотянуть до выхода.",perks:["Adrenaline","Decisive Strike","Off the Record","Unbreakable"]}
 ];
 let allPerks = [];
+const BUILD_PERK_RU={
+ "Déjà Vu":"Дежавю","Prove Thyself":"Докажи свою состоятельность","Stake Out":"Наблюдение","Hyperfocus":"Гиперфокус",
+ "Windows of Opportunity":"Окна возможностей","Lithe":"Гибкость","Resilience":"Стремление","Off the Record":"Не под запись",
+ "Distortion":"Искажение","Lightweight":"Лёгкий шаг","Calm Spirit":"Спокойный дух","Urban Evasion":"Городское уклонение",
+ "Botany Knowledge":"Ботанические знания","We'll Make It":"Мы справимся","Empathy":"Эмпатия","Self-Care":"Самолечение",
+ "Kindred":"Родственные души","Borrowed Time":"Заёмное время","We're Gonna Live Forever":"Мы будем жить вечно",
+ "Bond":"Связь","Adrenaline":"Адреналин","Decisive Strike":"Решающий удар","Unbreakable":"Несломленный"
+};
+function buildPerkKey(v){return String(v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]/g,"")}
 function buildPerk(wanted) {
- const key = norm(wanted).replace(/[^a-z0-9]/g,"");
- return allPerks.find(p=>[name(p),p.nameEn,p.englishName,p.name_en,p.id].some(v=>norm(v).replace(/[^a-z0-9]/g,"")===key)) || allPerks.find(p=>[name(p),p.nameEn,p.englishName,p.name_en,p.id].some(v=>{const k=norm(v).replace(/[^a-z0-9]/g,"");return k&& (k.includes(key)||key.includes(k))}));
+ const key=buildPerkKey(wanted);
+ if(!key)return null;
+ const records=Array.isArray(allPerks)?allPerks:[];
+ const fields=p=>[p.nameEn,p.englishName,p.name_en,p.english_name,p.slug,p.id,p.name,p.displayName,p.display_name];
+ return records.find(p=>fields(p).some(v=>buildPerkKey(v)===key))||
+  records.find(p=>fields(p).some(v=>{const k=buildPerkKey(v);return k.length>5&&key.length>5&&(k.includes(key)||key.includes(k))}))||null;
+}
+function buildPerkRussianName(p,wanted){
+ for(const value of [p?.nameRu,p?.name_ru,p?.russianName,p?.russian_name,p?.translation,p?.name]){
+  const text=String(value||"").trim();
+  if(/[А-Яа-яЁё]/.test(text))return text.replace(/\s*\([^)]*\)\s*$/,"").trim();
+ }
+ const display=String(p?.displayName||p?.display_name||"");
+ const prefix=display.split(/\s*\([^)]*\)\s*$/)[0];
+ if(/[А-Яа-яЁё]/.test(prefix))return prefix;
+ return BUILD_PERK_RU[wanted]||wanted;
 }
 function buildPerkOwner(p) { return String(p?.characterName||p?.character_name||p?.character||p?.owner||p?.survivor||p?.killer||""); }
 const LICENSED_PERK_OWNERS = ["Laurie Strode","Quentin Smith","Detective Tapp","Ash Williams","Nancy Wheeler","Steve Harrington","Cheryl Mason","Jill Valentine","Leon Kennedy","Rebecca Chambers","Ada Wong","Ellen Ripley","Pinhead","Alan Wake","Lara Croft"];
@@ -112,8 +140,8 @@ function renderBuilds() {
  $('#grid').classList.add('build-grid');
  $('#grid').innerHTML=groups.map(b=>{
   const perks=b.perks.map(wanted=>{
-   const p=buildPerk(wanted),src=p?image(p):'';
-   return '<div class="build-perk"><div class="build-perk-icon">'+(src?'<img loading="lazy" src="'+esc(src)+'" alt="" onerror="this.style.display=\'none\'">':'<span>✣</span>')+'</div><div class="build-perk-info"><b><button type="button" class="build-perk-link" data-loadout-type="perk" data-loadout-name="'+esc(p?(p.nameEn||p.englishName||name(p)):wanted)+'">'+esc(p?name(p):wanted)+'</button></b><small>'+esc(p?(buildPerkOwner(p)||'Игровой перк'):'Перк не найден в базе')+'</small></div>'+(p&&buildPerkIsPaid(p)?'<span class="auric-cell" title="Платный персонаж / лицензированный контент">◈</span>':'')+'</div>';
+   const p=buildPerk(wanted),src=p?image(p):'';const perkTitle=buildPerkRussianName(p,wanted);
+   return '<div class="build-perk"><div class="build-perk-icon">'+(src?'<img loading="lazy" src="'+esc(src)+'" alt="" onerror="this.style.display=\'none\'">':'<span class="build-perk-placeholder">✣</span>')+'</div><div class="build-perk-info"><b><button type="button" class="build-perk-link" data-loadout-type="perk" data-loadout-name="'+esc(p?(p.nameEn||p.englishName||name(p)):wanted)+'">'+esc(perkTitle)+'</button></b><small>'+esc(p?(buildPerkOwner(p)||'Игровой перк'):'Перк не найден в базе')+'</small></div>'+(p&&buildPerkIsPaid(p)?'<span class="auric-cell" title="Платный персонаж / лицензированный контент">◈</span>':'')+'</div>';
   }).join('');
   return '<article class="build-card"><div class="build-head"><span class="build-tag">'+esc(b.tag)+'</span><h3>'+esc(b.title)+'</h3><p>'+esc(b.desc)+'</p></div><div class="build-perks">'+perks+'</div><div class="build-foot"><span>4 ПЕРКА • ВЫЖИВШИЙ</span><button class="build-copy" data-copy-build="'+b.id+'">Скопировать названия</button></div></article>';
  }).join('') || '<div class="empty">По этому запросу сборок не найдено.</div>';
