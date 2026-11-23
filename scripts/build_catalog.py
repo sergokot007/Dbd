@@ -17,12 +17,18 @@ def img_for(node):
         return ""
     img = node if getattr(node, "name", None) == "img" else node.find("img")
     if img:
-        src = (img.get("src") or img.get("data-src") or img.get("data-lazy-src")
-               or img.get("data-original") or img.get("data-lazy") or "")
-        if not src and img.get("srcset"):
-            src = img.get("srcset").split(",")[0].strip().split(" ")[0]
-        if src and not src.startswith("data:"):
-            return urljoin(BASE, src)
+        # Lazy-loaded wiki thumbnails often put a transparent data URI in src
+        # and the real artwork in data-src. Check every candidate, not just the
+        # first truthy attribute, or the catalog silently loses the real image.
+        for attr in ("data-src", "data-lazy-src", "data-original", "data-lazy", "src"):
+            src = str(img.get(attr) or "").strip()
+            if src and not src.startswith(("data:", "blob:", "javascript:")):
+                return urljoin(BASE, src)
+        if img.get("srcset"):
+            for candidate in img.get("srcset").split(","):
+                src = candidate.strip().split(" ")[0]
+                if src and not src.startswith(("data:", "blob:", "javascript:")):
+                    return urljoin(BASE, src)
     source = node.select_one("picture source[srcset]") if hasattr(node, "select_one") else None
     if source:
         src = source.get("srcset", "").split(",")[0].strip().split(" ")[0]
@@ -572,6 +578,55 @@ def scrape_perk_ru_map(maps):
 
 
 
+
+def scrape_perk_owner_map():
+    """Map each perk slug to the English character who owns that teachable perk."""
+    jobs = []
+    for index_path in ("/killers/", "/survivors/"):
+        try:
+            index = page(index_path)
+            seen = set()
+            for a in index.find_all("a", href=True):
+                href = a["href"].split("#")[0]
+                if re.match(r"^" + re.escape(index_path) + r"[^/]+/?$", href) and href not in seen:
+                    seen.add(href)
+                    jobs.append(href)
+        except Exception as exc:
+            print("Perk owner index unavailable:", index_path, repr(exc))
+
+    def read_owner(path):
+        try:
+            soup = page(path)
+            h1 = soup.find("h1")
+            owner = clean(h1) if h1 else ""
+            heading = next((h for h in soup.find_all(["h2", "h3"])
+                            if clean(h).lower() == "perks"), None)
+            if not owner or not heading:
+                return {}
+            result, seen = {}, set()
+            for a in heading.find_all_next("a", href=True):
+                if a.find_previous("h2") is not heading and a.find_previous("h3") is not heading:
+                    break
+                match = re.match(r"^/perks/([^/]+)/?$", a["href"].split("#")[0])
+                if match and match.group(1) not in seen:
+                    seen.add(match.group(1))
+                    result[norm_en(match.group(1))] = owner
+                    if len(seen) >= 3:
+                        break
+            return result
+        except Exception as exc:
+            print("Perk owner extraction failed:", path, repr(exc))
+            return {}
+
+    from concurrent.futures import ThreadPoolExecutor
+    owners = {}
+    with ThreadPoolExecutor(max_workers=12) as pool:
+        for part in pool.map(read_owner, jobs):
+            owners.update(part)
+    print("Perk owner mapping:", len(owners), "perks")
+    return owners
+
+
 def perk_english_from_slug(slug):
     slug = str(slug or "").lower().strip("/")
     special = {
@@ -1094,6 +1149,7 @@ def main():
         "perks": external_names.get("perks", {}),
         "descriptions": external_descriptions,
         "perksById": perk_ru_map,
+        "perkOwners": scrape_perk_owner_map(),
         "maps": {en: ru for ru, en, *_ in map_ru_map.values()},
     }
     try:
