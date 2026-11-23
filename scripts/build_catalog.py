@@ -144,45 +144,43 @@ def scrape_offerings():
     return out
 
 def addon_section(soup, owner):
-    active = False
-    pieces, image_urls = [], []
-    for element in soup.descendants:
-        if isinstance(element, Tag) and element.name in ("h2", "h3"):
-            heading = clean(element)
-            if heading.lower() == "add-ons" or heading.lower().endswith(" add-ons"):
-                active = True
-                continue
-            if active:
-                active = False
-        if not active:
-            continue
-        if isinstance(element, NavigableString):
-            value = str(element).strip()
-            if value:
-                pieces.append(value)
-        elif isinstance(element, Tag) and element.name == "a":
-            href = element.get("href", "")
-            if "cdn.source.gs" in href:
-                image_urls.append(urljoin(BASE, href))
-    text = " ".join(pieces)
-    pattern = re.compile(r"Image\s*(.{2,100}?)\s+(Visceral|Ultra Rare|Very Rare|Rare|Uncommon|Common)\b", re.I)
-    matches = list(pattern.finditer(text))
+    full_text = soup.get_text(" ", strip=True)
+    headings = [h for h in soup.find_all(["h2", "h3"]) if clean(h).lower() == "add-ons" or clean(h).lower().endswith(" add-ons")]
     records = []
-    for i, match in enumerate(matches):
-        name = re.sub(r"\s+", " ", match.group(1)).strip(" •|—-")
-        if not name or len(name) > 100:
+    cursor = 0
+    pattern = re.compile(r"Image\s*(.{2,100}?)\s+(Visceral|Ultra Rare|Very Rare|Rare|Uncommon|Common)\b", re.I)
+    for heading in headings:
+        label = clean(heading)
+        start = full_text.find(label, cursor)
+        if start < 0:
             continue
-        stop = matches[i + 1].start() if i + 1 < len(matches) else len(text)
-        description = text[match.end():stop].strip(" •|—-")
-        records.append({
-            "id": re.sub(r"[^a-z0-9]+", "-", (owner + "-" + name).lower()).strip("-"),
-            "name": name,
-            "description": description,
-            "image": image_urls[i] if i < len(image_urls) else "",
-            "category": owner,
-            "rarity": match.group(2),
-            "source": BASE,
-        })
+        start += len(label)
+        next_heading = None
+        for candidate in soup.find_all(["h2", "h3"]):
+            if candidate.sourceline and heading.sourceline and candidate.sourceline > heading.sourceline:
+                next_heading = clean(candidate)
+                break
+        end = full_text.find(next_heading, start) if next_heading else len(full_text)
+        if end < 0:
+            end = len(full_text)
+        section = full_text[start:end]
+        cursor = end
+        matches = list(pattern.finditer(section))
+        for i, match in enumerate(matches):
+            name = re.sub(r"\s+", " ", match.group(1)).strip(" •|—-")
+            if not name or len(name) > 100:
+                continue
+            stop = matches[i + 1].start() if i + 1 < len(matches) else len(section)
+            description = section[match.end():stop].strip(" •|—-")
+            records.append({
+                "id": re.sub(r"[^a-z0-9]+", "-", (owner + "-" + name).lower()).strip("-"),
+                "name": name,
+                "description": description,
+                "image": "",
+                "category": owner,
+                "rarity": match.group(2),
+                "source": BASE,
+            })
     return records
 
 def scrape_addons():
@@ -230,7 +228,7 @@ def main():
         "maps": scrape_maps(),
         "addons": scrape_addons(),
     }
-    counts = {k: len(result[k]) for k in ("perks", "offerings", "maps")}
+    addon_records = scrape_addons()\n    if len(addon_records) >= 500:\n        result["addons"] = addon_records\n    else:\n        print("Add-on catalog is incomplete; leaving remote fallback enabled.")\n    counts = {k: len(result[k]) for k in ("perks", "offerings", "maps")}
     print("Catalog extraction counts:", json.dumps(counts, ensure_ascii=False))
     # Fail the deployment rather than publish an incomplete or silently empty catalog.
     if counts["perks"] < 200 or counts["offerings"] < 80 or counts["maps"] < 40:
