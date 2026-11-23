@@ -35,6 +35,43 @@ async function load(){
  if(['perks','offerings','maps'].includes(tab)){try{const local=await localCatalog();const data=arr(local[tab]);if(data.length){all=data;$('#connection').textContent='Локальная база загружена';$('#connection').classList.add('ok');render();return}}catch(e){lastError=e}}\n all=[];$('#notice').textContent='Не удалось загрузить этот раздел. Источник данных временно недоступен. ('+(lastError?.message||'ошибка')+')';
  $('#connection').textContent='Нет соединения';$('#connection').classList.remove('ok');render();
 }
+
+const UNIVERSAL_BUILDS = [
+{id:"genrush",title:"Генераторный раш",tag:"GEN RUSH",desc:"Быстрый ремонт: поиск генераторов и ускорение совместной починки.",perks:["Déjà Vu","Prove Thyself","Stake Out","Hyperfocus"]},
+{id:"chase",title:"Побег от убийцы",tag:"CHASE",desc:"Для долгих погонь: информация о петлях, быстрые переходы и дополнительное время.",perks:["Windows of Opportunity","Lithe","Resilience","Off the Record"]},
+{id:"stealth",title:"Скрытность",tag:"STEALTH",desc:"Меньше шума и следов, проще скрыться и не выдать своё местоположение.",perks:["Distortion","Lightweight","Calm Spirit","Urban Evasion"]},
+{id:"healing",title:"Лечение и отхил",tag:"HEALING",desc:"Поиск раненых союзников, ускоренное лечение и возможность лечить себя.",perks:["Botany Knowledge","We'll Make It","Empathy","Self-Care"]},
+{id:"support",title:"Поддержка команды",tag:"TEAM SUPPORT",desc:"Безопасные спасения с крюка и помощь союзникам после спасения.",perks:["Kindred","We'll Make It","Borrowed Time","We're Gonna Live Forever"]},
+{id:"solo",title:"Универсальный соло-билд",tag:"SOLO QUEUE",desc:"Сборка для игры без связи: информация, генераторы и надёжный инструмент для погони.",perks:["Windows of Opportunity","Déjà Vu","Bond","Lithe"]},
+{id:"escape",title:"Выживание любой ценой",tag:"LAST SURVIVOR",desc:"Больше шансов пережить опасную ситуацию, скрыться после удара и дотянуть до выхода.",perks:["Adrenaline","Decisive Strike","Off the Record","Unbreakable"]}
+];
+let allPerks = [];
+function buildPerk(wanted) {
+ const key = norm(wanted).replace(/[^a-z0-9]/g,"");
+ return allPerks.find(p=>norm(name(p)).replace(/[^a-z0-9]/g,"")===key) || allPerks.find(p=>norm(name(p)).replace(/[^a-z0-9]/g,"").includes(key) || key.includes(norm(name(p)).replace(/[^a-z0-9]/g,"")));
+}
+function buildPerkOwner(p) { return String(p.characterName||p.character_name||p.character||p.owner||p.survivor||p.killer||""); }
+const LICENSED_PERK_OWNERS = ["Laurie Strode","Quentin Smith","Detective Tapp","Ash Williams","Nancy Wheeler","Steve Harrington","Cheryl Mason","Jill Valentine","Leon Kennedy","Rebecca Chambers","Ada Wong","Ellen Ripley","Pinhead","Alan Wake","Lara Croft"];
+function buildPerkIsPaid(p) {
+ const owner=buildPerkOwner(p).toLowerCase();
+ return !!(p.isLicensed||p.is_licensed||p.licensed||p.dlc||p.isDlc||p.is_dlc||LICENSED_PERK_OWNERS.some(n=>owner.includes(n.toLowerCase())));
+}
+function renderBuilds() {
+ const q=norm($('#search').value.trim());
+ const groups=UNIVERSAL_BUILDS.filter(b=>norm(b.title+' '+b.tag+' '+b.desc+' '+b.perks.join(' ')).includes(q));
+ $('#sectionTitle').textContent='Готовые билды';
+ $('#sectionLabel').textContent='UNIVERSAL SURVIVOR BUILDS';
+ $('#filters').innerHTML='<span class="builds-hint">Выбери стиль игры — в каждой сборке четыре перка</span>';
+ $('#notice').textContent='Подборки для выжившего • '+groups.length+' сборок';
+ $('#grid').classList.add('build-grid');
+ $('#grid').innerHTML=groups.map(b=>{
+  const perks=b.perks.map(wanted=>{
+   const p=buildPerk(wanted),src=p?image(p):'';
+   return '<div class="build-perk"><div class="build-perk-icon">'+(src?'<img loading="lazy" src="'+esc(src)+'" alt="" onerror="this.style.display=\'none\'">':'<span>✣</span>')+'</div><div class="build-perk-info"><b>'+esc(p?name(p):wanted)+'</b><small>'+esc(p?buildPerkOwner(p):'Перк не найден в базе')+'</small></div>'+(p&&buildPerkIsPaid(p)?'<span class="auric-cell" title="Платный персонаж / лицензированный контент">◈</span>':'')+'</div>';
+  }).join('');
+  return '<article class="build-card"><div class="build-head"><span class="build-tag">'+esc(b.tag)+'</span><h3>'+esc(b.title)+'</h3><p>'+esc(b.desc)+'</p></div><div class="build-perks">'+perks+'</div><div class="build-foot"><span>4 ПЕРКА • ВЫЖИВШИЙ</span><button class="build-copy" data-copy-build="'+b.id+'">Скопировать названия</button></div></article>';
+ }).join('') || '<div class="empty">По этому запросу сборок не найдено.</div>';
+}
 function render(){
  const cfg=TYPES[tab];$('#sectionTitle').textContent=tab==='favorites'?'Избранное':cfg.title;$('#sectionLabel').textContent=tab==='favorites'?'YOUR COLLECTION':cfg.label;
  const data=tab==='favorites'?favorites.map(x=>x.data):all,q=norm($('#search').value.trim()),cats=['Все',...new Set(data.map(category).filter(Boolean))];
@@ -44,7 +81,7 @@ function render(){
  $('#notice').textContent=shown.length?'Найдено: '+shown.length+(tab==='items'?' • скины и косметика исключены':''):'Ничего не найдено';
  $('#grid').innerHTML=shown.map(x=>{const key=id(x),src=image(x),saved=favorites.some(f=>f.key===key);return '<article class="item"><div class="art">'+(src?'<img loading="lazy" src="'+esc(src)+'" alt="" onerror="this.remove()">':'<span class="placeholder">✣</span>')+'</div><div class="itembody"><div class="kind">'+esc(category(x)||cfg?.title||'DBD')+'</div><h3>'+esc(name(x))+'</h3><p>'+esc(desc(x)||'Информация об этой записи доступна в игровом справочнике.')+'</p><div class="cardbottom"><small>'+esc(x.realm||x.characterName||x.character||'DEAD BY DAYLIGHT')+'</small><button class="fav '+(saved?'saved':'')+'" data-fav="'+esc(key)+'">'+(saved?'♥':'♡')+'</button></div></div></article>'}).join('')||'<div class="empty">В этой части Тумана пока пусто.</div>';
 }
-function switchTab(t){tab=t;filter='Все';document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));$('#search').value='';load()}
+function switchTab(t){tab=t;filter='Все';document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));$('#search').value='';if(t==='builds'){renderBuilds();return}load()}
 
 const DBD_MAP_LAYOUTS={"Azarov’s Resting Place":"Autohaven Wreckers/Azarov’s Resting Place.webp",
 "Blood Lodge":"Autohaven Wreckers/Blood Lodge.webp",
@@ -115,6 +152,6 @@ function openMapTactics(map){
  modal.querySelector(".map-route-overlay").dataset.route="safe";
 }
 
-document.addEventListener('click',e=>{const mapCard=e.target.closest('#grid .item');if(tab==='maps'&&mapCard&&!e.target.closest('[data-fav]')){openMapTactics(all.find(x=>name(x)===mapCard.querySelector('h3')?.textContent)||{name:mapCard.querySelector('h3')?.textContent});return}if(e.target.closest('#mapTacticsModal .detail-close')||e.target.id==='mapTacticsModal'){const m=document.getElementById('mapTacticsModal');if(m)m.classList.remove('open');document.body.classList.remove('modal-open');return}const routeBtn=e.target.closest('[data-route]');if(routeBtn&&e.target.closest('#mapTacticsModal'))return;const t=e.target.closest('[data-tab]');if(t){switchTab(t.dataset.tab);return}const f=e.target.closest('[data-filter]');if(f){filter=f.dataset.filter;render();return}const b=e.target.closest('[data-fav]');if(b){const key=b.dataset.fav,item=(tab==='favorites'?favorites.map(x=>x.data):all).find(x=>id(x)===key);if(favorites.some(x=>x.key===key))favorites=favorites.filter(x=>x.key!==key);else if(item)favorites.push({key,data:item});updateFav();render()}});
-$('#search').addEventListener('input',render);$('#refresh').addEventListener('click',load);updateFav();load();
+document.addEventListener('click',e=>{const mapCard=e.target.closest('#grid .item');if(tab==='maps'&&mapCard&&!e.target.closest('[data-fav]')){openMapTactics(all.find(x=>name(x)===mapCard.querySelector('h3')?.textContent)||{name:mapCard.querySelector('h3')?.textContent});return}if(e.target.closest('#mapTacticsModal .detail-close')||e.target.id==='mapTacticsModal'){const m=document.getElementById('mapTacticsModal');if(m)m.classList.remove('open');document.body.classList.remove('modal-open');return}const routeBtn=e.target.closest('[data-route]');if(routeBtn&&e.target.closest('#mapTacticsModal'))return;const t=e.target.closest('[data-tab]');if(t){switchTab(t.dataset.tab);return}const copy=e.target.closest('[data-copy-build]');if(copy){const b=UNIVERSAL_BUILDS.find(x=>x.id===copy.dataset.copyBuild);if(b){const value=b.title+'\\n'+b.perks.join('\\n');navigator.clipboard?.writeText(value).then(()=>copy.textContent='Скопировано ✓').catch(()=>copy.textContent='Не удалось скопировать')}return}const f=e.target.closest('[data-filter]');if(f){filter=f.dataset.filter;render();return}const b=e.target.closest('[data-fav]');if(b){const key=b.dataset.fav,item=(tab==='favorites'?favorites.map(x=>x.data):all).find(x=>id(x)===key);if(favorites.some(x=>x.key===key))favorites=favorites.filter(x=>x.key!==key);else if(item)favorites.push({key,data:item});updateFav();render()}});
+$('#search').addEventListener('input',()=>tab==='builds'?renderBuilds():render());$('#refresh').addEventListener('click',load);updateFav();load();
 if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
