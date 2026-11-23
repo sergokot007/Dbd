@@ -102,7 +102,36 @@ const BUILD_PERK_RU={
  "Botany Knowledge":"Ботанические знания","We'll Make It":"Мы справимся","Empathy":"Эмпатия","Self-Care":"Самолечение",
  "Kindred":"Родственные души","Borrowed Time":"Заёмное время","We're Gonna Live Forever":"Мы будем жить вечно",
  "Bond":"Связь","Adrenaline":"Адреналин","Decisive Strike":"Решающий удар","Unbreakable":"Несломленный"
-};
+}, 
+ "Sprint Burst":"Спринтерский рывок","Decisive Strike":"Решающий удар","Adrenaline":"Адреналин","Unbreakable":"Несломленный",
+ "Quick & Quiet":"Бесшумность","Iron Will":"Железная воля","Lucky Break":"Счастливый случай","Finesse":"Ловкость",
+ "Built to Last":"Долговечность","Resurgence":"Возрождение","Reassurance":"Уверенность","Aftercare":"Забота",
+ "Deliverance":"Избавление","Flashbang":"Светошумовая граната","Plot Twist":"Неожиданный поворот",
+ "Off the Record":"Не под запись","Lithe":"Гибкость","Alert":"Бдительность","Technician":"Техник",
+ "Dead Hard":"Жёсткий удар","We're Gonna Live Forever":"Мы будем жить вечно","Boil Over":"Волна",
+ "Better Than New":"Лучше прежнего","Blast Mine":"Мина-ловушка","Background Player":"Игрок поддержки",
+ "Made for This":"Рождён для этого","Troubleshooter":"Устранение неполадок","Open-Handed":"Открытая ладонь",
+ "Ace in the Hole":"Туз в рукаве","Wake Up!":"Проснись!","Pharmacy":"Аптека","Vigil":"Бдительность",
+ "A Nurse's Calling":"Зов медсестры","Thanatophobia":"Танатофобия","Stridor":"Пронзительный крик",
+ "Hex: Undying":"Проклятие: Бессмертие","Dragon's Grip":"Драконья хватка","Hex: Blood Favor":"Проклятие: Кровавая милость",
+ "Scourge Hook: Pain Resonance":"Крюк-мучитель: Резонанс боли","Grim Embrace":"Мрачные объятия",
+ "Hex: Pentimento":"Проклятие: Пентименто","Corrupt Intervention":"Порченое вмешательство",
+ "Infectious Fright":"Заразительный ужас","Dark Devotion":"Тёмная преданность","Pop Goes the Weasel":"Поп goes the Weasel",
+ "Bamboozle":"Обман","Coulrophobia":"Кулрофобия","Deadlock":"Мёртвая хватка",
+ "Hex: Plaything":"Проклятие: Игрушка","Gift of Pain":"Дар боли","Lethal Pursuer":"Смертельный преследователь",
+ "Eruption":"Извержение","Hysteria":"Истерия","Nowhere to Hide":"Негде спрятаться",
+ "Hubris":"Высокомерие","Face the Darkness":"Лицом к тьме","Barbecue & Chilli":"Барбекю и чили",
+ "Franklin's Demise":"Гибель Франклина","Knock Out":"Нокаут","Spirit Fury":"Ярость духа",
+ "Haunted Ground":"Зачарованная земля","Rancor":"Злоба","I'm All Ears":"Я весь внимание",
+ "Thrilling Tremors":"Волнующая дрожь","Furtive Chase":"Скрытная погоня","No Way Out":"Выхода нет",
+ "Starstruck":"Поражённый звездой","Crowd Control":"Контроль толпы","Predator":"Хищник",
+ "Bloodhound":"Ищейка","Shadowborn":"Рождённый во тьме","Monitor & Abuse":"Наблюдение и жестокость",
+ "Overwhelming Presence":"Подавляющее присутствие","Overcharge":"Перегрузка","Discordance":"Разлад",
+ "Mad Grit":"Безумная хватка","Iron Maiden":"Железная дева","Save the Best for Last":"Приберечь лучшее напоследок",
+ "Play with Your Food":"Игра с едой","Dying Light":"Угасающий свет","Agitation":"Возбуждение",
+ "Unnerving Presence":"Тревожное присутствие","Brutal Strength":"Жестокая сила",
+ "Fire Up":"Разгорается","Remember Me":"Помни меня","Blood Warden":"Страж крови"
+}
 function buildPerkKey(v){return String(v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]/g,"")}
 function buildPerk(wanted) {
  const key=buildPerkKey(wanted);
