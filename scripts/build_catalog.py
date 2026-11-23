@@ -76,7 +76,8 @@ def scrape_maps():
             continue
         card = ancestor_card(h)
         text = clean(card)
-        if not re.search(r"\b\d+\s+to\s+\d+\s+hooks?\b", text, re.I) and h.name != "h3":
+        hooks = re.search(r"(\d+\s+to\s+\d+\s+hooks?)", text, re.I)
+        if not hooks:
             continue
         # Realm is the closest preceding section heading.
         realm = ""
@@ -89,7 +90,6 @@ def scrape_maps():
         if key in seen:
             continue
         seen.add(key)
-        hooks = re.search(r"(\d+\s+to\s+\d+\s+hooks?)", text, re.I)
         desc = text.replace(name, "", 1)
         if hooks:
             desc = desc.replace(hooks.group(1), "", 1)
@@ -465,6 +465,7 @@ def scrape_perk_ru_map(maps):
         "thisisnothappening": "Это не происходит",
         "detectiveshunch": "Интуиция детектива",
         "stakeout": "Под прицелом",
+        "slipperymeat": "Скользкое мясо",
         "unnervingpresence": "Пугающее присутствие",
         "enduring": "Стойкость",
         "lightborn": "Светорожденный",
@@ -616,6 +617,8 @@ def scrape_ru_addon_descriptions(addons, maps):
             described += 1
     print("Russian wiki add-on names:", translated, "/", len(addons))
     print("Russian wiki add-on descriptions:", described, "/", len(addons))
+    missing = [str(x.get("nameEn") or x.get("name")) for x in addons if not re.search(r"[А-Яа-яЁё]", str(x.get("name") or ""))]
+    print("Add-ons without RU names:", missing[:40])
     return addons
 
 def scrape_addons():
@@ -688,6 +691,8 @@ def apply_ru_article_names(records, name_map):
                 item["description"] = extra[0]
                 descriptions += 1
     print("Russian article names matched:", translated, "/", len(records), "; descriptions:", descriptions)
+    missing = [str(x.get("nameEn") or x.get("name")) for x in records if not re.search(r"[А-Яа-яЁё]", str(x.get("name") or ""))]
+    print("Offerings without RU names:", missing[:30])
     return records
 
 
@@ -705,10 +710,43 @@ REALM_RU = {
     "Dvarka Deepwood": "Заросли Дварки", "Sleepless District": "Бессонный район",
 }
 
+
+MAP_RU_EN = {
+    "Ironworks of Misery": "Завод Страданий", "Coal Tower": "Угольная Башня",
+    "Suffocation Pit": "Удушающая Яма", "Shelter Woods": "Лесная Опушка",
+    "Groaning Storehouse": "Стонущий Склад",
+    "The Thompson House": "Дом Томпсонов", "Torment Creek": "Ручей Страданий",
+    "Rancid Abattoir": "Заброшенная Скотобойня", "Rotten Fields": "Сгнившие Поля",
+    "Fractured Cowshed": "Разрушенный Хлев",
+    "Wretched Shop": "Магазин Барахольщика", "Blood Lodge": "Кровавая Лачуга",
+    "Azarov's Resting Place": "Место Упокоения Азарова", "Wreckers' Yard": "Зона Свалки",
+    "Gas Heaven": "Гэс Хевен",
+    "Father Campbell's Chapel": "Часовня Отца Кэмпбелла", "Disturbed Ward": "Отделение для Буйных",
+    "Lampkin Lane": "Переулок Лэмпкин", "Treatment Theater": "Лечебный Зал",
+    "Mother's Dwelling": "Обитель Матери", "The Temple of Purgation": "Храм Очищения",
+    "The Pale Rose": "Бледная Роза", "Grim Pantry": "Чудовищная Кладовая",
+    "Badham Preschool I": "Детский Сад Бэдхем I", "Badham Preschool II": "Детский Сад Бэдхем II",
+    "Badham Preschool III": "Детский Сад Бэдхем III", "Badham Preschool IV": "Детский Сад Бэдхем IV",
+    "Badham Preschool V": "Детский Сад Бэдхем V",
+    "The Game": "Игра", "Family Residence": "Семейная Резиденция",
+    "Sanctum of Wrath": "Прибежище Гнева", "Mount Ormond Resort": 'Курорт "Гора Ормонд"',
+    "Ormond Lake Mine": "Шахта Озера Ормонд", "The Underground Complex": "Подземный Комплекс",
+    "Dead Dawg Saloon": 'Салун "Мертвяк Вусмерть"', "Midwich Elementary School": "Начальная Школа Мидвича",
+    "Raccoon City Police Station East Wing": "Полицейский Участок Раккун-Сити: Восточное Крыло",
+    "Raccoon City Police Station West Wing": "Полицейский Участок Раккун-Сити: Западное Крыло",
+    "Eyrie of Crows": "Воронье Гнездовье", "Dead Sands": "Мёртвые Пески",
+    "Garden of Joy": "Сад Счастья", "Greenville Square": "Площадь Гринвилла",
+    "Freddy Fazbear's Pizza": "Пиццерия Фредди Фазбера", "Fallen Refuge": "Убежище Павших",
+    "The Shattered Square": "Разрушенная Площадь", "Forgotten Ruins": "Забытые Руины",
+    "Toba Landing": "Площадка Тоба", "Nostromo Wreckage": 'Крушение "Ностромо"',
+    "Trickster's Delusion": "Заблуждение Трикстера",
+}
+
 def scrape_ru_maps(records):
     realm_titles = list(dict.fromkeys(REALM_RU.values()))
     realm_export = fetch_ru_wiki_export(realm_titles)
-    map_titles, name_map = [], {}
+    map_titles = []
+    name_map = {norm_en(en): (ru, en, "") for en, ru in MAP_RU_EN.items()}
     source_names = {norm_en(x.get("name")): str(x.get("name") or "") for x in records}
     for source in realm_export.values():
         # Some realm pages expose the English map name as the display text of a Russian link.
@@ -728,6 +766,11 @@ def scrape_ru_maps(records):
         if english:
             name_map[norm_en(english)] = (title, english, article_description_wikitext(wikitext))
     result = apply_ru_article_names(records, name_map)
+    for item in result:
+        realm_ru = REALM_RU.get(str(item.get("realm") or ""))
+        if realm_ru:
+            item["realm"] = realm_ru
+            item["category"] = realm_ru
     missing = [str(x.get("nameEn") or x.get("name")) for x in result if not x.get("displayName") or x.get("displayName") == x.get("nameEn")]
     print("Maps without RU names:", missing[:30])
     return result, name_map
