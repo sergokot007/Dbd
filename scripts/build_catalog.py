@@ -279,6 +279,18 @@ def ru_wiki_soup(title):
             return BeautifulSoup(html, "html.parser")
     except Exception as exc:
         print("Fandom API unavailable for", title, repr(exc))
+    # GitHub-hosted runners are often blocked by Fandom. Jina Reader can fetch
+    # the same public page and return its HTML when explicitly requested.
+    try:
+        proxy_url = "https://r.jina.ai/" + direct
+        proxy_headers = {**HEADERS, "X-Respond-With": "html"}
+        response = requests.get(proxy_url, headers=proxy_headers, timeout=12)
+        response.raise_for_status()
+        if "<html" in response.text.lower() or "mw-parser-output" in response.text:
+            print("Russian wiki page loaded through proxy:", title)
+            return BeautifulSoup(response.text, "html.parser")
+    except Exception as exc:
+        print("Russian wiki proxy unavailable for", title, repr(exc))
     return None
 
 
