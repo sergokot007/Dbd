@@ -99,22 +99,27 @@ def scrape_maps():
 def scrape_offerings():
     soup = page("/offerings/")
     out, seen = [], set()
-    # The index exposes offerings as cards with a heading and a linked CDN icon.
-    for heading in soup.find_all(["h3", "h4"]):
-        name = clean(heading)
-        if not name or len(name) > 100:
+    # Offering cards are image-led; the title, rarity, side and effect are adjacent text.
+    for img in soup.find_all("img"):
+        src = img.get("src") or img.get("data-src") or img.get("data-lazy-src") or ""
+        if "cdn.source.gs" not in src:
             continue
-        card = ancestor_card(heading, 2400)
+        card = ancestor_card(img, 1800)
         raw = clean(card)
-        if len(raw) < len(name) + 12:
+        if len(raw) < 18:
             continue
-        if not re.search(r"\\b(?:Common|Uncommon|Rare|Very Rare|Ultra Rare|Event|Killer|Survivor|Either side)\\b", raw, re.I):
+        marker = re.search(r"\\b(?:Ultra Rare|Very Rare|Rare|Uncommon|Common|Event)\\b", raw, re.I)
+        if not marker:
             continue
-        if name.lower() in seen:
+        name = (img.get("alt") or img.get("title") or "").strip()
+        if not name or name.lower() in {"image", "icon"}:
+            name = raw[:marker.start()].strip(" •|—-")
+            name = re.sub(r"^Image\\s*", "", name).strip()
+        name = re.sub(r"\\s+", " ", name)
+        if not name or len(name) > 100 or name.lower() in seen:
             continue
         seen.add(name.lower())
-        desc = raw.replace(name, "", 1).strip(" •|—-")
-        out.append({"id": re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-"), "name": name, "description": desc, "image": img_for(card), "source": BASE + "/offerings/", "category": "Подношение"})
+        out.append({"id": re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-"), "name": name, "description": raw, "image": urljoin(BASE, src), "source": BASE + "/offerings/", "category": "Подношение"})
     return out
 
 def main():
