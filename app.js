@@ -129,15 +129,39 @@ function render(){
  $('#notice').textContent=shown.length?'Найдено: '+shown.length+(tab==='items'?' • скины и косметика исключены':''):'Ничего не найдено';
  $('#grid').innerHTML=shown.map(x=>{const key=id(x),src=image(x),saved=favorites.some(f=>f&&f.key===key);return '<article class="item" data-item-detail="'+esc(key)+'"><button class="art item-art-button" type="button" data-item-detail="'+esc(key)+'" aria-label="Подробнее: '+esc(name(x))+'">'+(src?'<img loading="lazy" src="'+esc(src)+'" alt="" onerror="this.remove()">':'<span class="placeholder">✣</span>')+'</button><div class="itembody"><div class="kind">'+esc(category(x)||cfg?.title||'DBD')+'</div><h3>'+(tab==='perks'?'<button class="catalog-perk-link" type="button" data-loadout-type="perk" data-loadout-name="'+esc(name(x))+'">'+esc(name(x))+'</button>':'<button class="item-name-link" type="button" data-item-detail="'+esc(key)+'">'+esc(name(x))+'</button>')+'</h3><div class="cardbottom"><small>'+esc(x.realm||x.characterName||x.character||'DEAD BY DAYLIGHT')+'</small><button class="fav '+(saved?'saved':'')+'" data-fav="'+esc(key)+'">'+(saved?'♥':'♡')+'</button></div><button class="item-more" type="button" data-item-detail="'+esc(key)+'">Открыть описание и эффект ↗</button></div></article>'}).join('')||'<div class="empty">В этой части Тумана пока пусто.</div>';
 }
+function detailValue(v){
+ if(v===null||v===undefined||v==="")return "";
+ if(Array.isArray(v))return v.map(detailValue).filter(Boolean).join(" • ");
+ if(typeof v==="object")return Object.entries(v).map(([k,val])=>k+": "+detailValue(val)).filter(Boolean).join(" • ");
+ return String(v);
+}
 function openItemDetail(item){
  const modalId='itemDetailModal';let modal=document.getElementById(modalId);
  if(!modal){modal=document.createElement('div');modal.id=modalId;modal.className='detail-overlay';document.body.appendChild(modal)}
  const title=name(item),english=item.nameEn||item.englishName||item.name_en||item.display_name_en||'';
- const fullDesc=item.description||item.desc||item.contentText||item.content||item.lore||'Описание в локальной базе отсутствует.';
- const effect=item.effect||item.effects||item.power||item.powerDescription||item.power_description||item.bonus||'';
- const fields=[['Тип',item.type||item.category||item.itemType||item.item_type],['Редкость',item.rarity||item.quality],['Стоимость',item.price||item.cost],['Источник',item.source||item.unlock||item.obtain||item.acquisition]];
  const imageUrl=image(item);
- modal.innerHTML='<section class="detail-panel item-detail-panel"><button class="detail-close" aria-label="Закрыть">×</button><div class="eyebrow">IN-GAME ITEM GUIDE</div><div class="item-detail-head">'+(imageUrl?'<img src="'+esc(imageUrl)+'" alt="" class="item-detail-icon" onerror="this.style.display=\'none\'">':'')+'<div><h2>'+esc(title)+'</h2>'+(english&&english!==title?'<p class="item-detail-en">'+esc(english)+'</p>':'')+'</div></div><h3>Что делает</h3><p class="item-detail-description">'+esc(fullDesc)+'</p>'+(effect?'<h3>Эффект в игре</h3><p>'+esc(effect)+'</p>':'')+fields.filter(x=>x[1]).map(x=>'<div class="item-detail-field"><b>'+esc(x[0])+'</b><span>'+esc(Array.isArray(x[1])?x[1].join(', '):x[1])+'</span></div>').join('')+'<p class="item-detail-note">Информация взята из доступных данных справочника. Числа и условия показаны только если они присутствуют в базе.</p></section>';
+ const description=item.descriptionRu||item.description_ru||item.description||item.desc||item.contentText||item.content||item.lore||'';
+ const effect=item.effectDescription||item.effect_description||item.effect||item.effects||item.powerDescription||item.power_description||item.power||item.bonus||'';
+ const sections=[
+  ['Игровой эффект',effect],
+  ['Дополнительное описание',item.detailedDescription||item.detailed_description||item.longDescription||item.long_description||item.gameDescription||item.game_description],
+  ['Заряды и использование',item.charges||item.chargeCount||item.charge_count||item.uses||item.maxUses||item.max_uses],
+  ['Длительность',item.duration||item.effectDuration||item.effect_duration],
+  ['Дальность действия',item.range||item.radius||item.distance],
+  ['Скорость и бонусы',item.speedBonus||item.speed_bonus||item.bonusDescription||item.bonus_description],
+  ['Ограничения и условия',item.conditions||item.requirements||item.restrictions||item.limitations],
+  ['Штрафы и недостатки',item.penalty||item.penalties||item.drawback||item.drawbacks]
+ ].map(([label,value])=>({label,value:detailValue(value)})).filter(x=>x.value);
+ const fields=[
+  ['Категория',item.type||item.category||item.itemType||item.item_type],
+  ['Редкость',item.rarity||item.quality],
+  ['Персонаж / владелец',item.characterName||item.character_name||item.owner||item.character],
+  ['Стоимость',item.price||item.cost],
+  ['Источник',item.source||item.unlock||item.obtain||item.acquisition]
+ ].map(([label,value])=>({label,value:detailValue(value)})).filter(x=>x.value);
+ const descriptionText=detailValue(description)||'Подробное описание для этого объекта пока отсутствует в доступной базе. Не буду придумывать игровые эффекты.';
+ const source=item.sourceUrl||item.source_url||item.wiki||item.url||'';
+ modal.innerHTML='<section class="detail-panel item-detail-panel item-detail-readable"><button class="detail-close" aria-label="Закрыть">×</button><div class="eyebrow">СПРАВОЧНИК DEAD BY DAYLIGHT</div><div class="item-detail-head">'+(imageUrl?'<img src="'+esc(imageUrl)+'" alt="" class="item-detail-icon" onerror="this.style.display=\'none\'">':'<div class="item-detail-icon item-detail-noicon">✣</div>')+'<div><h2>'+esc(title)+'</h2>'+(english&&english!==title?'<p class="item-detail-en">'+esc(english)+'</p>':'')+'<span class="item-detail-kind">'+esc(category(item)||tab)+'</span></div></div><section class="item-detail-section"><h3>Что это и что делает</h3><p class="item-detail-description">'+esc(descriptionText)+'</p></section>'+(sections.length?'<section class="item-detail-section"><h3>Подробности игрового эффекта</h3>'+sections.map(x=>'<div class="item-detail-field"><b>'+esc(x.label)+'</b><span>'+esc(x.value)+'</span></div>').join('')+'</section>':'')+(fields.length?'<section class="item-detail-section"><h3>Характеристики и получение</h3>'+fields.map(x=>'<div class="item-detail-field"><b>'+esc(x.label)+'</b><span>'+esc(x.value)+'</span></div>').join('')+'</section>':'')+(source?'<a class="item-detail-source" href="'+esc(source)+'" target="_blank" rel="noopener">Открыть источник информации ↗</a>':'')+'<p class="item-detail-note">Показываются только сведения, которые действительно есть в базе игры или справочника. Если у объекта не хватает подробностей, это отмечено отдельно.</p></section>';
  modal.classList.add('open');document.body.classList.add('modal-open');
 }
 function switchTab(t){tab=t;filter='Все';document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));$('#search').value='';if(t==='builds'){loadBuilds();return}if(t==='tiers'){loadTierList();return}load()}
