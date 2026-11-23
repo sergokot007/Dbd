@@ -67,3 +67,5 @@
 .map-image-fallback{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:30px;color:#aaa}
 .map-stage.map-image-missing .map-layout-image{display:none}
 @media(max-width:600px){.map-stage{max-height:58vh}.map-route-controls button{flex:1 1 30%;padding:8px 5px;font-size:10px}.map-tactics-panel{padding:14px}.map-warning{font-size:10px}}
+
+.map-stage.map-image-missing:after{content:'Не удалось загрузить схему карты. Попробуй открыть её ещё раз позже.';position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:28px;color:#d7c5c5;background:#17171d;z-index:0}
