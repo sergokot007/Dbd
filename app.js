@@ -51,7 +51,7 @@ async function load(){
  if(tab==='favorites'){render();return}
  $('#notice').textContent='Ищем записи в Тумане…';$('#grid').innerHTML='';
  const cfg=TYPES[tab];let lastError;
- if(['perks','offerings','maps','addons'].includes(tab)){
+ if(['perks','offerings','maps','addons','items'].includes(tab)){
   let local=null;
   try{local=await localCatalog()}catch(e){lastError=e}
   const data=local?arr(local[tab]):[];
@@ -79,7 +79,7 @@ async function load(){
    if(nested.length){all=nested.filter(usableGear);$('#connection').textContent='Резервная база подключена';$('#connection').classList.add('ok');render();return}
   }catch(e){lastError=e}
  }
- if(['perks','offerings','maps'].includes(tab)){try{const local=await localCatalog();const data=arr(local[tab]);if(data.length){all=applyCatalogNames(data,local,tab);$('#connection').textContent='Локальная база загружена';$('#connection').classList.add('ok');render();return}}catch(e){lastError=e}}
+ if(['perks','offerings','maps','items'].includes(tab)){try{const local=await localCatalog();const data=arr(local[tab]);if(data.length){all=applyCatalogNames(data,local,tab);$('#connection').textContent='Локальная база загружена';$('#connection').classList.add('ok');render();return}}catch(e){lastError=e}}
  all=[];$('#notice').textContent=tab==='addons'?'Не удалось открыть каталог улучшений. ('+(lastError?.message||'каталог не опубликован')+')':'Не удалось загрузить этот раздел. Источник данных временно недоступен. ('+(lastError?.message||'ошибка')+')';
  $('#connection').textContent='Нет соединения';$('#connection').classList.remove('ok');render();
 }
