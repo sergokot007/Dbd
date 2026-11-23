@@ -122,6 +122,10 @@ def scrape_offerings():
         print("Offerings JSON endpoint returned", len(normalized), "usable records; using HTML")
     except Exception as exc:
         print("Offerings JSON endpoint unavailable:", repr(exc))
+    linked = scrape_link_catalog("/offerings/", "offerings")
+    if len(linked) >= 80:
+        print("Offerings loaded from detail links:", len(linked))
+        return linked
     # The HTML catalog exposes each offering as a text card with rarity and side.
     soup = page("/offerings/")
     out, seen = [], set()
@@ -615,8 +619,38 @@ def scrape_ru_addon_descriptions(addons, maps):
         if key in descriptions:
             item["description"] = descriptions[key]
             described += 1
+    # Fill remaining names from the maintained per-killer Russian catalog when
+    # its order agrees with the already matched source records.
+    ordered_fills = 0
+    def norm_ru(value):
+        return re.sub(r"[^\w]+", "", str(value or "").lower())
+    for russian_owner, data in maps.get("KILLERS", {}).items():
+        expected = data.get("addons", []) if isinstance(data, dict) else []
+        group = [x for x in addons if str(x.get("category") or "") == russian_owner]
+        if not expected or not group or abs(len(group) - len(expected)) > 3:
+            continue
+        known = [(i, norm_ru(x.get("name"))) for i, x in enumerate(group) if re.search(r"[А-Яа-яЁё]", str(x.get("name") or ""))]
+        if len(known) < 5:
+            continue
+        best_offset, best_score = 0, 0
+        for offset in range(-3, 4):
+            matches = sum(1 for i, name in known if 0 <= i + offset < len(expected) and name == norm_ru(expected[i + offset]))
+            score = matches / len(known)
+            if score > best_score:
+                best_offset, best_score = offset, score
+        if best_score >= 0.7:
+            for i, item in enumerate(group):
+                if re.search(r"[А-Яа-яЁё]", str(item.get("name") or "")):
+                    continue
+                j = i + best_offset
+                if 0 <= j < len(expected):
+                    english = str(item.get("nameEn") or item.get("name") or "")
+                    item["name"] = expected[j]
+                    item["displayName"] = f"{expected[j]} ({english})"
+                    ordered_fills += 1
     print("Russian wiki add-on names:", translated, "/", len(addons))
     print("Russian wiki add-on descriptions:", described, "/", len(addons))
+    print("Additional add-on names filled by owner order:", ordered_fills)
     missing = [str(x.get("nameEn") or x.get("name")) for x in addons if not re.search(r"[А-Яа-яЁё]", str(x.get("name") or ""))]
     print("Add-ons without RU names:", missing[:40])
     return addons
