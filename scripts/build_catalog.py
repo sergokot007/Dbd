@@ -295,7 +295,7 @@ def ru_wiki_soup(title):
     return None
 
 
-def fetch_ru_wiki_export(titles, batch_size=75):
+def fetch_ru_wiki_export(titles, batch_size=50):
     """Bulk-download Russian wiki article source in a few proxy requests."""
     titles = list(dict.fromkeys(str(x).strip() for x in titles if str(x).strip()))
     result = {}
