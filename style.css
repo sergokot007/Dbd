@@ -139,3 +139,22 @@
 .perk-build-usage-card b{font:600 16px 'Barlow Condensed';color:#eee}
 .perk-build-usage-card span{font-size:10px;color:#d58b8f}
 .perk-build-usage-card p,.perk-build-usage-empty{font-size:11px;line-height:1.6;color:#aaa;margin:0}
+
+/* Readable interactive item / offering detail cards */
+.item-art-button{width:100%;border:0;cursor:pointer;background:transparent;padding:0;color:inherit}
+.item-name-link{border:0;background:none;color:inherit;font:inherit;font-weight:700;text-align:left;cursor:pointer;padding:0}
+.item-more{margin-top:12px;padding:9px 12px;border:1px solid #66504a;border-radius:8px;background:#211b1c;color:#f0d7c9;font:600 13px Inter,system-ui;cursor:pointer}
+.item-detail-panel{width:min(680px,calc(100vw - 24px));max-height:88vh;overflow:auto;padding:clamp(20px,4vw,32px)}
+.item-detail-head{display:flex;align-items:center;gap:18px;margin:16px 0 24px}
+.item-detail-icon{width:104px;height:104px;object-fit:contain;flex:0 0 auto;border-radius:12px;background:#211f25;padding:8px}
+.item-detail-panel h2{font-size:clamp(22px,4vw,30px);line-height:1.2;margin:0}
+.item-detail-panel h3{font-size:17px;margin:22px 0 8px;color:#e7c7ad}
+.item-detail-panel p{font-size:16px;line-height:1.65;color:#e1ddd8;white-space:pre-line}
+.item-detail-en{font-size:14px!important;color:#aaa!important;margin:7px 0 0}
+.item-detail-field{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid #ffffff18;font-size:15px}
+.item-detail-field span{text-align:right;color:#d8d2cb}
+.item-detail-note{font-size:12px!important;color:#96919a!important;margin-top:22px}
+.itembody{font-size:15px}
+.itembody .kind{font-size:12px}
+.itembody h3{font-size:18px;line-height:1.35}
+@media(max-width:600px){.item-detail-icon{width:82px;height:82px}.item-detail-panel p{font-size:15px}.item-detail-field{font-size:14px}}
