@@ -766,9 +766,9 @@ def scrape_ru_maps(records):
         if english:
             name_map[norm_en(english)] = (title, english, article_description_wikitext(wikitext))
     result = apply_ru_article_names(records, name_map)
-    map_pages_by_ru = {re.sub(r"[^\\w]+", "", title.lower()): source for title, source in map_export.items()}
+    map_pages_by_ru = {re.sub(r"[^\w]+", "", title.lower()): source for title, source in map_export.items()}
     for item in result:
-        ru_key = re.sub(r"[^\\w]+", "", str(item.get("name") or "").lower())
+        ru_key = re.sub(r"[^\w]+", "", str(item.get("name") or "").lower())
         source = map_pages_by_ru.get(ru_key)
         if source:
             description = article_description_wikitext(source)
