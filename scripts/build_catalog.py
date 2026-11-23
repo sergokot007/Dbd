@@ -80,7 +80,7 @@ def scrape_maps():
             continue
         # Realm is the closest preceding section heading.
         realm = ""
-        for prev in h.find_all_previous(["h2", "h3"]):
+        for prev in h.find_all_previous(["h2"]):
             candidate = clean(prev)
             if candidate and candidate != name:
                 realm = candidate
