@@ -13,11 +13,26 @@ def clean(node):
     return re.sub(r"\s+", " ", node.get_text(" ", strip=True)).strip()
 
 def img_for(node):
-    img = node.find("img") if node else None
-    if not img:
+    if not node:
         return ""
-    src = img.get("src") or img.get("data-src") or img.get("data-lazy-src") or ""
-    return urljoin(BASE, src) if src else ""
+    img = node if getattr(node, "name", None) == "img" else node.find("img")
+    if img:
+        src = (img.get("src") or img.get("data-src") or img.get("data-lazy-src")
+               or img.get("data-original") or img.get("data-lazy") or "")
+        if not src and img.get("srcset"):
+            src = img.get("srcset").split(",")[0].strip().split(" ")[0]
+        if src and not src.startswith("data:"):
+            return urljoin(BASE, src)
+    source = node.select_one("picture source[srcset]") if hasattr(node, "select_one") else None
+    if source:
+        src = source.get("srcset", "").split(",")[0].strip().split(" ")[0]
+        if src and not src.startswith("data:"):
+            return urljoin(BASE, src)
+    for attr in ("data-image", "data-icon", "data-src", "data-background"):
+        src = node.get(attr) if hasattr(node, "get") else None
+        if src and not str(src).startswith("data:"):
+            return urljoin(BASE, str(src))
+    return ""
 
 def page(path):
     response = requests.get(BASE + path, headers=HEADERS, timeout=40)
@@ -62,7 +77,7 @@ def scrape_link_catalog(path, kind):
         seen.add(name.lower())
         text = clean(card)
         desc = text.replace(name, "", 1).strip(" •|—-")
-        out.append({"id": href.strip("/").split("/")[-1], "name": name, "description": desc, "image": img_for(card), "source": urljoin(BASE, href), "category": kind})
+        out.append({"id": href.strip("/").split("/")[-1], "name": name, "description": desc, "image": img_for(a) or img_for(card), "source": urljoin(BASE, href), "category": kind})
     return out
 
 def scrape_maps():
