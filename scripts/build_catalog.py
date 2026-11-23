@@ -99,23 +99,22 @@ def scrape_maps():
 def scrape_offerings():
     soup = page("/offerings/")
     out, seen = [], set()
-    # Offering cards link to their dedicated pages; page order and card text carry rarity/side/effect.
-    for a in soup.find_all("a", href=True):
-        href = a["href"].split("#")[0]
-        if not re.match(r"^/offerings/[^/]+/?$", href):
+    # The index exposes offerings as cards with a heading and a linked CDN icon.
+    for heading in soup.find_all(["h3", "h4"]):
+        name = clean(heading)
+        if not name or len(name) > 100:
             continue
-        card = ancestor_card(a, 2400)
+        card = ancestor_card(heading, 2400)
         raw = clean(card)
-        name = title_for(a) or a.get("aria-label") or a.get("title") or ""
-        if not name:
-            raw_a = clean(a)
-            name = re.split(r"\\s+(?:Very Rare|Ultra Rare|Rare|Uncommon|Common|Event|Killer|Survivor|Either side)\\b", raw_a, maxsplit=1)[0]
-        name = re.sub(r"^Image\\s+", "", name).strip()
-        if not name or name.lower() in seen:
+        if len(raw) < len(name) + 12:
+            continue
+        if not re.search(r"\\b(?:Common|Uncommon|Rare|Very Rare|Ultra Rare|Event|Killer|Survivor|Either side)\\b", raw, re.I):
+            continue
+        if name.lower() in seen:
             continue
         seen.add(name.lower())
         desc = raw.replace(name, "", 1).strip(" •|—-")
-        out.append({"id": href.strip("/").split("/")[-1], "name": name, "description": desc, "image": img_for(card), "source": urljoin(BASE, href), "category": "Подношение"})
+        out.append({"id": re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-"), "name": name, "description": desc, "image": img_for(card), "source": BASE + "/offerings/", "category": "Подношение"})
     return out
 
 def main():
