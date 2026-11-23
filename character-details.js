@@ -71,7 +71,7 @@ function showDbdCharacter(card){
  if(typeof tab!=="undefined"&&tab!=="characters")return;
  if(card.querySelector("[data-fav]")?.matches(":active"))return;
  const key=card.querySelector("h3")?.textContent||"";
- const data=typeof all!=="undefined"?all.find(x=>(x.name||x.displayName||x.display_name||x.title||x.killerName||x.id)===key):null;
+ const data=typeof all!=="undefined"?all.find(x=>normDetail(x.displayName||x.display_name||x.name||x.title||x.killerName||x.id)===normDetail(key)):null;
  if(!data)return;
  const isK=isDbdKiller(data),builds=isK?killerBuilds:survivorBuilds;
  const img=data.image||data.imageUrl||data.image_url||data.icon||data.iconUrl||data.icon_url||data.iconURL||data.portrait||data.portraitURL||"";
@@ -117,7 +117,7 @@ function normDetail(v){return String(v||"").toLowerCase().replace(/^the /,"").re
 function findCharacter(owner){
  if(!owner)return null;
  const pool=typeof all!=="undefined"&&Array.isArray(all)?all:[];
- return pool.find(x=>normDetail(x.name||x.displayName||x.display_name||x.title||x.killerName)===normDetail(owner))||characterPortraits[normDetail(owner)]||null;
+ return pool.find(x=>normDetail(x.displayName||x.display_name||x.name||x.title||x.killerName)===normDetail(owner))||characterPortraits[normDetail(owner)]||null;
 }
 function itemInfo(type,label){
  const n=String(label||"").toLowerCase();
@@ -136,7 +136,8 @@ async function ensureCharacterPortraits(){
  try{const r=await fetch("https://dbd.source.gs/api/characters/",{cache:"force-cache"});if(!r.ok)return;const d=await r.json();const list=Array.isArray(d)?d:(d.data||d.characters||d.items||[]);for(const x of list){const nm=x.name||x.displayName||x.display_name||x.title||x.killerName;const im=x.image||x.imageUrl||x.image_url||x.icon||x.iconUrl||x.icon_url||x.portrait;if(nm&&im)characterPortraits[normDetail(nm)]=x;}}catch{}
 }
 function openLoadoutInfo(type,label){
- const owner=type==="perk"?perkOwners[label]:null;
+ const perkRecord=type==="perk"&&typeof allPerks!=="undefined"?allPerks.find(p=>[p.name,p.displayName,p.display_name,p.nameEn,p.englishName,p.id].some(v=>normDetail(v)===normDetail(label))):null;
+ const owner=type==="perk"?(perkOwners[label]||buildPerkOwner(perkRecord)||null):null;
  const character=owner?findCharacter(owner):null;
  const portrait=character?(character.image||character.imageUrl||character.image_url||character.icon||character.iconUrl||character.icon_url||character.portrait||""):"";
  const info=type==="perk"?(owner?{desc:"Уникальный перк персонажа "+owner+". После открытия его можно использовать на других персонажах той же роли.",obtain:"Повысь "+owner+" до престижа 1, чтобы открыть перк I уровня всем персонажам этой роли; престиж 2 и 3 сразу открывают II и III уровни. Альтернатива — купить перк в Святилище тайн за радужные осколки, когда он там появится."}:{desc:"Общий перк: он не привязан к одному конкретному персонажу.",obtain:"Открывается через Кровавую паутину. Если перк относится к отдельному персонажу, его владелец будет указан в карточке."}):itemInfo(type,label);
