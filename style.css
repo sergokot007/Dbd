@@ -188,3 +188,7 @@
  .item-detail-field b,.item-detail-field span{font-size:14px}
  .item-more{font-size:12px;padding:11px}
 }
+/* Reliable perk artwork sizing in build cards */
+.build-perk-icon{display:flex;align-items:center;justify-content:center;overflow:hidden;object-fit:contain}
+.build-perk-icon img{display:block;width:100%;height:100%;object-fit:contain;border-radius:2px}
+.build-perk-placeholder{font-size:20px}
