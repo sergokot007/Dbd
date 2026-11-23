@@ -129,7 +129,7 @@ function render(){
  $('#notice').textContent=shown.length?'Найдено: '+shown.length+(tab==='items'?' • скины и косметика исключены':''):'Ничего не найдено';
  $('#grid').innerHTML=shown.map(x=>{const key=id(x),src=image(x),saved=favorites.some(f=>f&&f.key===key);return '<article class="item"><div class="art">'+(src?'<img loading="lazy" src="'+esc(src)+'" alt="" onerror="this.remove()">':'<span class="placeholder">✣</span>')+'</div><div class="itembody"><div class="kind">'+esc(category(x)||cfg?.title||'DBD')+'</div><h3>'+esc(name(x))+'</h3><p>'+esc(desc(x)||'Информация об этой записи доступна в игровом справочнике.')+'</p><div class="cardbottom"><small>'+esc(x.realm||x.characterName||x.character||'DEAD BY DAYLIGHT')+'</small><button class="fav '+(saved?'saved':'')+'" data-fav="'+esc(key)+'">'+(saved?'♥':'♡')+'</button></div></div></article>'}).join('')||'<div class="empty">В этой части Тумана пока пусто.</div>';
 }
-function switchTab(t){tab=t;filter='Все';document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));$('#search').value='';if(t==='builds'){loadBuilds();return}if(t==='tiers'){renderTierList();return}load()}
+function switchTab(t){tab=t;filter='Все';document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));$('#search').value='';if(t==='builds'){loadBuilds();return}if(t==='tiers'){loadTierList();return}load()}
 
 const DBD_MAP_LAYOUTS={"Azarov’s Resting Place":"Autohaven Wreckers/Azarov’s Resting Place.webp",
 "Blood Lodge":"Autohaven Wreckers/Blood Lodge.webp",
