@@ -145,7 +145,8 @@ def scrape_offerings():
 
 def addon_section(soup, owner):
     full_text = soup.get_text(" ", strip=True)
-    all_headings = soup.find_all(["h2", "h3"])\n    headings = [h for h in all_headings if clean(h).lower() == "add-ons" or clean(h).lower().endswith(" add-ons")]
+    all_headings = soup.find_all(["h2", "h3"])
+    headings = [h for h in all_headings if clean(h).lower() == "add-ons" or clean(h).lower().endswith(" add-ons")]
     records = []
     cursor = 0
     pattern = re.compile(r"Image\s*(.{2,100}?)\s+(Visceral|Ultra Rare|Very Rare|Rare|Uncommon|Common)\b", re.I)
