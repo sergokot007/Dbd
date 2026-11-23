@@ -880,6 +880,7 @@ def fetch_external_ru_localization():
         "addons": "addons.json",
         "items": "items.json",
         "offerings": "offerings.json",
+        "character_names": "character-translations.ru.json",
         "loadout_names": "loadout-translations.ru.json",
         "loadout_descriptions": "loadout-description-ru-raw.json",
     }
@@ -898,6 +899,19 @@ def fetch_external_ru_localization():
 
 def apply_external_ru_localization(records, kind, source):
     """Apply verified RU-client names and descriptions, retaining English search aliases."""
+    if kind == "characters":
+        character_names = source.get("character_names", {})
+        translated = 0
+        for item in records:
+            english = str(item.get("nameEn") or item.get("name") or "")
+            russian = character_names.get(english)
+            if russian and russian != english:
+                item["nameEn"] = english
+                item["name"] = russian
+                item["displayName"] = f"{russian} ({english})"
+                translated += 1
+        print("External Russian characters names:", translated, "/", len(records))
+        return records
     rows = source.get(kind, [])
     if not isinstance(rows, list):
         rows = []
@@ -917,8 +931,9 @@ def apply_external_ru_localization(records, kind, source):
             russian = source.get("perk_names", {}).get(slug) or row.get("name", {}).get("ru")
             description = source.get("perk_descriptions", {}).get(slug, "")
         else:
-            russian = source.get("loadout_names", {}).get(kind + ":" + slug) or row.get("name", {}).get("ru")
-            description = source.get("loadout_descriptions", {}).get(kind + ":" + slug, "")
+            loadout_kind = {"addons": "addon", "items": "item", "offerings": "offering"}[kind]
+            russian = source.get("loadout_names", {}).get(loadout_kind + ":" + slug) or row.get("name", {}).get("ru")
+            description = source.get("loadout_descriptions", {}).get(loadout_kind + ":" + slug, "")
         if russian and russian != english:
             item["nameEn"] = english
             item["name"] = russian
@@ -933,6 +948,7 @@ def apply_external_ru_localization(records, kind, source):
 
 def external_translation_maps(source):
     names, descriptions = {}, {}
+    names["characters"] = {k: v for k, v in source.get("character_names", {}).items() if k != "_comment"}
     for kind in ("perks", "addons", "items", "offerings"):
         names[kind], descriptions[kind] = {}, {}
         rows = source.get(kind, [])
@@ -947,8 +963,9 @@ def external_translation_maps(source):
                 russian = source.get("perk_names", {}).get(slug) or row.get("name", {}).get("ru")
                 description = source.get("perk_descriptions", {}).get(slug, "")
             else:
-                russian = source.get("loadout_names", {}).get(kind + ":" + slug) or row.get("name", {}).get("ru")
-                description = source.get("loadout_descriptions", {}).get(kind + ":" + slug, "")
+                loadout_kind = {"addons": "addon", "items": "item", "offerings": "offering"}[kind]
+                russian = source.get("loadout_names", {}).get(loadout_kind + ":" + slug) or row.get("name", {}).get("ru")
+                description = source.get("loadout_descriptions", {}).get(loadout_kind + ":" + slug, "")
             if russian and russian != english:
                 names[kind][english] = russian
             if description and re.search(r"[А-Яа-яЁё]", str(description)):
@@ -969,11 +986,11 @@ def main():
         "maps": scrape_maps(),
         "addons": [],
     }
-    result["characters"] = apply_ru_names(scrape_link_catalog("/killers/", "killers") + scrape_link_catalog("/survivors/", "survivors"), ru_maps, "characters")
+    result["characters"] = apply_external_ru_localization(apply_ru_names(scrape_link_catalog("/killers/", "killers") + scrape_link_catalog("/survivors/", "survivors"), ru_maps, "characters"), "characters", external_ru)
     result["maps"], map_ru_map = scrape_ru_maps(result["maps"])
     result["items"] = apply_external_ru_localization(apply_ru_names(scrape_link_catalog("/items/", "items"), ru_maps, "items"), "items", external_ru)
     result["translations"] = {
-        "characters": {**ru_maps.get("KILLER_EN_RU", {}), **ru_maps.get("SURVIVOR_EN_RU", {})},
+        "characters": {**ru_maps.get("KILLER_EN_RU", {}), **ru_maps.get("SURVIVOR_EN_RU", {}), **external_names.get("characters", {})},
         "items": {**{en: ru for ru, en in ru_maps.get("ITEM_RU_EN", {}).items()}, **external_names.get("items", {})},
         "addons": {**{en: ru for variable in ("ADDON_RU_EN", "ITEM_ADDON_RU_EN") for group in ru_maps.get(variable, {}).values() for ru, en in group.items()}, **external_names.get("addons", {})},
         "offerings": {**{en: ru for _, (ru, en, *_rest) in offering_ru_map.items()}, **external_names.get("offerings", {})},
