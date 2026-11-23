@@ -133,9 +133,10 @@ function itemInfo(type,label){
 }
 async function ensureCharacterPortraits(){
  if(Object.keys(characterPortraits).length)return;
- try{const r=await fetch("https://dbd.source.gs/api/characters/",{cache:"force-cache"});if(!r.ok)return;const d=await r.json();const list=Array.isArray(d)?d:(d.data||d.characters||d.items||[]);for(const x of list){const nm=x.name||x.displayName||x.display_name||x.title||x.killerName;const im=x.image||x.imageUrl||x.image_url||x.icon||x.iconUrl||x.icon_url||x.portrait;if(nm&&im)characterPortraits[normDetail(nm)]=x;}}catch{}
+ try{let list=[];if(typeof localCatalog==="function"){const catalog=await localCatalog();list=Array.isArray(catalog.characters)?catalog.characters:[];}if(!list.length){const r=await fetch("https://dbd.source.gs/api/characters/",{cache:"force-cache"});if(r.ok){const payload=await r.json();list=Array.isArray(payload)?payload:(payload.data||payload.characters||payload.items||[]);}}for(const x of list){const nm=x.displayName||x.display_name||x.name||x.title||x.killerName;const im=x.image||x.imageUrl||x.image_url||x.icon||x.iconUrl||x.icon_url||x.portrait;if(nm&&im)characterPortraits[normDetail(nm)]=x;}}catch{}
 }
-function openLoadoutInfo(type,label){
+async function openLoadoutInfo(type,label){
+ if(type==="perk"&&typeof localCatalog==="function"&&(!Array.isArray(allPerks)||!allPerks.length)){try{const catalog=await localCatalog();allPerks=Array.isArray(catalog.perks)?catalog.perks:[]}catch{}}
  const perkRecord=type==="perk"&&typeof allPerks!=="undefined"?allPerks.find(p=>[p.name,p.displayName,p.display_name,p.nameEn,p.englishName,p.id].some(v=>normDetail(v)===normDetail(label))):null;
  const owner=type==="perk"?(perkOwners[label]||buildPerkOwner(perkRecord)||null):null;
  const character=owner?findCharacter(owner):null;
