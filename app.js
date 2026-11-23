@@ -2,7 +2,7 @@ const API='https://dbd-stats.info/api';
 const SOURCE='https://dbd.source.gs/api';
 const TYPES={
 characters:{title:'Персонажи',label:'THE ROSTER',endpoint:'characters',source:SOURCE+'/characters/'},
-perks:{title:'Перки',label:'TEACHABLES & ABILITIES',endpoint:'perks',source:[SOURCE+'/perks/','https://dbd.tricky.lol/api/perks?branch=live']},
+perks:{title:'Перки',label:'TEACHABLES & ABILITIES',endpoint:'perks',source:['https://dbd.tricky.lol/api/perks','https://dbd.tricky.lol/api/perks?branch=live',SOURCE+'/perks/']},
 items:{title:'Предметы',label:'SURVIVAL GEAR',endpoint:'items',source:SOURCE+'/items/'},
 offerings:{title:'Подношения',label:'OFFERINGS',endpoint:'offerings',source:SOURCE+'/offerings/'},
 addons:{title:'Аддоны',label:'ADD-ONS',endpoint:'itemaddons',source:SOURCE+'/itemaddons/'},
