@@ -13,7 +13,7 @@ try{favorites=JSON.parse(localStorage.getItem('dbd-favorites')||'[]')}catch{}
 const $=s=>document.querySelector(s);
 const norm=x=>String(x??'').toLowerCase();
 function arr(d){if(Array.isArray(d))return d;for(const k of ['data','results','items','characters','perks','maps','realms','killers','survivors','offerings','addons','itemAddons','item_addons','killerAddons','killer_addons','survivorAddons','survivor_addons','entries','list'])if(Array.isArray(d?.[k]))return d[k];if(d&&typeof d==='object'){const nested=Object.values(d).find(v=>Array.isArray(v));if(nested)return nested}return []}
-function name(x){return x.name||x.displayName||x.display_name||x.title||x.killerName||x.id||'Без названия'}
+function name(x){return x.displayName||x.name||x.display_name||x.title||x.killerName||x.id||'Без названия'}
 function desc(x){return x.description||x.desc||x.effect||x.power||x.contentText||x.content||''}
 function image(x){return x.image||x.imageUrl||x.image_url||x.icon||x.iconUrl||x.icon_url||x.iconURL||x.perkIcon||x.perk_icon||x.iconPath||x.icon_path||x.portrait||x.portraitURL||''}
 function category(x){return x.role||x.type||x.category||x.realm||x.faction||x.characterName||x.character||''}
@@ -85,7 +85,7 @@ function render(){
  const data=tab==='favorites'?favorites.map(x=>x.data):all,q=norm($('#search').value.trim()),cats=['Все',...new Set(data.map(category).filter(Boolean))];
  if(!cats.includes(filter))filter='Все';
  $('#filters').innerHTML=cats.length>2?cats.map(c=>'<button class="'+(filter===c?'active':'')+'" data-filter="'+esc(c)+'">'+esc(c)+'</button>').join(''):'';
- const shown=data.filter(x=>(filter==='Все'||category(x)===filter)&&(!q||norm(name(x)+' '+desc(x)+' '+category(x)).includes(q)));
+ const shown=data.filter(x=>(filter==='Все'||category(x)===filter)&&(!q||norm(name(x)+' '+(x.nameEn||'')+' '+desc(x)+' '+category(x)).includes(q)));
  $('#notice').textContent=shown.length?'Найдено: '+shown.length+(tab==='items'?' • скины и косметика исключены':''):'Ничего не найдено';
  $('#grid').innerHTML=shown.map(x=>{const key=id(x),src=image(x),saved=favorites.some(f=>f.key===key);return '<article class="item"><div class="art">'+(src?'<img loading="lazy" src="'+esc(src)+'" alt="" onerror="this.remove()">':'<span class="placeholder">✣</span>')+'</div><div class="itembody"><div class="kind">'+esc(category(x)||cfg?.title||'DBD')+'</div><h3>'+esc(name(x))+'</h3><p>'+esc(desc(x)||'Информация об этой записи доступна в игровом справочнике.')+'</p><div class="cardbottom"><small>'+esc(x.realm||x.characterName||x.character||'DEAD BY DAYLIGHT')+'</small><button class="fav '+(saved?'saved':'')+'" data-fav="'+esc(key)+'">'+(saved?'♥':'♡')+'</button></div></div></article>'}).join('')||'<div class="empty">В этой части Тумана пока пусто.</div>';
 }
