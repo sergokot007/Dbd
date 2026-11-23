@@ -100,7 +100,7 @@ def scrape_offerings():
     # Prefer the documented JSON endpoint when available; it avoids brittle page markup.
     api = "https://dbd-stats.info/api/offerings?branch=live"
     try:
-        response = requests.get(api, headers=HEADERS, timeout=25)
+        response = requests.get(api, headers=HEADERS, timeout=8)
         response.raise_for_status()
         payload = response.json()
         candidates = payload if isinstance(payload, list) else []
@@ -130,23 +130,30 @@ def scrape_offerings():
         print("Offerings JSON endpoint returned", len(normalized), "usable records; trying page parser")
     except Exception as exc:
         print("Offerings JSON endpoint unavailable:", repr(exc))
-    # Fallback: the public HTML page, whose cards may change markup over time.
+    # Fallback: parse the rarity text nodes on the public HTML page.
     soup = page("/offerings/")
     out, seen = [], set()
-    for node in soup.find_all(["h2", "h3", "h4", "a", "div", "article", "li"]):
-        text = clean(node)
-        if not text or len(text) > 1500:
-            continue
-        marker = re.search(r"\b(?:Ultra Rare|Very Rare|Rare|Uncommon|Common|Event)\b", text, re.I)
+    rarity_re = re.compile(r"\b(?:Ultra Rare|Very Rare|Rare|Uncommon|Common|Event)\b", re.I)
+    for text_node in soup.find_all(string=rarity_re):
+        node = text_node.parent
+        card = node
+        for parent in node.parents:
+            candidate = clean(parent)
+            if 20 < len(candidate) < 900:
+                card = parent
+                break
+        raw = clean(card)
+        marker = rarity_re.search(raw)
         if not marker:
             continue
-        name = text[:marker.start()].strip(" •|—-")
+        name = raw[:marker.start()].strip(" •|—-")
         name = re.sub(r"^(?:Image\s*)+", "", name).strip()
         name = re.sub(r"\s+", " ", name)
         if not name or len(name) > 100 or name.lower() in seen:
             continue
         seen.add(name.lower())
-        out.append({"id": re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-"), "name": name, "description": text, "image": img_for(node), "source": BASE + "/offerings/", "category": "Подношение"})
+        out.append({"id": re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-"), "name": name, "description": raw, "image": img_for(card), "source": BASE + "/offerings/", "category": "Подношение"})
+    print("Offerings HTML text-node records:", len(out))
     return out
 
 def main():
