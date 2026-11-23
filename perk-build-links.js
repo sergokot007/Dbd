@@ -13,7 +13,29 @@
     const catalogPerk = perkList.find(p =>
       [p.name,p.displayName,p.display_name,p.nameEn,p.englishName,p.id].some(v=>key(v)===key(label))
     );
-    const names = [label,catalogPerk && catalogPerk.name,catalogPerk && catalogPerk.nameEn,catalogPerk && catalogPerk.englishName].filter(Boolean).map(key);
+    const names = [label,catalogPerk && catalogPerk.name,catalogPerk && catalogPerk.displayName,catalogPerk && catalogPerk.display_name,catalogPerk && catalogPerk.nameEn,catalogPerk && catalogPerk.englishName,catalogPerk && catalogPerk.id].filter(Boolean).map(key);
+    // Restore the original in-game perk artwork in the detail header.
+    const perkImage = catalogPerk && (catalogPerk.image || catalogPerk.imageUrl || catalogPerk.image_url || catalogPerk.icon || catalogPerk.iconUrl || catalogPerk.icon_url || catalogPerk.iconURL || catalogPerk.perkIcon || catalogPerk.perk_icon || catalogPerk.iconPath || catalogPerk.icon_path);
+    if (perkImage) {
+      const head = panel.querySelector(".detail-head");
+      const oldImage = head && head.querySelector(":scope > img");
+      const placeholder = head && head.querySelector(":scope > .detail-placeholder");
+      if (oldImage) {
+        oldImage.src = perkImage;
+        oldImage.alt = "Иконка перка " + label;
+        oldImage.classList.add("perk-original-artwork");
+        oldImage.style.objectFit = "contain";
+        oldImage.style.background = "rgba(0,0,0,.22)";
+      } else if (placeholder) {
+        const img = document.createElement("img");
+        img.src = perkImage;
+        img.alt = "Иконка перка " + label;
+        img.className = "perk-original-artwork";
+        img.style.objectFit = "contain";
+        img.style.background = "rgba(0,0,0,.22)";
+        placeholder.replaceWith(img);
+      }
+    }
     const includes = list => list.some(p=>names.includes(key(p)) || names.some(n=>n && (n.includes(key(p)) || key(p).includes(n))));
     const rows = [];
     const add = (list,role) => (list || []).forEach(build=>{
