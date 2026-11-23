@@ -2,11 +2,11 @@ const API='https://dbd-stats.info/api';
 const SOURCE='https://dbd.source.gs/api';
 const TYPES={
 characters:{title:'Персонажи',label:'THE ROSTER',endpoint:'characters',source:SOURCE+'/characters/'},
-perks:{title:'Перки',label:'TEACHABLES & ABILITIES',endpoint:'perks',source:['https://dbd.tricky.lol/api/perks','https://dbd.tricky.lol/api/perks?branch=live',SOURCE+'/perks/']},
+perks:{title:'Перки',label:'TEACHABLES & ABILITIES',endpoint:'perks'},
 items:{title:'Предметы',label:'SURVIVAL GEAR',endpoint:'items',source:SOURCE+'/items/'},
-offerings:{title:'Подношения',label:'OFFERINGS',endpoint:'offerings',source:['https://dbd.tricky.lol/api/offerings?branch=live','https://dbd.tricky.lol/api/offerings']},
-addons:{title:'Аддоны',label:'ADD-ONS',endpoint:'itemaddons',source:['https://dbd.tricky.lol/api/itemaddons?branch=live','https://dbd.tricky.lol/api/itemaddons']},
-maps:{title:'Карты',label:'THE REALMS',endpoint:'maps',source:['https://dbd.tricky.lol/api/maps?branch=live','https://dbd.tricky.lol/api/maps']}
+offerings:{title:'Подношения',label:'OFFERINGS',endpoint:'offerings'},
+addons:{title:'Аддоны',label:'ADD-ONS',endpoint:'itemaddons'},
+maps:{title:'Карты',label:'THE REALMS',endpoint:'maps'}
 };
 let tab='characters',all=[],filter='Все',favorites=[];
 try{favorites=JSON.parse(localStorage.getItem('dbd-favorites')||'[]')}catch{}
@@ -22,17 +22,17 @@ function usableGear(x){return !cosmetic(x)&&!x.isCosmetic&&!x.is_cosmetic&&!x.co
 function id(x){return String(x.id||x._id||x.name||name(x))}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function updateFav(){$('#favCount').textContent=favorites.length;localStorage.setItem('dbd-favorites',JSON.stringify(favorites))}
-async function getData(url){const r=await fetch(url,{cache:'no-store',credentials:'omit'});if(!r.ok)throw Error('HTTP '+r.status);return r.json()}
+async function getData(url){const r=await fetch(url,{cache:'no-store',credentials:'omit'});if(!r.ok)throw Error('HTTP '+r.status);return r.json()}\nlet catalogPromise;async function localCatalog(){if(!catalogPromise)catalogPromise=fetch('./catalog-data.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Локальный каталог ещё не опубликован');return r.json()});return catalogPromise}
 async function load(){
  if(tab==='favorites'){render();return}
  $('#notice').textContent='Ищем записи в Тумане…';$('#grid').innerHTML='';
- const cfg=TYPES[tab],sources=[...(cfg.source?(Array.isArray(cfg.source)?cfg.source:[cfg.source]):[]),...(tab==='addons'?[SOURCE+'/addons/']:[]),API+'/'+cfg.endpoint+'?branch=live',API+'/'+cfg.endpoint,API+'/'+cfg.endpoint+'/'];let lastError;
+ const cfg=TYPES[tab];let lastError;\n if(['perks','offerings','maps'].includes(tab)){try{const local=await localCatalog();const data=arr(local[tab]);if(data.length){all=data;$('#connection').textContent='Локальная база загружена';$('#connection').classList.add('ok');render();return}}catch(e){lastError=e}}\n const sources=[...(cfg.source?(Array.isArray(cfg.source)?cfg.source:[cfg.source]):[]),...(tab==='addons'?[SOURCE+'/addons/',SOURCE+'/items/']:[]),API+'/'+cfg.endpoint+'?branch=live',API+'/'+cfg.endpoint,API+'/'+cfg.endpoint+'/'];
  for(const url of sources){try{
   let data=arr(await getData(url));if(['items','addons','offerings'].includes(tab))data=data.filter(usableGear);if(!data.length)throw Error('Источник вернул пустой список');
   all=data;$('#connection').textContent=url.startsWith(SOURCE)?'Резервная база подключена':'База подключена';$('#connection').classList.add('ok');render();return;
  }catch(e){lastError=e}}
  if(tab==='addons'){try{const [chars,items]=await Promise.all([getData(SOURCE+'/characters/'),getData(SOURCE+'/items/')]);const nested=[...arr(chars),...arr(items)].flatMap(x=>x.addons||x.addOns||x.add_ons||x.itemAddons||x.item_addons||x.powerAddons||x.power_addons||[]);if(nested.length){all=nested.filter(usableGear);$('#connection').textContent='Резервная база подключена';$('#connection').classList.add('ok');render();return}}catch(e){lastError=e}}
- all=[];$('#notice').textContent='Не удалось загрузить этот раздел. Источник данных временно недоступен. ('+(lastError?.message||'ошибка')+')';
+ if(['perks','offerings','maps'].includes(tab)){try{const local=await localCatalog();const data=arr(local[tab]);if(data.length){all=data;$('#connection').textContent='Локальная база загружена';$('#connection').classList.add('ok');render();return}}catch(e){lastError=e}}\n all=[];$('#notice').textContent='Не удалось загрузить этот раздел. Источник данных временно недоступен. ('+(lastError?.message||'ошибка')+')';
  $('#connection').textContent='Нет соединения';$('#connection').classList.remove('ok');render();
 }
 function render(){
