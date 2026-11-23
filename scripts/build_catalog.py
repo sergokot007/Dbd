@@ -269,7 +269,7 @@ def ru_wiki_soup(title):
         pass
     try:
         response = requests.get(
-            "https://dead-by-daylight.fandom.com/api.php",
+            "https://dead-by-daylight.fandom.com/ru/api.php",
             params={"action": "parse", "page": title, "prop": "text", "format": "json"},
             headers=HEADERS, timeout=12,
         )
@@ -302,7 +302,7 @@ def fetch_ru_wiki_export(titles, batch_size=75):
     for start in range(0, len(titles), batch_size):
         batch = titles[start:start + batch_size]
         params = urlencode({"action": "query", "export": "1", "exportnowrap": "1", "titles": "|".join(batch), "format": "xml"})
-        target = "https://dead-by-daylight.fandom.com/api.php?" + params
+        target = "https://dead-by-daylight.fandom.com/ru/api.php?" + params
         proxy = "https://r.jina.ai/" + target
         payload = ""
         for attempt in range(3):
