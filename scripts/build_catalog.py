@@ -226,7 +226,12 @@ def main():
         "maps": scrape_maps(),
         "addons": [],
     }
-    addon_records = scrape_addons()\n    if len(addon_records) >= 500:\n        result["addons"] = addon_records\n    else:\n        print("Add-on catalog is incomplete; leaving remote fallback enabled.")\n    counts = {k: len(result[k]) for k in ("perks", "offerings", "maps")}
+    addon_records = scrape_addons()
+    if len(addon_records) >= 500:
+        result["addons"] = addon_records
+    else:
+        print("Add-on catalog is incomplete; leaving remote fallback enabled.")
+    counts = {k: len(result[k]) for k in ("perks", "offerings", "maps")}
     print("Catalog extraction counts:", json.dumps(counts, ensure_ascii=False))
     # Fail the deployment rather than publish an incomplete or silently empty catalog.
     if counts["perks"] < 200 or counts["offerings"] < 80 or counts["maps"] < 40:
