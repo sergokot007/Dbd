@@ -27,7 +27,8 @@ function applyCatalogNames(records,catalog,kind){
  const maps=catalog?.translations||{},map=maps[kind]||{};
  return records.map(item=>{
   const en=String(item.nameEn||item.name||item.display_name||item.title||'');
-  const normalized=translationKey(en),shortName=translationKey(en.replace(/^the\\s+/i,''));\n  const ru=map[normalized]||map[shortName]||Object.entries(map).find(([key])=>translationKey(key)===normalized||translationKey(key)===shortName)?.[1]||maps.perksById?.[String(item.id||'')];
+  const normalized=translationKey(en),shortName=translationKey(en.replace(/^the\s+/i,''));
+  const ru=map[normalized]||map[shortName]||Object.entries(map).find(([key])=>translationKey(key)===normalized||translationKey(key)===shortName)?.[1]||maps.perksById?.[String(item.id||'')];
   return ru?{...item,nameEn:en,name:ru,displayName:ru+' ('+en+')'}:item;
  });
 }
