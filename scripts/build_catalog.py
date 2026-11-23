@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Build an offline catalog from the public dbd.source.gs reference pages."""
-import json, re, sys, time
+import ast, json, re, sys, time
 from pathlib import Path
 from urllib.parse import urljoin
 import requests
@@ -144,47 +144,105 @@ def scrape_offerings():
     return out
 
 def addon_section(soup, owner):
-    full_text = soup.get_text(" ", strip=True)
-    all_headings = soup.find_all(["h2", "h3"])
-    headings = [h for h in all_headings if clean(h).lower() == "add-ons" or clean(h).lower().endswith(" add-ons")]
+    """Read add-on cards from the real DOM; image alt text is not part of get_text()."""
     records = []
-    cursor = 0
-    pattern = re.compile(r"Image\s*(.{2,100}?)\s+(Visceral|Ultra Rare|Very Rare|Rare|Uncommon|Common)\b", re.I)
+    rarity_re = re.compile(r"\\b(Visceral|Ultra Rare|Very Rare|Rare|Uncommon|Common)\\b", re.I)
+    headings = [h for h in soup.find_all(["h2", "h3"]) if "add-on" in clean(h).lower()]
     for heading in headings:
-        label = clean(heading)
-        start = full_text.find(label, cursor)
-        if start < 0:
-            continue
-        start += len(label)
-        heading_index = all_headings.index(heading)
-        next_heading = clean(all_headings[heading_index + 1]) if heading_index + 1 < len(all_headings) else ""
-        end = full_text.find(next_heading, start) if next_heading else len(full_text)
-        if end < 0:
-            end = len(full_text)
-        section = full_text[start:end]
-        cursor = end
-        matches = list(pattern.finditer(section))
-        for i, match in enumerate(matches):
-            name = re.sub(r"\s+", " ", match.group(1)).strip(" •|—-")
+        for img in heading.find_all_next("img"):
+            # Only images belonging to this exact add-on section.
+            if img.find_previous(["h2", "h3"]) is not heading:
+                break
+            pieces = []
+            for node in img.next_elements:
+                if isinstance(node, Tag) and node is not img:
+                    if node.name in ("img", "h2", "h3"):
+                        break
+                if isinstance(node, NavigableString):
+                    value = str(node).strip()
+                    if value:
+                        pieces.append(value)
+            segment = re.sub(r"\\s+", " ", " ".join(pieces)).strip()
+            marker = rarity_re.search(segment)
+            if not marker:
+                continue
+            name = segment[:marker.start()].strip(" •|—-:").strip()
+            name = re.sub(r"^(?:Image\\s*)+", "", name, flags=re.I).strip()
             if not name or len(name) > 100:
                 continue
-            stop = matches[i + 1].start() if i + 1 < len(matches) else len(section)
-            description = section[match.end():stop].strip(" •|—-")
+            description = segment[marker.end():].strip(" •|—-")
+            # Keep a useful fallback if the source places the text outside the image node.
+            if not description:
+                card = ancestor_card(img)
+                card_text = clean(card)
+                card_marker = rarity_re.search(card_text)
+                if card_marker:
+                    description = card_text[card_marker.end():].strip(" •|—-")
             records.append({
                 "id": re.sub(r"[^a-z0-9]+", "-", (owner + "-" + name).lower()).strip("-"),
-                "name": name,
-                "description": description,
-                "image": "",
-                "category": owner,
-                "rarity": match.group(2),
-                "source": BASE,
+                "name": name, "description": description, "image": img.get("src") or img.get("data-src") or "",
+                "category": owner, "rarity": marker.group(1), "source": BASE,
             })
+    return records
+
+def assignment_from_python(source, variable):
+    tree = ast.parse(source)
+    for node in tree.body:
+        if isinstance(node, ast.Assign) and any(isinstance(t, ast.Name) and t.id == variable for t in node.targets):
+            return ast.literal_eval(node.value)
+    return {}
+
+def fetch_ru_maps():
+    """Load maintained RU-client name maps; English names remain searchable."""
+    root = "https://raw.githubusercontent.com/yungspiderq/dbd-randomizer/main/"
+    files = {
+        "addon": ("tools/addon_names_ru_en.py", ["ADDON_RU_EN", "ITEM_ADDON_RU_EN"]),
+        "chars": ("tools/char_map_ru.py", ["KILLER_EN_RU", "SURVIVOR_EN_RU"]),
+        "items": ("tools/char_names_ru_en.py", ["ITEM_RU_EN"]),
+        "game": ("dbd_data.py", ["KILLERS", "SURVIVORS", "SURVIVOR_ITEMS"]),
+    }
+    result = {}
+    for group, (path, variables) in files.items():
+        try:
+            response = requests.get(root + path, headers=HEADERS, timeout=25)
+            response.raise_for_status()
+            for variable in variables:
+                result[variable] = assignment_from_python(response.text, variable)
+        except Exception as exc:
+            print("Russian name map unavailable:", path, repr(exc))
+            result.update({variable: {} for variable in variables})
+    return result
+
+def apply_ru_names(records, maps, kind):
+    en_to_ru = {}
+    if kind == "addons":
+        for variable in ("ADDON_RU_EN", "ITEM_ADDON_RU_EN"):
+            for group in maps.get(variable, {}).values():
+                for ru, en in group.items():
+                    en_to_ru[re.sub(r"[^a-z0-9]+", "", str(en).lower())] = ru
+    elif kind == "items":
+        for ru, en in maps.get("ITEM_RU_EN", {}).items():
+            en_to_ru[re.sub(r"[^a-z0-9]+", "", str(en).lower())] = ru
+    elif kind == "characters":
+        for variable in ("KILLER_EN_RU", "SURVIVOR_EN_RU"):
+            for en, ru in maps.get(variable, {}).items():
+                en_to_ru[re.sub(r"[^a-z0-9]+", "", str(en).lower())] = ru
+    for item in records:
+        english = str(item.get("nameEn") or item.get("name") or "")
+        key = re.sub(r"[^a-z0-9]+", "", english.lower())
+        russian = en_to_ru.get(key)
+        if russian:
+            item["nameEn"] = english
+            item["name"] = russian
+            item["displayName"] = f"{russian} ({english})"
+        elif english:
+            item["nameEn"] = english
+            item["displayName"] = english
     return records
 
 def scrape_addons():
     items_soup = page("/items/")
     addons = addon_section(items_soup, "Предметы выжившего")
-    # The items page has a separate Add-ons heading for each survivor item family.
     killer_index = page("/killers/")
     paths, seen = [], set()
     for a in killer_index.find_all("a", href=True):
@@ -207,7 +265,6 @@ def scrape_addons():
     with ThreadPoolExecutor(max_workers=10) as pool:
         for result in pool.map(one_killer, paths):
             addons.extend(result)
-    # The source reports 922 total add-ons; deduplicate repeated cards by owner and name.
     unique, keys = [], set()
     for item in addons:
         key = (item["category"].lower(), item["name"].lower())
@@ -218,6 +275,7 @@ def scrape_addons():
     return unique
 
 def main():
+    ru_maps = fetch_ru_maps()
     result = {
         "generatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "source": BASE,
@@ -226,15 +284,15 @@ def main():
         "maps": scrape_maps(),
         "addons": [],
     }
+    result["characters"] = apply_ru_names(scrape_link_catalog("/killers/", "killers") + scrape_link_catalog("/survivors/", "survivors"), ru_maps, "characters")
+    result["items"] = apply_ru_names(scrape_link_catalog("/items/", "items"), ru_maps, "items")
     try:
         addon_records = scrape_addons()
-        if len(addon_records) >= 500:
-            result["addons"] = addon_records
-        else:
-            print("Add-on catalog is incomplete; leaving remote fallback enabled.")
+        result["addons"] = apply_ru_names(addon_records, ru_maps, "addons")
+        print("Published add-on records:", len(result["addons"]))
     except Exception as exc:
         print("Add-on catalog unavailable; continuing without it:", repr(exc))
-    counts = {k: len(result[k]) for k in ("perks", "offerings", "maps")}
+    counts = {k: len(result[k]) for k in ("perks", "offerings", "maps", "addons", "characters", "items")}
     print("Catalog extraction counts:", json.dumps(counts, ensure_ascii=False))
     # Fail the deployment rather than publish an incomplete or silently empty catalog.
     if counts["perks"] < 200 or counts["offerings"] < 80 or counts["maps"] < 40:
