@@ -97,31 +97,50 @@ def scrape_maps():
     return out
 
 def scrape_offerings():
-    # The public index links each offering icon to cdn.source.gs; its card contains name and rarity.
+    # Prefer the documented JSON endpoint when available.
+    api = "https://dbd-stats.info/api/offerings?branch=live"
+    try:
+        response = requests.get(api, headers=HEADERS, timeout=8)
+        response.raise_for_status()
+        payload = response.json()
+        candidates = payload if isinstance(payload, list) else []
+        if isinstance(payload, dict):
+            for key in ("data", "results", "items", "offerings", "entries", "list"):
+                if isinstance(payload.get(key), list):
+                    candidates = payload[key]
+                    break
+        normalized = []
+        for item in candidates:
+            if not isinstance(item, dict):
+                continue
+            name = item.get("name") or item.get("displayName") or item.get("display_name") or item.get("title")
+            if name:
+                normalized.append({"id": str(item.get("id") or item.get("_id") or name), "name": str(name), "description": str(item.get("description") or item.get("desc") or item.get("effect") or ""), "image": str(item.get("image") or item.get("imageUrl") or item.get("image_url") or item.get("icon") or ""), "source": api, "category": str(item.get("category") or item.get("type") or "Подношение")})
+        if len(normalized) >= 80:
+            print("Offerings loaded from JSON endpoint:", len(normalized))
+            return normalized
+        print("Offerings JSON endpoint returned", len(normalized), "usable records; using HTML")
+    except Exception as exc:
+        print("Offerings JSON endpoint unavailable:", repr(exc))
+    # The HTML catalog exposes each offering as a text card with rarity and side.
     soup = page("/offerings/")
     out, seen = [], set()
-    for icon_link in soup.find_all("a", href=True):
-        src = icon_link["href"]
-        if "cdn.source.gs" not in src:
+    rarity_re = re.compile(r"\b(?:Ultra Rare|Very Rare|Rare|Uncommon|Common|Event)\b", re.I)
+    for node in soup.find_all(["h2", "h3", "h4", "a", "div", "article", "li"]):
+        text = clean(node)
+        if not text or len(text) > 1500:
             continue
-        card = icon_link
-        for parent in icon_link.parents:
-            text = clean(parent)
-            if 25 < len(text) < 1800:
-                card = parent
-                break
-        raw = clean(card)
-        marker = re.search(r"\b(?:Ultra Rare|Very Rare|Rare|Uncommon|Common|Event)\b", raw, re.I)
+        marker = rarity_re.search(text)
         if not marker:
             continue
-        name = raw[:marker.start()].strip(" •|—-")
+        name = text[:marker.start()].strip(" •|—-")
         name = re.sub(r"^(?:Image\s*)+", "", name).strip()
         name = re.sub(r"\s+", " ", name)
         if not name or len(name) > 100 or name.lower() in seen:
             continue
         seen.add(name.lower())
-        out.append({"id": re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-"), "name": name, "description": raw, "image": urljoin(BASE, src), "source": BASE + "/offerings/", "category": "Подношение"})
-    print("Offerings HTML card records:", len(out))
+        out.append({"id": re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-"), "name": name, "description": text, "image": img_for(node), "source": BASE + "/offerings/", "category": "Подношение"})
+    print("Offerings HTML records:", len(out))
     return out
 
 def main():
