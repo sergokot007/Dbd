@@ -90,3 +90,39 @@
 .build-foot{padding:11px 16px;display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid #302e35;color:#777;font-size:9px;letter-spacing:1px}
 .build-copy{padding:8px 10px;background:#292329;border:1px solid #564048;color:#e4c8c8;border-radius:2px;font-size:10px}
 .build-copy:hover{background:#612a31;color:white}
+
+/* Top-down map viewer */
+.map-tactics-panel{width:min(1180px,100%)}
+.map-stage{aspect-ratio:auto;min-height:55vh;max-height:76vh;overflow:auto;display:flex;align-items:center;justify-content:center;background:#0c0c10}
+.map-image-canvas{width:100%;min-height:55vh;display:flex;align-items:center;justify-content:center}
+.map-layout-image{position:relative;inset:auto;display:block;width:100%;height:auto;max-height:none;object-fit:contain;transform-origin:center center;transition:transform .18s}
+.map-stage.map-image-missing .map-layout-image{display:none}
+.map-stage.map-image-missing:after{content:'Не удалось загрузить схему карты. Попробуй открыть её ещё раз позже.'}
+.map-legend{justify-content:space-between}
+.map-legend span{font-size:10px;color:#bcb5bb}
+.map-route-controls button{min-width:90px}
+@media(max-width:600px){.map-stage{min-height:48vh;max-height:70vh}.map-image-canvas{min-height:48vh}.map-layout-image{width:100%}.map-tactics-panel{padding:12px}}
+/* Character purchase tier list */
+.tier-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr))}
+.tier-side-tabs,.tier-rank-filters{display:flex;gap:7px;flex-wrap:wrap;width:100%;margin:0 0 8px}
+.tier-side-tabs button,.tier-rank-filters button{border:1px solid #49404a;background:#1c1b22;color:#c9c1c6;border-radius:3px;padding:9px 13px;font:600 11px Inter}
+.tier-side-tabs button.active,.tier-rank-filters button.active{background:#642a31;border-color:#c64a50;color:#fff}
+.tier-card{background:linear-gradient(145deg,#24232b,#17171d);border:1px solid #39343b;border-radius:5px;overflow:hidden;padding:14px}
+.tier-card-top{display:flex;align-items:center;gap:12px;min-width:0}
+.tier-grade{width:43px;height:48px;flex:0 0 43px;display:grid;place-items:center;font:800 26px 'Barlow Condensed';border:1px solid #6b5558;background:#34242a;color:#f2dfe0}
+.tier-s .tier-grade{background:#69333a;border-color:#d35b65;color:#fff}
+.tier-a .tier-grade{background:#64452a;border-color:#ba874a;color:#fff}
+.tier-b .tier-grade{background:#344b55;border-color:#648d9c;color:#fff}
+.tier-c .tier-grade{background:#3b3b43;border-color:#73737d;color:#fff}
+.tier-d .tier-grade,.tier-e .tier-grade{background:#29282e;border-color:#57535b;color:#bbb}
+.tier-card-top img,.tier-portrait-fallback{width:60px;height:60px;flex:0 0 60px;object-fit:contain;background:#101015;border:1px solid #49404a;border-radius:3px}
+.tier-portrait-fallback{display:grid;place-items:center;color:#c64a50;font-size:25px}
+.tier-title{min-width:0;display:grid;gap:3px}
+.tier-title h3{font:700 19px 'Barlow Condensed';margin:0;line-height:1.15}
+.tier-title small{font-size:10px;color:#aaa;overflow-wrap:anywhere}
+.tier-title span{font-size:9px;color:#d58b8f;letter-spacing:.4px}
+.tier-reason{font-size:11px;line-height:1.65;color:#c2bbc1;margin:13px 0}
+.tier-perks-label{font-size:9px;letter-spacing:1.5px;color:#c64a50;font-weight:800;margin-bottom:7px}
+.tier-perks{display:flex;gap:6px;flex-wrap:wrap}
+.tier-perk{font-size:10px;line-height:1.35;color:#eee0e0;background:#30242a;border:1px solid #574048;padding:6px 8px;border-radius:3px}
+@media(max-width:600px){.tier-grid{grid-template-columns:1fr}.tier-card{padding:12px}.tier-title h3{font-size:18px}}
