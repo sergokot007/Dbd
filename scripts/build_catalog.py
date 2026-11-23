@@ -80,8 +80,8 @@ def scrape_link_catalog(path, kind):
         out.append({"id": href.strip("/").split("/")[-1], "name": name, "description": desc, "image": img_for(a) or img_for(card), "source": urljoin(BASE, href), "category": kind})
     return out
 
-def scrape_items():
-    """Load the complete in-game survivor item catalog from the structured live endpoint."""
+def scrape_items(fallback_categories=None):
+    """Load survivor items from the live endpoint, then a maintained item-name map."""
     api = "https://dbd-stats.info/api/items?branch=live"
     try:
         response = requests.get(api, headers=HEADERS, timeout=20)
@@ -123,7 +123,33 @@ def scrape_items():
     if len(linked) >= 20:
         print("Items loaded from detail links:", len(linked))
         return linked
-    raise RuntimeError("The item catalog is incomplete: fewer than 20 real item records were found.")
+    # Last-resort fallback: maintained Russian game-data item names by category.
+    # Never invent effects or icons when live sources are unavailable.
+    fallback = []
+    excluded = {"туманный кристалл"}  # limited in-trial item, not loadout equipment
+    for category, group in (fallback_categories or {}).items():
+        if not isinstance(group, dict):
+            continue
+        for name in group.get("items", []):
+            if not isinstance(name, str) or not name.strip() or name.strip().lower() in excluded:
+                continue
+            fallback.append({
+                "id": re.sub(r"[^a-z0-9а-яё]+", "-", name.lower()).strip("-"),
+                "name": name.strip(),
+                "description": "",
+                "image": "",
+                "source": "https://github.com/yungspiderq/dbd-randomizer/blob/main/dbd_data.py",
+                "category": category,
+                "dataStatus": "name-only-fallback",
+            })
+    if len(fallback) >= 20:
+        print("Items loaded from maintained fallback name map:", len(fallback),
+              "(names/categories only; no fabricated descriptions or icons)")
+        return fallback
+    raise RuntimeError(
+        "The item catalog is incomplete: live sources and maintained fallback "
+        + "returned only " + str(len(fallback)) + " records."
+    )
 
 
 def scrape_maps():
@@ -1059,7 +1085,7 @@ def main():
     }
     result["characters"] = apply_external_ru_localization(apply_ru_names(scrape_link_catalog("/killers/", "killers") + scrape_link_catalog("/survivors/", "survivors"), ru_maps, "characters"), "characters", external_ru)
     result["maps"], map_ru_map = scrape_ru_maps(result["maps"])
-    result["items"] = apply_external_ru_localization(apply_ru_names(scrape_items(), ru_maps, "items"), "items", external_ru)
+    result["items"] = apply_external_ru_localization(apply_ru_names(scrape_items(ru_maps.get("SURVIVOR_ITEMS", {})), ru_maps, "items"), "items", external_ru)
     result["translations"] = {
         "characters": {**ru_maps.get("KILLER_EN_RU", {}), **ru_maps.get("SURVIVOR_EN_RU", {}), **external_names.get("characters", {})},
         "items": {**{en: ru for ru, en in ru_maps.get("ITEM_RU_EN", {}).items()}, **external_names.get("items", {})},
