@@ -901,10 +901,12 @@ def apply_external_ru_localization(records, kind, source):
     """Apply verified RU-client names and descriptions, retaining English search aliases."""
     if kind == "characters":
         character_names = source.get("character_names", {})
+        character_lookup = {norm_en(k): v for k, v in character_names.items() if k != "_comment"}
         translated = 0
         for item in records:
             english = str(item.get("nameEn") or item.get("name") or "")
-            russian = character_names.get(english)
+            lookup = re.sub(r"^The\\s+", "", english, flags=re.I)
+            russian = character_names.get(english) or character_names.get(lookup) or character_lookup.get(norm_en(english)) or character_lookup.get(norm_en(lookup))
             if russian and russian != english:
                 item["nameEn"] = english
                 item["name"] = russian
