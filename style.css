@@ -158,3 +158,33 @@
 .itembody .kind{font-size:12px}
 .itembody h3{font-size:18px;line-height:1.35}
 @media(max-width:600px){.item-detail-icon{width:82px;height:82px}.item-detail-panel p{font-size:15px}.item-detail-field{font-size:14px}}
+
+
+/* Readable, touch-friendly item and offering detail cards */
+.item-art-button{width:100%;border:0;padding:0;cursor:pointer}
+.item-name-link{border:0;padding:0;background:none;color:inherit;text-align:left;font:inherit;cursor:pointer}
+.item-more{margin-top:10px;padding:9px 11px;width:100%;border:1px solid #624047;background:#2b2025;color:#f0dfe0;border-radius:3px;font-size:12px}
+.item-detail-readable{max-width:760px}
+.item-detail-head{display:flex;align-items:center;gap:20px;padding:12px 0 22px;border-bottom:1px solid #514047}
+.item-detail-icon{width:116px;height:116px;flex:0 0 116px;object-fit:contain;padding:8px;background:#30252b;border:1px solid #554047;border-radius:5px}
+.item-detail-noicon{display:grid;place-items:center;font-size:38px;color:#d6a3a5}
+.item-detail-head h2{font-size:clamp(28px,5vw,40px);line-height:1.1;margin:0 0 7px}
+.item-detail-en{font-size:14px;color:#aaa;margin:0 0 8px}
+.item-detail-kind{font-size:12px;color:#e08b90}
+.item-detail-section{padding:20px 0;border-bottom:1px solid #40343a}
+.item-detail-section h3{font:700 24px 'Barlow Condensed';margin:0 0 12px;color:#f3e8e5}
+.item-detail-description,.item-detail-section p{font-size:16px;line-height:1.8;color:#e1d9d9;margin:0;white-space:pre-line}
+.item-detail-field{display:grid;grid-template-columns:minmax(125px, .38fr) 1fr;gap:14px;padding:11px 0;border-bottom:1px solid #ffffff12;font-size:14px;line-height:1.6}
+.item-detail-field:last-child{border-bottom:0}
+.item-detail-field b{color:#e2a0a2;font-size:14px}
+.item-detail-field span{color:#eee8e8}
+.item-detail-source{display:inline-block;margin-top:18px;color:#f0a0a3;font-size:14px}
+.item-detail-note{font-size:12px;line-height:1.6;color:#999;margin:18px 0 0}
+@media(max-width:600px){
+ .item-detail-head{gap:13px}
+ .item-detail-icon{width:88px;height:88px;flex-basis:88px}
+ .item-detail-description,.item-detail-section p{font-size:15px;line-height:1.75}
+ .item-detail-field{grid-template-columns:1fr;gap:4px;font-size:14px}
+ .item-detail-field b,.item-detail-field span{font-size:14px}
+ .item-more{font-size:12px;padding:11px}
+}
