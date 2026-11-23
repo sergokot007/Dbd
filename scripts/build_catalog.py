@@ -99,22 +99,23 @@ def scrape_maps():
 def scrape_offerings():
     soup = page("/offerings/")
     out, seen = [], set()
-    # Offering cards are image-led; the title, rarity, side and effect are adjacent text.
-    for img in soup.find_all("img"):
-        src = img.get("src") or img.get("data-src") or img.get("data-lazy-src") or ""
+    # The rendered index links each offering icon to cdn.source.gs; title and effect sit beside it.
+    for icon_link in soup.find_all("a", href=True):
+        src = icon_link["href"]
         if "cdn.source.gs" not in src:
             continue
-        card = ancestor_card(img, 1800)
+        card = icon_link
+        for parent in icon_link.parents:
+            text = clean(parent)
+            if 25 < len(text) < 1800:
+                card = parent
+                break
         raw = clean(card)
-        if len(raw) < 18:
-            continue
         marker = re.search(r"\\b(?:Ultra Rare|Very Rare|Rare|Uncommon|Common|Event)\\b", raw, re.I)
         if not marker:
             continue
-        name = (img.get("alt") or img.get("title") or "").strip()
-        if not name or name.lower() in {"image", "icon"}:
-            name = raw[:marker.start()].strip(" •|—-")
-            name = re.sub(r"^Image\\s*", "", name).strip()
+        name = raw[:marker.start()].strip(" •|—-")
+        name = re.sub(r"^(?:Image\\s*)+", "", name).strip()
         name = re.sub(r"\\s+", " ", name)
         if not name or len(name) > 100 or name.lower() in seen:
             continue
