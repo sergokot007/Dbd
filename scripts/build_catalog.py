@@ -200,6 +200,7 @@ def fetch_ru_maps():
         "chars": ("tools/char_map_ru.py", ["KILLER_EN_RU", "SURVIVOR_EN_RU"]),
         "items": ("tools/char_names_ru_en.py", ["ITEM_RU_EN"]),
         "game": ("dbd_data.py", ["KILLERS", "SURVIVORS", "SURVIVOR_ITEMS"]),
+        "perks": ("tools/perk_icon_ids.py", ["PERK_ICON_IDS"]),
     }
     result = {}
     for group, (path, variables) in files.items():
@@ -294,7 +295,7 @@ def ru_wiki_soup(title):
     return None
 
 
-def fetch_ru_wiki_export(titles, batch_size=50):
+def fetch_ru_wiki_export(titles, batch_size=75):
     """Bulk-download Russian wiki article source in a few proxy requests."""
     titles = list(dict.fromkeys(str(x).strip() for x in titles if str(x).strip()))
     result = {}
@@ -384,89 +385,28 @@ def norm_en(value):
     return re.sub(r"[^a-z0-9]+", "", str(value or "").lower())
 
 def scrape_perk_ru_map(maps):
-    """Pair live English perk slugs with the maintained Russian client names."""
-    killer_map = maps.get("KILLER_EN_RU", {})
-    survivor_map = maps.get("SURVIVOR_EN_RU", {})
-    killer_perks = maps.get("KILLERS", {})
-    survivor_perks = maps.get("SURVIVORS", {})
-    indexes = [("/killers/", killer_map, killer_perks), ("/survivors/", survivor_map, survivor_perks)]
-    jobs = []
-    for index_path, name_map, perk_map in indexes:
-        try:
-            soup = page(index_path)
-            for a in soup.find_all("a", href=True):
-                href = a["href"].split("#")[0]
-                if re.match(r"^" + re.escape(index_path) + r"[^/]+/?$", href):
-                    jobs.append((href, name_map, perk_map))
-        except Exception as exc:
-            print("Could not read character index for perk translations:", index_path, repr(exc))
-    def read_character(job):
-        path, name_map, perk_map = job
-        try:
-            soup = page(path)
-            h1 = soup.find("h1")
-            english_owner = clean(h1) if h1 else ""
-            lookup = re.sub(r"^The\s+", "", english_owner, flags=re.I)
-            russian_owner = name_map.get(english_owner) or name_map.get(lookup)
-            if not russian_owner:
-                return {}
-            data = perk_map.get(russian_owner)
-            russian_perks = data.get("perks", []) if isinstance(data, dict) else data
-            if not russian_perks:
-                return {}
-            heading = next((h for h in soup.find_all(["h2", "h3"]) if clean(h).lower() == "perks"), None)
-            if not heading:
-                return {}
-            ids, seen = [], set()
-            for a in heading.find_all_next("a", href=True):
-                if a.find_previous("h2") is not heading and a.find_previous("h3") is not heading:
-                    break
-                href = a["href"].split("#")[0]
-                match = re.match(r"^/perks/([^/]+)/?$", href)
-                if match and match.group(1) not in seen:
-                    seen.add(match.group(1))
-                    ids.append(match.group(1))
-            result = {}
-            for perk_id, russian_name in zip(ids[:3], russian_perks[:3]):
-                result[perk_id] = russian_name
-            return result
-        except Exception as exc:
-            print("Perk-name mapping failed for", path, repr(exc))
-            return {}
-    from concurrent.futures import ThreadPoolExecutor
+    """Invert the maintained Russian-name to game-icon-ID table."""
     result = {}
-    with ThreadPoolExecutor(max_workers=12) as pool:
-        for part in pool.map(read_character, jobs):
-            result.update(part)
-    # Shared perks do not belong to one character, so keep their verified RU-client names here.
-    common = {
-        "dark-sense": "Темное чувство", "deja-vu": "Дежавю", "hope": "Надежда",
-        "bond": "Кровные узы", "lightweight": "Легковес", "no-mither": "Этому не бывать",
-        "well-make-it": "Мы справимся", "premonition": "Предчувствие", "resilience": "Устойчивость",
-        "slippery-meat": "Скользкое мясо", "small-game": "Мелкая дичь", "spine-chill": "Мурашки по спине",
-        "no-one-left-behind": "Никто не остался позади", "plunderers-instinct": "Мародерское чутье",
-        "whispers": "Шепоты", "deerstalker": "Охотник на оленей", "fearmonger": "Сеющий страх",
-        "hex-no-one-escapes-death": "Порча: никому не скрыться от смерти",
-        "hex-huntress-lullaby": "Порча: охотничий азарт", "insidious": "Коварство",
-        "iron-grasp": "Мертвая хватка", "monstrous-shrine": "Секущий крюк: чудовищный храм",
-        "sloppy-butcher": "Небрежный мясник", "spies-from-the-shadows": "Сумеречные шпионы",
-        "shattered-hope": "Разбитые надежды", "unrelenting": "Безжалостный",
-    }
-    result.update(common)
-    print("Russian perk-name map:", len(result), "slugs")
+    for russian, icon_id in maps.get("PERK_ICON_IDS", {}).items():
+        key = norm_en(icon_id)
+        if key:
+            result[key] = russian
+    print("Russian perk-name map from icon IDs:", len(result), "slugs")
     return result
 
 def apply_perk_ru_names(records, id_map):
     translated = 0
     for item in records:
         english = str(item.get("nameEn") or item.get("name") or "")
-        russian = id_map.get(str(item.get("id") or ""))
+        russian = id_map.get(norm_en(item.get("id"))) or id_map.get(norm_en(english))
         if russian:
             item["nameEn"] = english
             item["name"] = russian
             item["displayName"] = f"{russian} ({english})"
             translated += 1
     print("Russian perk names:", translated, "/", len(records))
+    missing = [str(x.get("nameEn") or x.get("name")) for x in records if not re.search(r"[А-Яа-яЁё]", str(x.get("name") or ""))]
+    print("Perks without RU names:", missing[:25])
     return records
 
 def scrape_ru_perk_descriptions(records, ru_maps):
