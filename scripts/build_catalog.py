@@ -80,6 +80,52 @@ def scrape_link_catalog(path, kind):
         out.append({"id": href.strip("/").split("/")[-1], "name": name, "description": desc, "image": img_for(a) or img_for(card), "source": urljoin(BASE, href), "category": kind})
     return out
 
+def scrape_items():
+    """Load the complete in-game survivor item catalog from the structured live endpoint."""
+    api = "https://dbd-stats.info/api/items?branch=live"
+    try:
+        response = requests.get(api, headers=HEADERS, timeout=20)
+        response.raise_for_status()
+        payload = response.json()
+        candidates = payload if isinstance(payload, list) else []
+        if isinstance(payload, dict):
+            for key in ("data", "results", "items", "entries", "list"):
+                if isinstance(payload.get(key), list):
+                    candidates = payload[key]
+                    break
+        records = []
+        for item in candidates:
+            if not isinstance(item, dict):
+                continue
+            name = (item.get("name") or item.get("displayName") or
+                    item.get("display_name") or item.get("title"))
+            if not name:
+                continue
+            records.append({
+                **item,
+                "id": str(item.get("id") or item.get("_id") or name),
+                "name": str(name),
+                "description": str(item.get("description") or item.get("desc") or
+                                   item.get("effect") or item.get("lore") or ""),
+                "image": str(item.get("image") or item.get("imageUrl") or
+                             item.get("image_url") or item.get("icon") or
+                             item.get("iconUrl") or item.get("icon_url") or ""),
+                "source": api,
+                "category": str(item.get("category") or item.get("type") or "Предмет"),
+            })
+        if len(records) >= 20:
+            print("Items loaded from live JSON endpoint:", len(records))
+            return records
+        print("Items JSON endpoint returned", len(records), "usable records; trying HTML")
+    except Exception as exc:
+        print("Items JSON endpoint unavailable:", repr(exc))
+    linked = scrape_link_catalog("/items/", "items")
+    if len(linked) >= 20:
+        print("Items loaded from detail links:", len(linked))
+        return linked
+    raise RuntimeError("The item catalog is incomplete: fewer than 20 real item records were found.")
+
+
 def scrape_maps():
     soup = page("/maps/")
     out, seen = [], set()
@@ -1013,7 +1059,7 @@ def main():
     }
     result["characters"] = apply_external_ru_localization(apply_ru_names(scrape_link_catalog("/killers/", "killers") + scrape_link_catalog("/survivors/", "survivors"), ru_maps, "characters"), "characters", external_ru)
     result["maps"], map_ru_map = scrape_ru_maps(result["maps"])
-    result["items"] = apply_external_ru_localization(apply_ru_names(scrape_link_catalog("/items/", "items"), ru_maps, "items"), "items", external_ru)
+    result["items"] = apply_external_ru_localization(apply_ru_names(scrape_items(), ru_maps, "items"), "items", external_ru)
     result["translations"] = {
         "characters": {**ru_maps.get("KILLER_EN_RU", {}), **ru_maps.get("SURVIVOR_EN_RU", {}), **external_names.get("characters", {})},
         "items": {**{en: ru for ru, en in ru_maps.get("ITEM_RU_EN", {}).items()}, **external_names.get("items", {})},
@@ -1038,7 +1084,7 @@ def main():
     print("Russian localization coverage:", json.dumps({"addonNames": addon_ru_names, "addonDescriptions": addon_ru_descriptions, "offeringDescriptions": offering_ru_descriptions}, ensure_ascii=False))
     print("Catalog extraction counts:", json.dumps(counts, ensure_ascii=False))
     # Fail the deployment rather than publish an incomplete or silently empty catalog.
-    if counts["perks"] < 200 or counts["offerings"] < 80 or counts["maps"] < 40 or counts["addons"] < 500 or addon_ru_names < 850 or addon_ru_descriptions < 700 or offering_ru_descriptions < 70:
+    if counts["perks"] < 200 or counts["offerings"] < 80 or counts["maps"] < 40 or counts["items"] < 20 or counts["addons"] < 500 or addon_ru_names < 850 or addon_ru_descriptions < 700 or offering_ru_descriptions < 70:
         raise SystemExit("Catalog validation failed; refusing to publish incomplete data (including add-ons).")
     Path("catalog-data.json").write_text(json.dumps(result, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
     print("catalog-data.json created successfully")
