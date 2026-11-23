@@ -22,17 +22,21 @@ function usableGear(x){return !cosmetic(x)&&!x.isCosmetic&&!x.is_cosmetic&&!x.co
 function id(x){return String(x.id||x._id||x.name||name(x))}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function updateFav(){$('#favCount').textContent=favorites.length;localStorage.setItem('dbd-favorites',JSON.stringify(favorites))}
-async function getData(url){const r=await fetch(url,{cache:'no-store',credentials:'omit'});if(!r.ok)throw Error('HTTP '+r.status);return r.json()}\nlet catalogPromise;async function localCatalog(){if(!catalogPromise)catalogPromise=fetch('./catalog-data.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Локальный каталог ещё не опубликован');return r.json()});return catalogPromise}
+async function getData(url){const r=await fetch(url,{cache:'no-store',credentials:'omit'});if(!r.ok)throw Error('HTTP '+r.status);return r.json()}
+let catalogPromise;async function localCatalog(){if(!catalogPromise)catalogPromise=fetch('./catalog-data.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Локальный каталог ещё не опубликован');return r.json()});return catalogPromise}
 async function load(){
  if(tab==='favorites'){render();return}
  $('#notice').textContent='Ищем записи в Тумане…';$('#grid').innerHTML='';
- const cfg=TYPES[tab];let lastError;\n if(['perks','offerings','maps','addons'].includes(tab)){try{const local=await localCatalog();const data=arr(local[tab]);if(data.length){all=data;$('#connection').textContent='Локальная база загружена';$('#connection').classList.add('ok');render();return}}catch(e){lastError=e}}\n const sources=[...(cfg.source?(Array.isArray(cfg.source)?cfg.source:[cfg.source]):[]),API+'/'+cfg.endpoint+'?branch=live',API+'/'+cfg.endpoint,API+'/'+cfg.endpoint+'/'];
+ const cfg=TYPES[tab];let lastError;
+ if(['perks','offerings','maps','addons'].includes(tab)){try{const local=await localCatalog();const data=arr(local[tab]);if(data.length){all=data;$('#connection').textContent='Локальная база загружена';$('#connection').classList.add('ok');render();return}}catch(e){lastError=e}}
+ const sources=[...(cfg.source?(Array.isArray(cfg.source)?cfg.source:[cfg.source]):[]),API+'/'+cfg.endpoint+'?branch=live',API+'/'+cfg.endpoint,API+'/'+cfg.endpoint+'/'];
  for(const url of sources){try{
   let data=arr(await getData(url));if(['items','addons','offerings'].includes(tab))data=data.filter(usableGear);if(!data.length)throw Error('Источник вернул пустой список');
   all=data;$('#connection').textContent=url.startsWith(SOURCE)?'Резервная база подключена':'База подключена';$('#connection').classList.add('ok');render();return;
  }catch(e){lastError=e}}
  if(tab==='addons'){try{const [chars,items]=await Promise.all([getData(SOURCE+'/characters/'),getData(SOURCE+'/items/')]);const nested=[...arr(chars),...arr(items)].flatMap(x=>x.addons||x.addOns||x.add_ons||x.itemAddons||x.item_addons||x.powerAddons||x.power_addons||[]);if(nested.length){all=nested.filter(usableGear);$('#connection').textContent='Резервная база подключена';$('#connection').classList.add('ok');render();return}}catch(e){lastError=e}}
- if(['perks','offerings','maps'].includes(tab)){try{const local=await localCatalog();const data=arr(local[tab]);if(data.length){all=data;$('#connection').textContent='Локальная база загружена';$('#connection').classList.add('ok');render();return}}catch(e){lastError=e}}\n all=[];$('#notice').textContent='Не удалось загрузить этот раздел. Источник данных временно недоступен. ('+(lastError?.message||'ошибка')+')';
+ if(['perks','offerings','maps'].includes(tab)){try{const local=await localCatalog();const data=arr(local[tab]);if(data.length){all=data;$('#connection').textContent='Локальная база загружена';$('#connection').classList.add('ok');render();return}}catch(e){lastError=e}}
+ all=[];$('#notice').textContent='Не удалось загрузить этот раздел. Источник данных временно недоступен. ('+(lastError?.message||'ошибка')+')';
  $('#connection').textContent='Нет соединения';$('#connection').classList.remove('ok');render();
 }
 
@@ -51,12 +55,14 @@ function buildPerk(wanted) {
  return allPerks.find(p=>norm(name(p)).replace(/[^a-z0-9]/g,"")===key) || allPerks.find(p=>norm(name(p)).replace(/[^a-z0-9]/g,"").includes(key) || key.includes(norm(name(p)).replace(/[^a-z0-9]/g,"")));
 }
 function buildPerkOwner(p) { return String(p.characterName||p.character_name||p.character||p.owner||p.survivor||p.killer||""); }
-const LICENSED_PERK_OWNERS = ["Laurie Strode","Quentin Smith","Detective Tapp","Ash Williams","Nancy Wheeler","Steve Harrington","Cheryl Mason","Jill Valentine","Leon Kennedy","Rebecca Chambers","Ada Wong","Ellen Ripley","Pinhead","Alan Wake","Lara Croft"];\nconst LICENSED_PERK_NAMES = ["Decisive Strike","Hyperfocus","Chemical Trap","Background Player","Troubleshooter","Champion of Light","Moment of Glory","Invocation: Treacherous Crows"];
+const LICENSED_PERK_OWNERS = ["Laurie Strode","Quentin Smith","Detective Tapp","Ash Williams","Nancy Wheeler","Steve Harrington","Cheryl Mason","Jill Valentine","Leon Kennedy","Rebecca Chambers","Ada Wong","Ellen Ripley","Pinhead","Alan Wake","Lara Croft"];
+const LICENSED_PERK_NAMES = ["Decisive Strike","Hyperfocus","Chemical Trap","Background Player","Troubleshooter","Champion of Light","Moment of Glory","Invocation: Treacherous Crows"];
 function buildPerkIsPaid(p) {
  const owner=buildPerkOwner(p).toLowerCase();
  return !!(p.isLicensed||p.is_licensed||p.licensed||p.dlc||p.isDlc||p.is_dlc||LICENSED_PERK_OWNERS.some(n=>owner.includes(n.toLowerCase()))||LICENSED_PERK_NAMES.some(n=>norm(name(p))===norm(n)));
 }
-async function loadBuilds(){try{const catalog=await localCatalog();allPerks=arr(catalog.perks);renderBuilds()}catch(e){allPerks=[];renderBuilds();$('#notice').textContent='Каталог перков недоступен — названия сборок всё равно доступны, иконки появятся после загрузки базы.'}}\nfunction renderBuilds() {
+async function loadBuilds(){try{const catalog=await localCatalog();allPerks=arr(catalog.perks);renderBuilds()}catch(e){allPerks=[];renderBuilds();$('#notice').textContent='Каталог перков недоступен — названия сборок всё равно доступны, иконки появятся после загрузки базы.'}}
+function renderBuilds() {
  const q=norm($('#search').value.trim());
  const groups=UNIVERSAL_BUILDS.filter(b=>norm(b.title+' '+b.tag+' '+b.desc+' '+b.perks.join(' ')).includes(q));
  $('#sectionTitle').textContent='Готовые билды';
@@ -154,6 +160,6 @@ function openMapTactics(map){
  modal.querySelector(".map-route-overlay").dataset.route="safe";
 }
 
-document.addEventListener('click',e=>{const mapCard=e.target.closest('#grid .item');if(tab==='maps'&&mapCard&&!e.target.closest('[data-fav]')){openMapTactics(all.find(x=>name(x)===mapCard.querySelector('h3')?.textContent)||{name:mapCard.querySelector('h3')?.textContent});return}if(e.target.closest('#mapTacticsModal .detail-close')||e.target.id==='mapTacticsModal'){const m=document.getElementById('mapTacticsModal');if(m)m.classList.remove('open');document.body.classList.remove('modal-open');return}const routeBtn=e.target.closest('[data-route]');if(routeBtn&&e.target.closest('#mapTacticsModal'))return;const t=e.target.closest('[data-tab]');if(t){switchTab(t.dataset.tab);return}const copy=e.target.closest('[data-copy-build]');if(copy){const b=UNIVERSAL_BUILDS.find(x=>x.id===copy.dataset.copyBuild);if(b){const value=b.title+'\\n'+b.perks.join('\\n');navigator.clipboard?.writeText(value).then(()=>copy.textContent='Скопировано ✓').catch(()=>copy.textContent='Не удалось скопировать')}return}const f=e.target.closest('[data-filter]');if(f){filter=f.dataset.filter;render();return}const b=e.target.closest('[data-fav]');if(b){const key=b.dataset.fav,item=(tab==='favorites'?favorites.map(x=>x.data):all).find(x=>id(x)===key);if(favorites.some(x=>x.key===key))favorites=favorites.filter(x=>x.key!==key);else if(item)favorites.push({key,data:item});updateFav();render()}});
+document.addEventListener('click',e=>{const mapCard=e.target.closest('#grid .item');if(tab==='maps'&&mapCard&&!e.target.closest('[data-fav]')){openMapTactics(all.find(x=>name(x)===mapCard.querySelector('h3')?.textContent)||{name:mapCard.querySelector('h3')?.textContent});return}if(e.target.closest('#mapTacticsModal .detail-close')||e.target.id==='mapTacticsModal'){const m=document.getElementById('mapTacticsModal');if(m)m.classList.remove('open');document.body.classList.remove('modal-open');return}const routeBtn=e.target.closest('[data-route]');if(routeBtn&&e.target.closest('#mapTacticsModal'))return;const t=e.target.closest('[data-tab]');if(t){switchTab(t.dataset.tab);return}const copy=e.target.closest('[data-copy-build]');if(copy){const b=UNIVERSAL_BUILDS.find(x=>x.id===copy.dataset.copyBuild);if(b){const value=b.title+'\n'+b.perks.join('\n');if(navigator.clipboard?.writeText){navigator.clipboard.writeText(value).then(()=>copy.textContent='Скопировано ✓').catch(()=>copy.textContent='Не удалось скопировать')}else{copy.textContent='Буфер обмена недоступен'}}return}const f=e.target.closest('[data-filter]');if(f){filter=f.dataset.filter;render();return}const b=e.target.closest('[data-fav]');if(b){const key=b.dataset.fav,item=(tab==='favorites'?favorites.map(x=>x.data):all).find(x=>id(x)===key);if(favorites.some(x=>x.key===key))favorites=favorites.filter(x=>x.key!==key);else if(item)favorites.push({key,data:item});updateFav();render()}});
 $('#search').addEventListener('input',()=>tab==='builds'?renderBuilds():render());$('#refresh').addEventListener('click',load);updateFav();load();
 if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
