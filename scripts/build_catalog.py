@@ -515,24 +515,133 @@ def scrape_addons():
     print("Add-on extraction:", len(unique), "records from", len(paths), "killer pages plus survivor item page")
     return unique
 
+
+def article_english_name(soup):
+    text = clean(soup)
+    match = re.search(r"\(англ\.\s*["«]?(.+?)["»]?\)", text, re.I)
+    return match.group(1).strip().strip('"«»') if match else ""
+
+def scrape_ru_index_name_map(index_title):
+    """Resolve English catalog names through Russian wiki index/article titles."""
+    index_soup = ru_wiki_soup(index_title)
+    if index_soup is None:
+        print("Russian index unavailable:", index_title)
+        return {}
+    content = index_soup.find(id="mw-content-text") or index_soup
+    links, seen = [], set()
+    for a in content.find_all("a", href=True):
+        href = a["href"].split("#")[0]
+        title = clean(a)
+        if not href.startswith("/ru/wiki/") or href.startswith("/ru/wiki/Категория:") or not title or len(title) > 100:
+            continue
+        page_title = href.rsplit("/", 1)[-1].replace("_", " ")
+        if page_title not in seen and title.lower() not in {"править", "история", "обсуждение"}:
+            seen.add(page_title)
+            links.append((page_title, title))
+    def read_article(entry):
+        page_title, russian_name = entry
+        soup = ru_wiki_soup(page_title)
+        if soup is None:
+            return None
+        english = article_english_name(soup)
+        if not english:
+            return None
+        return (re.sub(r"[^a-z0-9]+", "", english.lower()), (russian_name, english))
+    from concurrent.futures import ThreadPoolExecutor
+    result = {}
+    with ThreadPoolExecutor(max_workers=16) as pool:
+        for found in pool.map(read_article, links):
+            if found:
+                result[found[0]] = found[1]
+    print("Russian index map:", index_title, len(result), "English aliases")
+    return result
+
+def apply_ru_article_names(records, name_map):
+    translated = 0
+    for item in records:
+        english = str(item.get("nameEn") or item.get("name") or "")
+        match = name_map.get(re.sub(r"[^a-z0-9]+", "", english.lower()))
+        if match:
+            russian, english = match
+            item["nameEn"] = english
+            item["name"] = russian
+            item["displayName"] = f"{russian} ({english})"
+            translated += 1
+    print("Russian article names matched:", translated, "/", len(records))
+    return records
+
+REALM_RU = {
+    "MacMillan Estate": "Поместье МакМиллан", "Autohaven Wreckers": "Свалка Автохевен",
+    "Coldwind Farm": "Ферма Колдвинд", "Crotus Prenn Asylum": "Психлечебница Кротус Пренн",
+    "Haddonfield": "Хэддонфилд", "Backwater Swamp": "Гнилое болото",
+    "Léry's Memorial Institute": "Мемориальный институт Лэри", "Red Forest": "Красный лес",
+    "Springwood": "Спрингвуд", "Gideon Meat Plant": 'Мясокомбинат "Гидеон"',
+    "Yamaoka Estate": "Поместье Ямаоки", "Ormond": "Ормонд",
+    "Hawkins National Laboratory": "Национальная лаборатория Хоукинса",
+    "Grave of Glenvale": "Могила в Гленвейле", "Silent Hill": "Сайлент Хилл",
+    "Raccoon City": "Раккун-Сити", "Forsaken Boneyard": "Заброшенное кладбище",
+    "Withered Isle": "Зачахший остров", "The Decimated Borgo": "Разоренная деревушка-борго",
+    "Dvarka Deepwood": "Заросли Дварки", "Sleepless District": "Бессонный район",
+}
+
+def scrape_ru_maps(records):
+    realm_links = {}
+    for item in records:
+        realm = str(item.get("realm") or "")
+        russian_realm = REALM_RU.get(realm)
+        if russian_realm:
+            realm_links.setdefault(russian_realm, set())
+    page_titles = set()
+    for realm in realm_links:
+        soup = ru_wiki_soup(realm)
+        if soup is None:
+            continue
+        content = soup.find(id="mw-content-text") or soup
+        for a in content.find_all("a", href=True):
+            href = a["href"].split("#")[0]
+            if href.startswith("/ru/wiki/") and not href.startswith("/ru/wiki/Категория:"):
+                title = href.rsplit("/", 1)[-1].replace("_", " ")
+                if title != realm and len(title) < 100:
+                    page_titles.add(title)
+    def read_map(title):
+        soup = ru_wiki_soup(title)
+        if soup is None:
+            return None
+        english = article_english_name(soup)
+        if not english:
+            return None
+        return (re.sub(r"[^a-z0-9]+", "", english.lower()), (title, english))
+    from concurrent.futures import ThreadPoolExecutor
+    name_map = {}
+    with ThreadPoolExecutor(max_workers=16) as pool:
+        for found in pool.map(read_map, sorted(page_titles)):
+            if found:
+                name_map[found[0]] = found[1]
+    return apply_ru_article_names(records, name_map), name_map
+
+
 def main():
     ru_maps = fetch_ru_maps()
     perk_ru_map = scrape_perk_ru_map(ru_maps)
+    offering_ru_map = scrape_ru_index_name_map("Подношения")
     result = {
         "generatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "source": BASE,
         "perks": scrape_ru_perk_descriptions(apply_perk_ru_names(scrape_link_catalog("/perks/", "perks"), perk_ru_map), ru_maps),
-        "offerings": scrape_offerings(),
+        "offerings": apply_ru_article_names(scrape_offerings(), offering_ru_map),
         "maps": scrape_maps(),
         "addons": [],
     }
     result["characters"] = apply_ru_names(scrape_link_catalog("/killers/", "killers") + scrape_link_catalog("/survivors/", "survivors"), ru_maps, "characters")
+    result["maps"], map_ru_map = scrape_ru_maps(result["maps"])
     result["items"] = apply_ru_names(scrape_link_catalog("/items/", "items"), ru_maps, "items")
     result["translations"] = {
         "characters": {**ru_maps.get("KILLER_EN_RU", {}), **ru_maps.get("SURVIVOR_EN_RU", {})},
         "items": {en: ru for ru, en in ru_maps.get("ITEM_RU_EN", {}).items()},
         "addons": {en: ru for variable in ("ADDON_RU_EN", "ITEM_ADDON_RU_EN") for group in ru_maps.get(variable, {}).values() for ru, en in group.items()},
+        "offerings": {en: ru for _, (ru, en) in offering_ru_map.items()},
         "perksById": perk_ru_map,
+        "maps": {en: ru for ru, en in map_ru_map.values()},
     }
     try:
         addon_records = scrape_addons()
