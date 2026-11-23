@@ -51,10 +51,10 @@ function buildPerk(wanted) {
  return allPerks.find(p=>norm(name(p)).replace(/[^a-z0-9]/g,"")===key) || allPerks.find(p=>norm(name(p)).replace(/[^a-z0-9]/g,"").includes(key) || key.includes(norm(name(p)).replace(/[^a-z0-9]/g,"")));
 }
 function buildPerkOwner(p) { return String(p.characterName||p.character_name||p.character||p.owner||p.survivor||p.killer||""); }
-const LICENSED_PERK_OWNERS = ["Laurie Strode","Quentin Smith","Detective Tapp","Ash Williams","Nancy Wheeler","Steve Harrington","Cheryl Mason","Jill Valentine","Leon Kennedy","Rebecca Chambers","Ada Wong","Ellen Ripley","Pinhead","Alan Wake","Lara Croft"];
+const LICENSED_PERK_OWNERS = ["Laurie Strode","Quentin Smith","Detective Tapp","Ash Williams","Nancy Wheeler","Steve Harrington","Cheryl Mason","Jill Valentine","Leon Kennedy","Rebecca Chambers","Ada Wong","Ellen Ripley","Pinhead","Alan Wake","Lara Croft"];\nconst LICENSED_PERK_NAMES = ["Decisive Strike","Hyperfocus","Chemical Trap","Background Player","Troubleshooter","Champion of Light","Moment of Glory","Invocation: Treacherous Crows"];
 function buildPerkIsPaid(p) {
  const owner=buildPerkOwner(p).toLowerCase();
- return !!(p.isLicensed||p.is_licensed||p.licensed||p.dlc||p.isDlc||p.is_dlc||LICENSED_PERK_OWNERS.some(n=>owner.includes(n.toLowerCase())));
+ return !!(p.isLicensed||p.is_licensed||p.licensed||p.dlc||p.isDlc||p.is_dlc||LICENSED_PERK_OWNERS.some(n=>owner.includes(n.toLowerCase()))||LICENSED_PERK_NAMES.some(n=>norm(name(p))===norm(n)));
 }
 async function loadBuilds(){try{const catalog=await localCatalog();allPerks=arr(catalog.perks);renderBuilds()}catch(e){allPerks=[];renderBuilds();$('#notice').textContent='Каталог перков недоступен — названия сборок всё равно доступны, иконки появятся после загрузки базы.'}}\nfunction renderBuilds() {
  const q=norm($('#search').value.trim());
@@ -67,7 +67,7 @@ async function loadBuilds(){try{const catalog=await localCatalog();allPerks=arr(
  $('#grid').innerHTML=groups.map(b=>{
   const perks=b.perks.map(wanted=>{
    const p=buildPerk(wanted),src=p?image(p):'';
-   return '<div class="build-perk"><div class="build-perk-icon">'+(src?'<img loading="lazy" src="'+esc(src)+'" alt="" onerror="this.style.display=\'none\'">':'<span>✣</span>')+'</div><div class="build-perk-info"><b>'+esc(p?name(p):wanted)+'</b><small>'+esc(p?buildPerkOwner(p):'Перк не найден в базе')+'</small></div>'+(p&&buildPerkIsPaid(p)?'<span class="auric-cell" title="Платный персонаж / лицензированный контент">◈</span>':'')+'</div>';
+   return '<div class="build-perk"><div class="build-perk-icon">'+(src?'<img loading="lazy" src="'+esc(src)+'" alt="" onerror="this.style.display=\'none\'">':'<span>✣</span>')+'</div><div class="build-perk-info"><b>'+esc(p?name(p):wanted)+'</b><small>'+esc(p?(buildPerkOwner(p)||'Игровой перк'):'Перк не найден в базе')+'</small></div>'+(p&&buildPerkIsPaid(p)?'<span class="auric-cell" title="Платный персонаж / лицензированный контент">◈</span>':'')+'</div>';
   }).join('');
   return '<article class="build-card"><div class="build-head"><span class="build-tag">'+esc(b.tag)+'</span><h3>'+esc(b.title)+'</h3><p>'+esc(b.desc)+'</p></div><div class="build-perks">'+perks+'</div><div class="build-foot"><span>4 ПЕРКА • ВЫЖИВШИЙ</span><button class="build-copy" data-copy-build="'+b.id+'">Скопировать названия</button></div></article>';
  }).join('') || '<div class="empty">По этому запросу сборок не найдено.</div>';
