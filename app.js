@@ -92,7 +92,7 @@ const UNIVERSAL_BUILDS = [
 let allPerks = [];
 function buildPerk(wanted) {
  const key = norm(wanted).replace(/[^a-z0-9]/g,"");
- return allPerks.find(p=>norm(name(p)).replace(/[^a-z0-9]/g,"")===key) || allPerks.find(p=>norm(name(p)).replace(/[^a-z0-9]/g,"").includes(key) || key.includes(norm(name(p)).replace(/[^a-z0-9]/g,"")));
+ return allPerks.find(p=>[name(p),p.nameEn,p.englishName,p.name_en,p.id].some(v=>norm(v).replace(/[^a-z0-9]/g,"")===key)) || allPerks.find(p=>[name(p),p.nameEn,p.englishName,p.name_en,p.id].some(v=>{const k=norm(v).replace(/[^a-z0-9]/g,"");return k&& (k.includes(key)||key.includes(k))}));
 }
 function buildPerkOwner(p) { return String(p.characterName||p.character_name||p.character||p.owner||p.survivor||p.killer||""); }
 const LICENSED_PERK_OWNERS = ["Laurie Strode","Quentin Smith","Detective Tapp","Ash Williams","Nancy Wheeler","Steve Harrington","Cheryl Mason","Jill Valentine","Leon Kennedy","Rebecca Chambers","Ada Wong","Ellen Ripley","Pinhead","Alan Wake","Lara Croft"];
