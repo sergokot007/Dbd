@@ -224,7 +224,7 @@ def main():
         "perks": scrape_link_catalog("/perks/", "perks"),
         "offerings": scrape_offerings(),
         "maps": scrape_maps(),
-        "addons": scrape_addons(),
+        "addons": [],
     }
     addon_records = scrape_addons()\n    if len(addon_records) >= 500:\n        result["addons"] = addon_records\n    else:\n        print("Add-on catalog is incomplete; leaving remote fallback enabled.")\n    counts = {k: len(result[k]) for k in ("perks", "offerings", "maps")}
     print("Catalog extraction counts:", json.dumps(counts, ensure_ascii=False))
