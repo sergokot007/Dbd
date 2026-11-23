@@ -137,12 +137,12 @@ def scrape_offerings():
         text = clean(node)
         if not text or len(text) > 1500:
             continue
-        marker = re.search(r"\\b(?:Ultra Rare|Very Rare|Rare|Uncommon|Common|Event)\\b", text, re.I)
+        marker = re.search(r"\b(?:Ultra Rare|Very Rare|Rare|Uncommon|Common|Event)\b", text, re.I)
         if not marker:
             continue
         name = text[:marker.start()].strip(" •|—-")
-        name = re.sub(r"^(?:Image\\s*)+", "", name).strip()
-        name = re.sub(r"\\s+", " ", name)
+        name = re.sub(r"^(?:Image\s*)+", "", name).strip()
+        name = re.sub(r"\s+", " ", name)
         if not name or len(name) > 100 or name.lower() in seen:
             continue
         seen.add(name.lower())
