@@ -73,6 +73,8 @@ async function loadBuilds(){try{const catalog=await localCatalog();allPerks=arr(
  }).join('') || '<div class="empty">По этому запросу сборок не найдено.</div>';
 }
 function render(){
+ if(tab==='builds'){renderBuilds();return}
+ $('#grid').classList.remove('build-grid');
  const cfg=TYPES[tab];$('#sectionTitle').textContent=tab==='favorites'?'Избранное':cfg.title;$('#sectionLabel').textContent=tab==='favorites'?'YOUR COLLECTION':cfg.label;
  const data=tab==='favorites'?favorites.map(x=>x.data):all,q=norm($('#search').value.trim()),cats=['Все',...new Set(data.map(category).filter(Boolean))];
  if(!cats.includes(filter))filter='Все';
