@@ -244,3 +244,19 @@
 .mybuild-empty{font-size:13px;color:#d8b7b7;line-height:1.5}
 @media(max-width:760px){.mybuild-main{grid-template-columns:1fr}.mybuild-character-list{max-height:380px}}
 @media(max-width:420px){.mybuild-character-list{grid-template-columns:1fr}.mybuild-roster,.mybuild-result{padding:12px}.mybuild-perk-image{width:54px;height:54px;flex-basis:54px}}
+
+/* Unified perk detail cards and owner portraits */
+.perk-owner-mini{display:inline-flex;align-items:center;gap:6px;margin:5px 4px 0 0;padding:4px 7px 4px 4px;border:1px solid #55404a;border-radius:3px;background:#211d23;color:#e8d9dc;font:600 10px Inter;cursor:pointer;vertical-align:middle;max-width:100%}
+.perk-owner-mini img{width:25px;height:25px;object-fit:cover;border-radius:2px;background:#101015;flex:0 0 25px}
+.perk-owner-mini span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tier-perks{align-items:flex-start}
+.perk-detail-head{display:flex;gap:18px;align-items:center;padding:0 42px 20px 0;border-bottom:1px solid #393039}
+.perk-detail-art{width:112px;height:112px;object-fit:contain;background:#17171d;border:1px solid #574047;border-radius:4px;flex:0 0 112px}
+.perk-detail-copy{padding:18px 0;border-bottom:1px solid #393039}
+.perk-detail-copy h3{font:600 21px 'Barlow Condensed';margin:0 0 8px}
+.perk-detail-copy p{font-size:12px;line-height:1.7;color:#c7bec4;white-space:pre-line;margin:0 0 12px}
+.perk-owner-card{display:flex;align-items:center;gap:12px;padding:12px;background:#211d23;border:1px solid #55404a;border-radius:4px;margin-top:12px}
+.perk-owner-card img{width:66px;height:66px;object-fit:cover;background:#101015;border-radius:3px}
+.perk-owner-card button{display:block;border:0;background:none;padding:0;color:#f0dfe0;font:600 19px 'Barlow Condensed';text-align:left}
+.perk-owner-card small{display:block;color:#aaa;font-size:10px;margin-top:4px}
+@media(max-width:600px){.perk-detail-art{width:82px;height:82px;flex-basis:82px}.perk-detail-copy p{font-size:11px}.perk-owner-card img{width:54px;height:54px}}

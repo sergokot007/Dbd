@@ -271,8 +271,20 @@ function itemInfo(type,label){
  return {desc:"Подношение выбирается перед матчем и расходуется после его завершения. Эффект зависит от конкретного подношения.",obtain:"Подношения открываются в Кровавой паутине. Некоторые дают очки крови, меняют условия карты или стартовое расположение игроков."};
 }
 async function ensureCharacterPortraits(){
- if(Object.keys(characterPortraits).length)return;
- try{let list=[];if(typeof localCatalog==="function"){const catalog=await localCatalog();list=Array.isArray(catalog.characters)?catalog.characters:[];}if(!list.length){const r=await fetch("https://dbd.source.gs/api/characters/",{cache:"force-cache"});if(r.ok){const payload=await r.json();list=Array.isArray(payload)?payload:(payload.data||payload.characters||payload.items||[]);}}for(const x of list){const nm=x.displayName||x.display_name||x.name||x.title||x.killerName;const im=x.image||x.imageUrl||x.image_url||x.icon||x.iconUrl||x.icon_url||x.portrait;if(nm&&im)characterPortraits[normDetail(nm)]=x;}}catch{}
+ if(window.__dbdCharacterPortraitPromise)return window.__dbdCharacterPortraitPromise;
+ window.__dbdCharacterPortraitPromise=(async()=>{
+  try{
+   let list=[];
+   if(typeof localCatalog==="function"){const catalog=await localCatalog();list=Array.isArray(catalog.characters)?catalog.characters:[];window.__dbdCharacterCatalog=list;}
+   if(!list.length){const r=await fetch("https://dbd.source.gs/api/characters/",{cache:"force-cache"});if(r.ok){const payload=await r.json();list=Array.isArray(payload)?payload:(payload.data||payload.characters||payload.items||[]);}}
+   for(const x of list){
+    const names=[x.nameEn,x.englishName,x.name_en,x.english_name,x.displayName,x.display_name,x.name,x.title,x.killerName].filter(Boolean);
+    const im=x.image||x.imageUrl||x.image_url||x.icon||x.iconUrl||x.icon_url||x.iconURL||x.portrait||x.portraitURL||x.portraitUrl||x.characterIcon||x.character_icon;
+    if(im)for(const nm of names)characterPortraits[normDetail(nm)]=x;
+   }
+  }catch{}
+ })();
+ return window.__dbdCharacterPortraitPromise;
 }
 async function openLoadoutInfo(type,label){
  if(type==="perk"&&typeof localCatalog==="function"&&(!Array.isArray(allPerks)||!allPerks.length)){try{const catalog=await localCatalog();allPerks=Array.isArray(catalog.perks)?catalog.perks:[]}catch{}}
