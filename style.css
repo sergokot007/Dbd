@@ -206,3 +206,41 @@
 .perk-chip{display:inline-flex;align-items:center;gap:10px;min-height:76px}
 .perk-chip .build-perk-name{font-size:13px}
 @media(max-width:420px){.character-perk-grid{gap:6px}.character-perk-card img,.character-perk-card .build-perk-placeholder{width:54px;height:54px}.perk-chip .build-perk-icon{width:50px;height:50px;flex-basis:50px}}
+
+/* Personal owned-character loadout builder */
+.mybuild-layout{display:block!important}
+.mybuild-main{display:grid;grid-template-columns:minmax(280px,.9fr) minmax(320px,1.1fr);gap:18px;align-items:start}
+.mybuild-roster,.mybuild-result{background:linear-gradient(145deg,#24232b,#17171d);border:1px solid #39343b;border-radius:6px;padding:16px;min-width:0}
+.mybuild-roster-head,.mybuild-result-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.mybuild-roster h3,.mybuild-result h3{font:700 24px 'Barlow Condensed';margin:0}
+.mybuild-roster-head span,.mybuild-foot{font-size:11px;color:#c98b8e}
+.mybuild-roster>p,.mybuild-result-top p{font-size:12px;line-height:1.6;color:#aaa}
+.mybuild-character-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;max-height:540px;overflow:auto}
+.mybuild-character{position:relative;display:flex;align-items:center;gap:8px;min-width:0;padding:7px;background:#111116;border:1px solid #343039;border-radius:4px;cursor:pointer}
+.mybuild-character.selected{border-color:#b95760;background:#302126}
+.mybuild-character input{position:absolute;opacity:0;pointer-events:none}
+.mybuild-character img,.mybuild-no-portrait{width:42px;height:42px;flex:0 0 42px;object-fit:contain;background:#27232a;border-radius:3px}
+.mybuild-no-portrait{display:grid;place-items:center;color:#c65a61}
+.mybuild-check{width:18px;height:18px;flex:0 0 18px;border:1px solid #76616a;border-radius:3px;display:grid;place-items:center;color:#fff;font-size:12px}
+.mybuild-character.selected .mybuild-check{background:#963f49;border-color:#d36a73}
+.mybuild-character-name{font-size:12px;line-height:1.3;color:#eee;overflow-wrap:anywhere}
+.mybuild-side,.mybuild-tasks{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}
+.mybuild-side button,.mybuild-tasks button,.mybuild-result-top button{border:1px solid #49404a;background:#1c1b22;color:#d8cfd3;border-radius:4px;padding:9px 12px;font-size:12px}
+.mybuild-side button.active,.mybuild-tasks button.active{background:#642a31;border-color:#c64a50;color:#fff}
+.mybuild-task-label{font-size:11px;color:#aaa;margin:8px 0}
+.mybuild-result-top{align-items:flex-start}
+.mybuild-result-top .eyebrow{font-size:9px;color:#d58b8f;letter-spacing:1px}
+.mybuild-result-top h3{margin:5px 0}
+.mybuild-result-top p{margin:0}
+.mybuild-perks{display:grid;gap:9px;margin-top:16px}
+.mybuild-perk{display:flex;align-items:flex-start;gap:12px;padding:10px;background:#111116;border:1px solid #37323a;border-radius:4px}
+.mybuild-perk-image{width:62px;height:62px;flex:0 0 62px;background:#28232a;border:1px solid #594047;display:grid;place-items:center}
+.mybuild-perk-image img{width:100%;height:100%;object-fit:contain}
+.mybuild-perk-image span{color:#c65a61;font-size:22px}
+.mybuild-perk b{font-size:15px;color:#f2e9e9}
+.mybuild-perk small{display:block;color:#d58b8f;font-size:10px;margin-top:3px}
+.mybuild-perk p{font-size:11px;line-height:1.5;color:#aaa;margin:6px 0 0}
+.mybuild-foot{border-top:1px solid #38343b;margin-top:14px;padding-top:12px}
+.mybuild-empty{font-size:13px;color:#d8b7b7;line-height:1.5}
+@media(max-width:760px){.mybuild-main{grid-template-columns:1fr}.mybuild-character-list{max-height:380px}}
+@media(max-width:420px){.mybuild-character-list{grid-template-columns:1fr}.mybuild-roster,.mybuild-result{padding:12px}.mybuild-perk-image{width:54px;height:54px;flex-basis:54px}}
