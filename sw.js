@@ -9,3 +9,4 @@ self.addEventListener('fetch',e=>{
   return v;
  }).catch(()=>caches.match(e.request).then(v=>v||caches.match('./index.html'))));
 });
+// Trigger Pages rebuild for locally mirrored perk artwork.
