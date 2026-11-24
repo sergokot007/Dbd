@@ -673,6 +673,53 @@ def audit_perk_image_urls(records):
     return records
 
 
+def mirror_perk_images(records):
+    """Copy verified perk artwork into Pages to avoid third-party hotlink failures on mobile."""
+    from concurrent.futures import ThreadPoolExecutor
+    from mimetypes import guess_extension
+    target_dir = Path("assets/perks")
+    target_dir.mkdir(parents=True, exist_ok=True)
+
+    def download(item):
+        url = str(item.get("image") or "").strip()
+        if not url.startswith(("https://", "http://")):
+            return item.get("id"), ""
+        try:
+            response = requests.get(url, headers=HEADERS, timeout=25, stream=True)
+            response.raise_for_status()
+            content_type = str(response.headers.get("Content-Type", "")).split(";", 1)[0].lower()
+            if not content_type.startswith("image/"):
+                response.close()
+                return item.get("id"), ""
+            data = response.content
+            response.close()
+            if not data or len(data) > 2_000_000:
+                return item.get("id"), ""
+            ext = guess_extension(content_type) or ".img"
+            if ext == ".jpe":
+                ext = ".jpg"
+            slug = re.sub(r"[^a-zA-Z0-9_-]+", "-", str(item.get("id") or "perk")).strip("-") or "perk"
+            filename = slug + ext
+            (target_dir / filename).write_bytes(data)
+            return item.get("id"), "./assets/perks/" + filename
+        except Exception as exc:
+            print("Perk image mirror failed:", item.get("id"), type(exc).__name__)
+            return item.get("id"), ""
+
+    with ThreadPoolExecutor(max_workers=12) as pool:
+        results = list(pool.map(download, records))
+    paths = {key: value for key, value in results if key and value}
+    mirrored = 0
+    for item in records:
+        local = paths.get(item.get("id"))
+        if local:
+            item["sourceImage"] = item.get("image", "")
+            item["image"] = local
+            mirrored += 1
+    print("Perk artwork mirrored locally:", mirrored, "/", len(records))
+    return records
+
+
 def scrape_perk_owner_map():
     """Map each perk slug to the English character who owns that teachable perk."""
     jobs = []
@@ -1227,7 +1274,7 @@ def main():
     result = {
         "generatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "source": BASE,
-        "perks": apply_external_ru_localization(scrape_ru_perk_descriptions(audit_perk_image_urls(fill_missing_perk_images(apply_perk_ru_names(scrape_link_catalog("/perks/", "perks"), perk_ru_map))), ru_maps), "perks", external_ru),
+        "perks": apply_external_ru_localization(scrape_ru_perk_descriptions(mirror_perk_images(audit_perk_image_urls(fill_missing_perk_images(apply_perk_ru_names(scrape_link_catalog("/perks/", "perks"), perk_ru_map)))), ru_maps), "perks", external_ru),
         "offerings": apply_external_ru_localization(apply_ru_article_names(scrape_offerings(), offering_ru_map), "offerings", external_ru),
         "maps": scrape_maps(),
         "addons": [],
