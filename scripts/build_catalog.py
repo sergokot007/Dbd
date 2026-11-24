@@ -634,6 +634,45 @@ def fill_missing_perk_images(records):
     return records
 
 
+
+def audit_perk_image_urls(records):
+    """Check whether catalog image URLs actually return image content, not just non-empty strings."""
+    from concurrent.futures import ThreadPoolExecutor
+    from collections import Counter
+    candidates = [(i, str(item.get("image") or "").strip()) for i, item in enumerate(records)]
+    candidates = [(i, url) for i, url in candidates if url.startswith(("https://", "http://"))]
+
+    def check(entry):
+        index, url = entry
+        try:
+            response = requests.get(url, headers=HEADERS, timeout=18, stream=True,
+                                    allow_redirects=True)
+            status = response.status_code
+            content_type = str(response.headers.get("Content-Type", "")).lower()
+            response.close()
+            if status == 200 and content_type.startswith("image/"):
+                return index, True, status, content_type
+            return index, False, status, content_type or "missing-content-type"
+        except Exception as exc:
+            return index, False, "error", type(exc).__name__
+
+    with ThreadPoolExecutor(max_workers=16) as pool:
+        results = list(pool.map(check, candidates))
+    valid = sum(1 for _, ok, _, _ in results if ok)
+    failures = [(records[i].get("id", i), status, kind)
+                for i, ok, status, kind in results if not ok]
+    print("Perk image URL HTTP audit:", valid, "/", len(candidates),
+          "valid image responses;", len(failures), "failed")
+    if failures:
+        print("Perk image URL failures (first 25):", failures[:25])
+    missing = len(records) - len(candidates)
+    if missing:
+        print("Perk records without absolute HTTP image URLs:", missing)
+    # Keep the original URLs: a transient CDN/network rejection must not erase
+    # artwork from the published catalog. The audit is diagnostic, not destructive.
+    return records
+
+
 def scrape_perk_owner_map():
     """Map each perk slug to the English character who owns that teachable perk."""
     jobs = []
@@ -1188,7 +1227,7 @@ def main():
     result = {
         "generatedAt": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "source": BASE,
-        "perks": apply_external_ru_localization(scrape_ru_perk_descriptions(fill_missing_perk_images(apply_perk_ru_names(scrape_link_catalog("/perks/", "perks"), perk_ru_map)), ru_maps), "perks", external_ru),
+        "perks": apply_external_ru_localization(scrape_ru_perk_descriptions(audit_perk_image_urls(fill_missing_perk_images(apply_perk_ru_names(scrape_link_catalog("/perks/", "perks"), perk_ru_map))), ru_maps), "perks", external_ru),
         "offerings": apply_external_ru_localization(apply_ru_article_names(scrape_offerings(), offering_ru_map), "offerings", external_ru),
         "maps": scrape_maps(),
         "addons": [],
