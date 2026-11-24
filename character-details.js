@@ -129,8 +129,8 @@ function personalCharacterBuilds(data,isK){
  ]:[
   {id:"chase",terms:["chase","pallet","vault","window","exhaustion","погон","паллет","окн"],index:1},
   {id:"gens",terms:["generator","repair","gen","skill check","генератор","ремонт"],index:2},
-  {id:"heal",terms:["heal","healing","injured","леч","ранен"],index:3},
-  {id:"support",terms:["hook","unhook","protection","крюк","сняти","защит"],index:4},
+  {id:"heal",terms:["heal","healing","injured","леч","ранен"],index:0},
+  {id:"support",terms:["hook","unhook","protection","крюк","сняти","защит"],index:3},
   {id:"stealth",terms:["scratch","quiet","silent","hide","след","шум","скрыт"],index:4}
  ];
  const output=personal.map((p,i)=>{
