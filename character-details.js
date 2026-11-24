@@ -27,7 +27,7 @@ const DOSSIER_PERK_RU={
  "Stake Out":"Наблюдение","Built to Last":"Долговечность","Kindred":"Родственные души","We'll Make It":"Мы справимся",
  "Reassurance":"Уверенность","Empathy":"Эмпатия","Iron Will":"Железная воля","Lightweight":"Лёгкий шаг",
  "Quick & Quiet":"Бесшумность","Lucky Break":"Счастливый случай","Corrupt Intervention":"Порченое вмешательство",
- "Pop Goes the Weasel":"Поп goes the Weasel","Grim Embrace":"Мрачные объятия","No Holds Barred":"Без ограничений",
+ "Pop Goes the Weasel":"Чертик из табакерки","Grim Embrace":"Мрачные объятия","No Holds Barred":"Без ограничений",
  "Lethal Pursuer":"Смертельный преследователь","Barbecue & Chilli":"Барбекю и чили","Nowhere to Hide":"Негде спрятаться",
  "I'm All Ears":"Я весь внимание","Bamboozle":"Обман","Brutal Strength":"Жестокая сила","Enduring":"Стойкость",
  "Spirit Fury":"Ярость духа","Infectious Fright":"Заразительный ужас","Deadlock":"Мёртвая хватка",
