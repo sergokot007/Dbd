@@ -113,7 +113,7 @@ const BUILD_PERK_RU={
  "Hex: Undying":"Проклятие: Бессмертие","Dragon's Grip":"Драконья хватка","Hex: Blood Favor":"Проклятие: Кровавая милость",
  "Scourge Hook: Pain Resonance":"Крюк-мучитель: Резонанс боли","Grim Embrace":"Мрачные объятия",
  "Hex: Pentimento":"Проклятие: Пентименто","Corrupt Intervention":"Порченое вмешательство",
- "Infectious Fright":"Заразительный ужас","Dark Devotion":"Тёмная преданность","Pop Goes the Weasel":"Поп goes the Weasel",
+ "Infectious Fright":"Заразительный ужас","Dark Devotion":"Тёмная преданность","Pop Goes the Weasel":"Чертик из табакерки",
  "Bamboozle":"Обман","Coulrophobia":"Кулрофобия","Deadlock":"Мёртвая хватка","Hex: Plaything":"Проклятие: Игрушка",
  "Gift of Pain":"Дар боли","Lethal Pursuer":"Смертельный преследователь","Eruption":"Извержение","Hysteria":"Истерия",
  "Nowhere to Hide":"Негде спрятаться","Hubris":"Высокомерие","Face the Darkness":"Лицом к тьме",
@@ -166,7 +166,7 @@ function renderBuilds() {
  $('#grid').innerHTML=groups.map(b=>{
   const perks=b.perks.map(wanted=>{
    const p=buildPerk(wanted),src=p?image(p):'';const perkTitle=buildPerkRussianName(p,wanted);
-   return '<div class="build-perk"><div class="build-perk-icon">'+(src?'<img loading="lazy" src="'+esc(src)+'" alt="" onerror="this.style.display=\'none\'">':'<span class="build-perk-placeholder">✣</span>')+'</div><div class="build-perk-info"><b><button type="button" class="build-perk-link" data-loadout-type="perk" data-loadout-name="'+esc(p?(p.nameEn||p.englishName||p.name_en||p.english_name||p.id||wanted):wanted)+'">'+esc(perkTitle)+'</button></b><small>'+esc(p?(buildPerkOwner(p)||'Игровой перк'):'Перк не найден в базе')+'</small></div>'+(p&&buildPerkIsPaid(p)?'<span class="auric-cell" title="Платный персонаж / лицензированный контент">◈</span>':'')+'</div>';
+   return '<div class="build-perk"><div class="build-perk-icon">'+(src?'<img loading="lazy" src="'+esc(src)+'" alt="" onerror="this.outerHTML=\'<span class=&quot;build-perk-placeholder&quot;>✣</span>\'">':'<span class="build-perk-placeholder">✣</span>')+'</div><div class="build-perk-info"><b><button type="button" class="build-perk-link" data-loadout-type="perk" data-loadout-name="'+esc(p?(p.nameEn||p.englishName||p.name_en||p.english_name||p.id||wanted):wanted)+'">'+esc(perkTitle)+'</button></b><small>'+esc(p?(buildPerkOwner(p)||'Игровой перк'):'Перк не найден в базе')+'</small></div>'+(p&&buildPerkIsPaid(p)?'<span class="auric-cell" title="Платный персонаж / лицензированный контент">◈</span>':'')+'</div>';
   }).join('');
   return '<article class="build-card"><div class="build-head"><span class="build-tag">'+esc(b.tag)+'</span><h3>'+esc(b.title)+'</h3><p>'+esc(b.desc)+'</p></div><div class="build-perks">'+perks+'</div><div class="build-foot"><span>4 ПЕРКА • ВЫЖИВШИЙ</span><button class="build-copy" data-copy-build="'+b.id+'">Скопировать названия</button></div></article>';
  }).join('') || '<div class="empty">По этому запросу сборок не найдено.</div>';

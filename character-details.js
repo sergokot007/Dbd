@@ -70,7 +70,7 @@ function refreshVisiblePerkIcons(){
   if(!placeholder)return;
   const img=document.createElement("img");
   img.className="build-perk-icon";img.loading="lazy";img.alt="";img.src=src;
-  img.onerror=()=>img.remove();
+  img.onerror=()=>{const fallback=document.createElement("span");fallback.className="build-perk-placeholder";fallback.textContent="✦";img.replaceWith(fallback)};
   placeholder.replaceWith(img);
  });
  if(typeof tab!=="undefined"&&tab==="builds"&&typeof renderBuilds==="function")renderBuilds();
