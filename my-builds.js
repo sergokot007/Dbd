@@ -1,6 +1,7 @@
 /* Builds restricted to perks the player has unlocked. */
 (function(){
  const STORE='dbd-owned-characters-v1';
+ const GENERAL={survivors:['Déjà Vu','Kindred','Lightweight','No One Left Behind','Resilience','Slippery Meat','Spine Chill','This Is Not Happening',"We'll Make It"],killers:['Bitter Murmur','Deerstalker','Hex: No One Escapes Death','Insidious','Iron Grasp','Monstrous Shrine','Sloppy Butcher','Spies from the Shadows','Unrelenting','Whispers']};
  const TASKS={
   survivors:[
    {id:'chase',title:'Долгая погоня',desc:'Преимущества для окон, паллет и продления преследования.',terms:['chase','loop','pallet','vault','window','exhaustion','speed','ускор','погон','окн','паллет','прыж'],known:['Windows of Opportunity','Lithe','Sprint Burst','Balanced Landing','Dead Hard','Finesse','Resilience','Made for This','Adrenaline','Quick & Quiet','Dance With Me','Overcome']},
@@ -35,7 +36,7 @@
   for(const id of ids){if(map[id])return String(map[id]);const hit=Object.entries(map).find(([k])=>key(k)===key(id));if(hit)return String(hit[1])}
   return '';
  }
- function isGeneral(p){const o=perkOwner(p);return p.isGeneral===true||p.is_general===true||p.general===true||/^(general|общие перки|общий перк|all characters)$/i.test(o)||/general|общ(ий|ая|ие)|без владельца/i.test(String(p.sourceType||p.source_type||p.unlockType||p.unlock_type||''))}
+ function isGeneral(p){const o=perkOwner(p),names=[p.nameEn,p.englishName,p.name_en,p.english_name,p.slug,p.id,p.name,p.displayName].filter(Boolean).map(key);return p.isGeneral===true||p.is_general===true||p.general===true||/^(general|общие перки|общий перк|all characters)$/i.test(o)||GENERAL[side].some(n=>names.includes(key(n)))||/general|общ(ий|ая|ие)|без владельца/i.test(String(p.sourceType||p.source_type||p.unlockType||p.unlock_type||''))}
  function perkName(p){return String(p.nameRu||p.name_ru||p.russianName||p.russian_name||p.displayName||p.display_name||p.name||p.nameEn||p.id||'Перк')}
  function perkDescription(p){return String(p.descriptionRu||p.description_ru||p.description||p.desc||p.effect||'')}
  function availablePerks(){
