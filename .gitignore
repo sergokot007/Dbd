@@ -1,0 +1,13 @@
+# Local development / build artifacts (Pages deploys the filesystem, not Git)
+.venv/
+node_modules/
+__pycache__/
+*.py[cod]
+*.log
+.DS_Store
+package-lock.json
+
+# Generated at deploy time by scripts/build_catalog.py
+catalog-data.json
+catalog-fallback.json
+assets/perks/

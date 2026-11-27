@@ -1,0 +1,4652 @@
+[
+  {
+    "slug": "a-place-for-us",
+    "role": "survivor",
+    "name": {
+      "en": "A Place For Us",
+      "ru": "Место для нас"
+    },
+    "character": "Kwon",
+    "icon": "/perks/survivor/a-place-for-us.webp",
+    "tags": [
+      "healing"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "ace-in-the-hole",
+    "role": "survivor",
+    "name": {
+      "en": "Ace in the Hole",
+      "ru": "Туз в рукаве"
+    },
+    "character": "Ace",
+    "icon": "/perks/survivor/ace-in-the-hole.webp",
+    "tags": [
+      "items"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "adrenaline",
+    "role": "survivor",
+    "name": {
+      "en": "Adrenaline",
+      "ru": "Адреналин"
+    },
+    "character": "Meg",
+    "icon": "/perks/survivor/adrenaline.webp",
+    "tags": [
+      "healing",
+      "exhaustion"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "aftercare",
+    "role": "survivor",
+    "name": {
+      "en": "Aftercare",
+      "ru": "Уход за больным"
+    },
+    "character": "Jeff",
+    "icon": "/perks/survivor/aftercare.webp",
+    "tags": [
+      "healing",
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "alert",
+    "role": "survivor",
+    "name": {
+      "en": "Alert",
+      "ru": "Тревога"
+    },
+    "character": "Feng",
+    "icon": "/perks/survivor/alert.webp",
+    "tags": [
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "any-means-necessary",
+    "role": "survivor",
+    "name": {
+      "en": "Any Means Necessary",
+      "ru": "Любыми средствами"
+    },
+    "character": "Yui",
+    "icon": "/perks/survivor/any-means-necessary.webp",
+    "tags": [
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "apocalyptic-ingenuity",
+    "role": "survivor",
+    "name": {
+      "en": "Apocalyptic Ingenuity",
+      "ru": "Апокалиптическая смекалка"
+    },
+    "character": "Rick",
+    "icon": "/perks/survivor/apocalyptic-ingenuity.webp",
+    "tags": [
+      "aura"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "appraisal",
+    "role": "survivor",
+    "name": {
+      "en": "Appraisal",
+      "ru": "Изучение"
+    },
+    "character": "Élodie",
+    "icon": "/perks/survivor/appraisal.webp",
+    "tags": [
+      "items"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "autodidact",
+    "role": "survivor",
+    "name": {
+      "en": "Autodidact",
+      "ru": "Самоучка"
+    },
+    "character": "Adam",
+    "icon": "/perks/survivor/autodidact.webp",
+    "tags": [
+      "healing"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "babysitter",
+    "role": "survivor",
+    "name": {
+      "en": "Babysitter",
+      "ru": "Нянька"
+    },
+    "character": "Steve",
+    "icon": "/perks/survivor/babysitter.webp",
+    "tags": [
+      "aura",
+      "stealth",
+      "unhooking"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "background-player",
+    "role": "survivor",
+    "name": {
+      "en": "Background Player",
+      "ru": "Запасной игрок"
+    },
+    "character": "Renato",
+    "icon": "/perks/survivor/background-player.webp",
+    "tags": [
+      "exhaustion"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "bada-bada-boom",
+    "role": "survivor",
+    "name": {
+      "en": "Bada Bada Boom",
+      "ru": "Бада-бада-бум"
+    },
+    "character": "Dustin",
+    "icon": "/perks/survivor/bada-bada-boom.webp",
+    "tags": [
+      "generator",
+      "aura"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "balanced-landing",
+    "role": "survivor",
+    "name": {
+      "en": "Balanced Landing",
+      "ru": "Ловкое приземление"
+    },
+    "character": "Nea",
+    "icon": "/perks/survivor/balanced-landing.webp",
+    "tags": [
+      "exhaustion"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "bardic-inspiration",
+    "role": "survivor",
+    "name": {
+      "en": "Bardic Inspiration",
+      "ru": "Вдохновение барда"
+    },
+    "character": "Aestri",
+    "icon": "/perks/survivor/bardic-inspiration.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "better-together",
+    "role": "survivor",
+    "name": {
+      "en": "Better Together",
+      "ru": "Лучше вместе"
+    },
+    "character": "Nancy",
+    "icon": "/perks/survivor/better-together.webp",
+    "tags": [
+      "generator",
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "better-than-new",
+    "role": "survivor",
+    "name": {
+      "en": "Better than New",
+      "ru": "Как новенький"
+    },
+    "character": "Rebecca",
+    "icon": "/perks/survivor/better-than-new.webp",
+    "tags": [
+      "healing"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "bite-the-bullet",
+    "role": "survivor",
+    "name": {
+      "en": "Bite the Bullet",
+      "ru": "Стиснув зубы"
+    },
+    "character": "Leon",
+    "icon": "/perks/survivor/bite-the-bullet.webp",
+    "tags": [
+      "healing"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "blast-mine",
+    "role": "survivor",
+    "name": {
+      "en": "Blast Mine",
+      "ru": "Фугасная мина"
+    },
+    "character": "Jill",
+    "icon": "/perks/survivor/blast-mine.webp",
+    "tags": [
+      "generator",
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "blood-pact",
+    "role": "survivor",
+    "name": {
+      "en": "Blood Pact",
+      "ru": "Кровавый договор"
+    },
+    "character": "Cheryl",
+    "icon": "/perks/survivor/blood-pact.webp",
+    "tags": [
+      "healing",
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "blood-rush",
+    "role": "survivor",
+    "name": {
+      "en": "Blood Rush",
+      "ru": "Выше головы"
+    },
+    "character": "Renato",
+    "icon": "/perks/survivor/blood-rush.webp",
+    "tags": [
+      "exhaustion",
+      "unhooking"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "boil-over",
+    "role": "survivor",
+    "name": {
+      "en": "Boil Over",
+      "ru": "Через край"
+    },
+    "character": "Kate",
+    "icon": "/perks/survivor/boil-over.webp",
+    "tags": [
+      "aura",
+      "unhooking"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "bond",
+    "role": "survivor",
+    "name": {
+      "en": "Bond",
+      "ru": "Связь"
+    },
+    "character": "Dwight",
+    "icon": "/perks/survivor/bond.webp",
+    "tags": [
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "boon-circle-of-healing",
+    "role": "survivor",
+    "name": {
+      "en": "Boon: Circle of Healing",
+      "ru": "Дар: круг исцеления"
+    },
+    "character": "Mikaela",
+    "icon": "/perks/survivor/boon-circle-of-healing.webp",
+    "tags": [
+      "healing",
+      "aura",
+      "totems"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "boon-dark-theory",
+    "role": "survivor",
+    "name": {
+      "en": "Boon: Dark Theory",
+      "ru": "Дар: теория мрака"
+    },
+    "character": "Yoichi",
+    "icon": "/perks/survivor/boon-dark-theory.webp",
+    "tags": [
+      "totems"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "boon-exponential",
+    "role": "survivor",
+    "name": {
+      "en": "Boon: Exponential",
+      "ru": "Дар: экспонента"
+    },
+    "character": "Jonah",
+    "icon": "/perks/survivor/boon-exponential.webp",
+    "tags": [
+      "totems"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "boon-illumination",
+    "role": "survivor",
+    "name": {
+      "en": "Boon: Illumination",
+      "ru": "Дар: освещение"
+    },
+    "character": "Alan",
+    "icon": "/perks/survivor/boon-illumination.webp",
+    "tags": [
+      "generator",
+      "aura",
+      "totems"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "boon-shadow-step",
+    "role": "survivor",
+    "name": {
+      "en": "Boon: Shadow Step",
+      "ru": "Дар: уход в тень"
+    },
+    "character": "Mikaela",
+    "icon": "/perks/survivor/boon-shadow-step.webp",
+    "tags": [
+      "aura",
+      "stealth",
+      "totems"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "boon-steadfast",
+    "role": "survivor",
+    "name": {
+      "en": "Boon: Steadfast",
+      "ru": "Дар: непоколебимость"
+    },
+    "character": "Aurora",
+    "icon": "/perks/survivor/boon-steadfast.webp",
+    "tags": [
+      "generator",
+      "aura",
+      "totems"
+    ],
+    "addedAt": "2026-08-26T03:38:19.039Z"
+  },
+  {
+    "slug": "borrowed-time",
+    "role": "survivor",
+    "name": {
+      "en": "Borrowed Time",
+      "ru": "Одолженное время"
+    },
+    "character": "Bill",
+    "icon": "/perks/survivor/borrowed-time.webp",
+    "tags": [
+      "unhooking"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "botany-knowledge",
+    "role": "survivor",
+    "name": {
+      "en": "Botany Knowledge",
+      "ru": "Познания в ботанике"
+    },
+    "character": "Claudette",
+    "icon": "/perks/survivor/botany-knowledge.webp",
+    "tags": [
+      "healing"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "bound-by-obsession",
+    "role": "survivor",
+    "name": {
+      "en": "Bound by Obsession",
+      "ru": "Сковывающая одержимость"
+    },
+    "character": "All",
+    "icon": "/perks/survivor/bound-by-obsession.webp",
+    "tags": [
+      "generator",
+      "healing",
+      "aura"
+    ],
+    "addedAt": "2026-08-19T08:56:09.086Z"
+  },
+  {
+    "slug": "breakdown",
+    "role": "survivor",
+    "name": {
+      "en": "Breakdown",
+      "ru": "Поломка"
+    },
+    "character": "Jeff",
+    "icon": "/perks/survivor/breakdown.webp",
+    "tags": [
+      "generator",
+      "aura",
+      "unhooking",
+      "items"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "breakout",
+    "role": "survivor",
+    "name": {
+      "en": "Breakout",
+      "ru": "Форсаж"
+    },
+    "character": "Yui",
+    "icon": "/perks/survivor/breakout.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "buckle-up",
+    "role": "survivor",
+    "name": {
+      "en": "Buckle Up",
+      "ru": "Пристегнись"
+    },
+    "character": "Ash",
+    "icon": "/perks/survivor/buckle-up.webp",
+    "tags": [
+      "healing",
+      "aura",
+      "exhaustion",
+      "stealth"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "built-to-last",
+    "role": "survivor",
+    "name": {
+      "en": "Built to Last",
+      "ru": "Строим на века"
+    },
+    "character": "Felix",
+    "icon": "/perks/survivor/built-to-last.webp",
+    "tags": [
+      "items"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "calm-spirit",
+    "role": "survivor",
+    "name": {
+      "en": "Calm Spirit",
+      "ru": "Спокойствие духа"
+    },
+    "character": "Jake",
+    "icon": "/perks/survivor/calm-spirit.webp",
+    "tags": [
+      "totems"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "camaraderie",
+    "role": "survivor",
+    "name": {
+      "en": "Camaraderie",
+      "ru": "Товарищество"
+    },
+    "character": "Steve",
+    "icon": "/perks/survivor/camaraderie.webp",
+    "tags": [
+      "unhooking"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "champion-of-light",
+    "role": "survivor",
+    "name": {
+      "en": "Champion of Light",
+      "ru": "Воин света"
+    },
+    "character": "Alan",
+    "icon": "/perks/survivor/champion-of-light.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "change-of-plan",
+    "role": "survivor",
+    "name": {
+      "en": "Change of Plan",
+      "ru": "Изменение плана"
+    },
+    "character": "Dustin",
+    "icon": "/perks/survivor/change-of-plan.webp",
+    "tags": [
+      "generator",
+      "items"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "chemical-trap",
+    "role": "survivor",
+    "name": {
+      "en": "Chemical Trap",
+      "ru": "Химическая ловушка"
+    },
+    "character": "Ellen",
+    "icon": "/perks/survivor/chemical-trap.webp",
+    "tags": [
+      "generator",
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "clairvoyance",
+    "role": "survivor",
+    "name": {
+      "en": "Clairvoyance",
+      "ru": "Ясновидение"
+    },
+    "character": "Mikaela",
+    "icon": "/perks/survivor/clairvoyance.webp",
+    "tags": [
+      "generator",
+      "aura",
+      "totems",
+      "items"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "clean-break",
+    "role": "survivor",
+    "name": {
+      "en": "Clean Break",
+      "ru": "С чистого листа"
+    },
+    "character": "Taurie",
+    "icon": "/perks/survivor/clean-break.webp",
+    "tags": [
+      "healing"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "come-and-get-me",
+    "role": "survivor",
+    "name": {
+      "en": "Come and Get Me!",
+      "ru": "Эй, я здесь!"
+    },
+    "character": "Rick",
+    "icon": "/perks/survivor/come-and-get-me.webp",
+    "tags": [
+      "aura",
+      "stealth",
+      "unhooking"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "conviction",
+    "role": "survivor",
+    "name": {
+      "en": "Conviction",
+      "ru": "Убежденность"
+    },
+    "character": "Michonne",
+    "icon": "/perks/survivor/conviction.webp",
+    "tags": [
+      "healing"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "corrective-action",
+    "role": "survivor",
+    "name": {
+      "en": "Corrective Action",
+      "ru": "Корректировка"
+    },
+    "character": "Jonah",
+    "icon": "/perks/survivor/corrective-action.webp",
+    "tags": [
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "counterforce",
+    "role": "survivor",
+    "name": {
+      "en": "Counterforce",
+      "ru": "Противодействие"
+    },
+    "character": "Jill",
+    "icon": "/perks/survivor/counterforce.webp",
+    "tags": [
+      "aura",
+      "totems"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "cross-examination",
+    "role": "survivor",
+    "name": {
+      "en": "Cross-Examination",
+      "ru": "Перекрестный допрос"
+    },
+    "character": "Shane",
+    "icon": "/perks/survivor/cross-examination.webp",
+    "tags": [
+      "stealth"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "cut-loose",
+    "role": "survivor",
+    "name": {
+      "en": "Cut Loose",
+      "ru": "На волю"
+    },
+    "character": "Thalita",
+    "icon": "/perks/survivor/cut-loose.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "dance-with-me",
+    "role": "survivor",
+    "name": {
+      "en": "Dance With Me",
+      "ru": "Потанцуй со мной"
+    },
+    "character": "Kate",
+    "icon": "/perks/survivor/dance-with-me.webp",
+    "tags": [
+      "stealth"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "dark-sense",
+    "role": "survivor",
+    "name": {
+      "en": "Dark Sense",
+      "ru": "Темное чувство"
+    },
+    "character": "All",
+    "icon": "/perks/survivor/dark-sense.webp",
+    "tags": [
+      "generator",
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "dead-hard",
+    "role": "survivor",
+    "name": {
+      "en": "Dead Hard",
+      "ru": "Крепкий орешек"
+    },
+    "character": "David King",
+    "icon": "/perks/survivor/dead-hard.webp",
+    "tags": [
+      "exhaustion",
+      "unhooking"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "deadline",
+    "role": "survivor",
+    "name": {
+      "en": "Deadline",
+      "ru": "Дедлайн"
+    },
+    "character": "Alan",
+    "icon": "/perks/survivor/deadline.webp",
+    "tags": [
+      "generator",
+      "healing"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "deception",
+    "role": "survivor",
+    "name": {
+      "en": "Deception",
+      "ru": "Уловка"
+    },
+    "character": "Élodie",
+    "icon": "/perks/survivor/deception.webp",
+    "tags": [
+      "stealth"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "deja-vu",
+    "role": "survivor",
+    "name": {
+      "en": "Deja Vu",
+      "ru": "Дежавю"
+    },
+    "character": "All",
+    "icon": "/perks/survivor/deja-vu.webp",
+    "tags": [
+      "generator",
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "deliverance",
+    "role": "survivor",
+    "name": {
+      "en": "Deliverance",
+      "ru": "Освобождение"
+    },
+    "character": "Adam",
+    "icon": "/perks/survivor/deliverance.webp",
+    "tags": [
+      "unhooking"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "desperate-measures",
+    "role": "survivor",
+    "name": {
+      "en": "Desperate Measures",
+      "ru": "Отчаянные меры"
+    },
+    "character": "Felix",
+    "icon": "/perks/survivor/desperate-measures.webp",
+    "tags": [
+      "healing",
+      "unhooking"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "detective-s-hunch",
+    "role": "survivor",
+    "name": {
+      "en": "Detective's Hunch",
+      "ru": "Детективное чутье"
+    },
+    "character": "David Tapp",
+    "icon": "/perks/survivor/detective-s-hunch.webp",
+    "tags": [
+      "generator",
+      "aura",
+      "totems"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "distortion",
+    "role": "survivor",
+    "name": {
+      "en": "Distortion",
+      "ru": "Искажение"
+    },
+    "character": "Jeff",
+    "icon": "/perks/survivor/distortion.webp",
+    "tags": [
+      "aura",
+      "stealth"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "diversion",
+    "role": "survivor",
+    "name": {
+      "en": "Diversion",
+      "ru": "Диверсия"
+    },
+    "character": "Adam",
+    "icon": "/perks/survivor/diversion.webp",
+    "tags": [
+      "stealth"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "do-no-harm",
+    "role": "survivor",
+    "name": {
+      "en": "Do No Harm",
+      "ru": "Не навреди"
+    },
+    "character": "Orela",
+    "icon": "/perks/survivor/do-no-harm.webp",
+    "tags": [
+      "healing"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "down-to-the-last",
+    "role": "survivor",
+    "name": {
+      "en": "Down to the Last",
+      "ru": "До последнего"
+    },
+    "character": "All",
+    "icon": "/perks/survivor/down-to-the-last.webp",
+    "tags": [
+      "generator",
+      "aura"
+    ],
+    "addedAt": "2026-08-19T08:56:09.086Z"
+  },
+  {
+    "slug": "dramaturgy",
+    "role": "survivor",
+    "name": {
+      "en": "Dramaturgy",
+      "ru": "Драматургия"
+    },
+    "character": "Nicolas",
+    "icon": "/perks/survivor/dramaturgy.webp",
+    "tags": [
+      "exhaustion",
+      "items"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "duty-of-care",
+    "role": "survivor",
+    "name": {
+      "en": "Duty of Care",
+      "ru": "Врачебный долг"
+    },
+    "character": "Orela",
+    "icon": "/perks/survivor/duty-of-care.webp",
+    "tags": [],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "empathic-connection",
+    "role": "survivor",
+    "name": {
+      "en": "Empathic Connection",
+      "ru": "Эмпатическая связь"
+    },
+    "character": "Yoichi",
+    "icon": "/perks/survivor/empathic-connection.webp",
+    "tags": [
+      "healing",
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "empathy",
+    "role": "survivor",
+    "name": {
+      "en": "Empathy",
+      "ru": "Сострадание"
+    },
+    "character": "Claudette",
+    "icon": "/perks/survivor/empathy.webp",
+    "tags": [
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "extrasensory-perception",
+    "role": "survivor",
+    "name": {
+      "en": "Extrasensory Perception",
+      "ru": "Восприятие экстрасенса"
+    },
+    "character": "Eleven",
+    "icon": "/perks/survivor/extrasensory-perception.webp",
+    "tags": [
+      "generator",
+      "aura",
+      "totems"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "exultation",
+    "role": "survivor",
+    "name": {
+      "en": "Exultation",
+      "ru": "Ликование"
+    },
+    "character": "Trevor",
+    "icon": "/perks/survivor/exultation.webp",
+    "tags": [
+      "items"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "eyes-of-belmont",
+    "role": "survivor",
+    "name": {
+      "en": "Eyes of Belmont",
+      "ru": "Глаза Бельмонта"
+    },
+    "character": "Trevor",
+    "icon": "/perks/survivor/eyes-of-belmont.webp",
+    "tags": [
+      "generator",
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "fast-track",
+    "role": "survivor",
+    "name": {
+      "en": "Fast Track",
+      "ru": "За чужой счет"
+    },
+    "character": "Yun-Jin",
+    "icon": "/perks/survivor/fast-track.webp",
+    "tags": [
+      "generator",
+      "unhooking",
+      "items"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "finesse",
+    "role": "survivor",
+    "name": {
+      "en": "Finesse",
+      "ru": "Сноровка"
+    },
+    "character": "Lara",
+    "icon": "/perks/survivor/finesse.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "five-moves-ahead",
+    "role": "survivor",
+    "name": {
+      "en": "Five Moves Ahead",
+      "ru": "На пять шагов впереди"
+    },
+    "character": "Kwon",
+    "icon": "/perks/survivor/five-moves-ahead.webp",
+    "tags": [
+      "aura",
+      "stealth"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "fixated",
+    "role": "survivor",
+    "name": {
+      "en": "Fixated",
+      "ru": "Фиксация"
+    },
+    "character": "Nancy",
+    "icon": "/perks/survivor/fixated.webp",
+    "tags": [
+      "stealth"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "flashbang",
+    "role": "survivor",
+    "name": {
+      "en": "Flashbang",
+      "ru": "Световая граната"
+    },
+    "character": "Leon",
+    "icon": "/perks/survivor/flashbang.webp",
+    "tags": [
+      "generator"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "flip-flop",
+    "role": "survivor",
+    "name": {
+      "en": "Flip-Flop",
+      "ru": "Раскачка"
+    },
+    "character": "Ash",
+    "icon": "/perks/survivor/flip-flop.webp",
+    "tags": [
+      "items"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "flow-state",
+    "role": "survivor",
+    "name": {
+      "en": "Flow State",
+      "ru": "Состояние потока"
+    },
+    "character": "Kwon",
+    "icon": "/perks/survivor/flow-state.webp",
+    "tags": [
+      "generator",
+      "healing",
+      "totems",
+      "unhooking"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "fogwise",
+    "role": "survivor",
+    "name": {
+      "en": "Fogwise",
+      "ru": "Умудренный туманом"
+    },
+    "character": "Vittorio",
+    "icon": "/perks/survivor/fogwise.webp",
+    "tags": [
+      "generator",
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "for-the-people",
+    "role": "survivor",
+    "name": {
+      "en": "For the People",
+      "ru": "Ради людей"
+    },
+    "character": "Zarina",
+    "icon": "/perks/survivor/for-the-people.webp",
+    "tags": [
+      "healing",
+      "unhooking"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "friendly-competition",
+    "role": "survivor",
+    "name": {
+      "en": "Friendly Competition",
+      "ru": "Дружеское состязание"
+    },
+    "character": "Thalita",
+    "icon": "/perks/survivor/friendly-competition.webp",
+    "tags": [
+      "generator"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "fruits-of-your-labor",
+    "role": "survivor",
+    "name": {
+      "en": "Fruits of Your Labor",
+      "ru": "Плоды трудов"
+    },
+    "character": "Aurora",
+    "icon": "/perks/survivor/fruits-of-your-labor.webp",
+    "tags": [
+      "generator",
+      "healing"
+    ],
+    "addedAt": "2026-08-26T03:38:19.039Z"
+  },
+  {
+    "slug": "ghost-notes",
+    "role": "survivor",
+    "name": {
+      "en": "Ghost Notes",
+      "ru": "Записки о призраке"
+    },
+    "character": "Vee",
+    "icon": "/perks/survivor/ghost-notes.webp",
+    "tags": [
+      "exhaustion",
+      "stealth"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "hardened",
+    "role": "survivor",
+    "name": {
+      "en": "Hardened",
+      "ru": "Закалка"
+    },
+    "character": "Lara",
+    "icon": "/perks/survivor/hardened.webp",
+    "tags": [
+      "aura",
+      "totems"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "head-on",
+    "role": "survivor",
+    "name": {
+      "en": "Head On",
+      "ru": "Напролом"
+    },
+    "character": "Jane",
+    "icon": "/perks/survivor/head-on.webp",
+    "tags": [
+      "exhaustion"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "hope",
+    "role": "survivor",
+    "name": {
+      "en": "Hope",
+      "ru": "Надежда"
+    },
+    "character": "All",
+    "icon": "/perks/survivor/hope.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "hyperfocus",
+    "role": "survivor",
+    "name": {
+      "en": "Hyperfocus",
+      "ru": "Полная сосредоточенность"
+    },
+    "character": "Rebecca",
+    "icon": "/perks/survivor/hyperfocus.webp",
+    "tags": [
+      "generator",
+      "healing"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "inner-focus",
+    "role": "survivor",
+    "name": {
+      "en": "Inner Focus",
+      "ru": "Собранность"
+    },
+    "character": "Haddie",
+    "icon": "/perks/survivor/inner-focus.webp",
+    "tags": [
+      "aura",
+      "stealth"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "inner-strength",
+    "role": "survivor",
+    "name": {
+      "en": "Inner Strength",
+      "ru": "Внутренняя сила"
+    },
+    "character": "Nancy",
+    "icon": "/perks/survivor/inner-strength.webp",
+    "tags": [
+      "healing",
+      "totems"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "invocation-treacherous-crows",
+    "role": "survivor",
+    "name": {
+      "en": "Invocation: Treacherous Crows",
+      "ru": "Чары: предательские вороны"
+    },
+    "character": "Taurie",
+    "icon": "/perks/survivor/invocation-treacherous-crows.webp",
+    "tags": [
+      "aura",
+      "stealth"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "invocation-weaving-spiders",
+    "role": "survivor",
+    "name": {
+      "en": "Invocation: Weaving Spiders",
+      "ru": "Чары: пауки-прядильщики"
+    },
+    "character": "Sable",
+    "icon": "/perks/survivor/invocation-weaving-spiders.webp",
+    "tags": [
+      "generator",
+      "aura",
+      "items"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "iron-will",
+    "role": "survivor",
+    "name": {
+      "en": "Iron Will",
+      "ru": "Железная воля"
+    },
+    "character": "Jake",
+    "icon": "/perks/survivor/iron-will.webp",
+    "tags": [
+      "exhaustion"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "kindred",
+    "role": "survivor",
+    "name": {
+      "en": "Kindred",
+      "ru": "Кровные узы"
+    },
+    "character": "All",
+    "icon": "/perks/survivor/kindred.webp",
+    "tags": [
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "last-stand",
+    "role": "survivor",
+    "name": {
+      "en": "Last Stand",
+      "ru": "Последний рубеж"
+    },
+    "character": "Michonne",
+    "icon": "/perks/survivor/last-stand.webp",
+    "tags": [
+      "stealth"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "leader",
+    "role": "survivor",
+    "name": {
+      "en": "Leader",
+      "ru": "Лидер"
+    },
+    "character": "Dwight",
+    "icon": "/perks/survivor/leader.webp",
+    "tags": [
+      "healing",
+      "unhooking"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "left-behind",
+    "role": "survivor",
+    "name": {
+      "en": "Left Behind",
+      "ru": "Оставленный Позади"
+    },
+    "character": "Bill",
+    "icon": "/perks/survivor/left-behind.webp",
+    "tags": [
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "lend-a-hand",
+    "role": "survivor",
+    "name": {
+      "en": "Lend a Hand",
+      "ru": "Оказание помощи"
+    },
+    "character": "Shane",
+    "icon": "/perks/survivor/lend-a-hand.webp",
+    "tags": [
+      "healing",
+      "totems",
+      "items"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "light-footed",
+    "role": "survivor",
+    "name": {
+      "en": "Light-Footed",
+      "ru": "Легкоступ"
+    },
+    "character": "Ellen",
+    "icon": "/perks/survivor/light-footed.webp",
+    "tags": [
+      "stealth"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "lightweight",
+    "role": "survivor",
+    "name": {
+      "en": "Lightweight",
+      "ru": "Легковес"
+    },
+    "character": "All",
+    "icon": "/perks/survivor/lightweight.webp",
+    "tags": [
+      "stealth"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "lithe",
+    "role": "survivor",
+    "name": {
+      "en": "Lithe",
+      "ru": "Гибкость"
+    },
+    "character": "Feng",
+    "icon": "/perks/survivor/lithe.webp",
+    "tags": [
+      "exhaustion"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "low-profile",
+    "role": "survivor",
+    "name": {
+      "en": "Low Profile",
+      "ru": "Ниже травы"
+    },
+    "character": "Ada",
+    "icon": "/perks/survivor/low-profile.webp",
+    "tags": [
+      "stealth"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "lucky-break",
+    "role": "survivor",
+    "name": {
+      "en": "Lucky Break",
+      "ru": "Везение"
+    },
+    "character": "Yui",
+    "icon": "/perks/survivor/lucky-break.webp",
+    "tags": [
+      "healing",
+      "stealth"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "lucky-star",
+    "role": "survivor",
+    "name": {
+      "en": "Lucky Star",
+      "ru": "Счастливая звезда"
+    },
+    "character": "Ellen",
+    "icon": "/perks/survivor/lucky-star.webp",
+    "tags": [
+      "generator",
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "made-for-this",
+    "role": "survivor",
+    "name": {
+      "en": "Made for This",
+      "ru": "Призвание"
+    },
+    "character": "Gabriel",
+    "icon": "/perks/survivor/made-for-this.webp",
+    "tags": [
+      "healing",
+      "unhooking"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "mettle-of-man",
+    "role": "survivor",
+    "name": {
+      "en": "Mettle of Man",
+      "ru": "Проверка на прочность"
+    },
+    "character": "Ash",
+    "icon": "/perks/survivor/mettle-of-man.webp",
+    "tags": [
+      "healing",
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "mirrored-illusion",
+    "role": "survivor",
+    "name": {
+      "en": "Mirrored Illusion",
+      "ru": "Зеркальная иллюзия"
+    },
+    "character": "Aestri",
+    "icon": "/perks/survivor/mirrored-illusion.webp",
+    "tags": [
+      "generator",
+      "totems"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "moment-of-glory",
+    "role": "survivor",
+    "name": {
+      "en": "Moment of Glory",
+      "ru": "Момент славы"
+    },
+    "character": "Trevor",
+    "icon": "/perks/survivor/moment-of-glory.webp",
+    "tags": [
+      "healing"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "no-mither",
+    "role": "survivor",
+    "name": {
+      "en": "No Mither",
+      "ru": "Без сожаления"
+    },
+    "character": "David King",
+    "icon": "/perks/survivor/no-mither.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "no-one-left-behind",
+    "role": "survivor",
+    "name": {
+      "en": "No One Left Behind",
+      "ru": "Никто не остался позади"
+    },
+    "character": "All",
+    "icon": "/perks/survivor/no-one-left-behind.webp",
+    "tags": [
+      "healing",
+      "aura",
+      "unhooking"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "off-the-record",
+    "role": "survivor",
+    "name": {
+      "en": "Off the Record",
+      "ru": "Без огласки"
+    },
+    "character": "Zarina",
+    "icon": "/perks/survivor/off-the-record.webp",
+    "tags": [
+      "aura",
+      "stealth",
+      "unhooking"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "one-two-three-four",
+    "role": "survivor",
+    "name": {
+      "en": "One-Two-Three-Four!",
+      "ru": "Раз, два, три, четыре!"
+    },
+    "character": "Vee",
+    "icon": "/perks/survivor/one-two-three-four.webp",
+    "tags": [
+      "generator",
+      "healing"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "open-handed",
+    "role": "survivor",
+    "name": {
+      "en": "Open-Handed",
+      "ru": "Игра в открытую"
+    },
+    "character": "Ace",
+    "icon": "/perks/survivor/open-handed.webp",
+    "tags": [
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "overcome",
+    "role": "survivor",
+    "name": {
+      "en": "Overcome",
+      "ru": "Преодоление"
+    },
+    "character": "Jonah",
+    "icon": "/perks/survivor/overcome.webp",
+    "tags": [
+      "exhaustion"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "overzealous",
+    "role": "survivor",
+    "name": {
+      "en": "Overzealous",
+      "ru": "Усердие"
+    },
+    "character": "Haddie",
+    "icon": "/perks/survivor/overzealous.webp",
+    "tags": [
+      "generator",
+      "totems"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "parental-guidance",
+    "role": "survivor",
+    "name": {
+      "en": "Parental Guidance",
+      "ru": "Родительская забота"
+    },
+    "character": "Yoichi",
+    "icon": "/perks/survivor/parental-guidance.webp",
+    "tags": [
+      "stealth"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "pharmacy",
+    "role": "survivor",
+    "name": {
+      "en": "Pharmacy",
+      "ru": "Аптекарь"
+    },
+    "character": "Quentin",
+    "icon": "/perks/survivor/pharmacy.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "plot-twist",
+    "role": "survivor",
+    "name": {
+      "en": "Plot Twist",
+      "ru": "Вот это поворот"
+    },
+    "character": "Nicolas",
+    "icon": "/perks/survivor/plot-twist.webp",
+    "tags": [
+      "healing"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "plunderer-s-instinct",
+    "role": "survivor",
+    "name": {
+      "en": "Plunderer's Instinct",
+      "ru": "Мародерское чутье"
+    },
+    "character": "All",
+    "icon": "/perks/survivor/plunderer-s-instinct.webp",
+    "tags": [
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "poised",
+    "role": "survivor",
+    "name": {
+      "en": "Poised",
+      "ru": "Равновесие"
+    },
+    "character": "Jane",
+    "icon": "/perks/survivor/poised.webp",
+    "tags": [
+      "generator",
+      "aura",
+      "stealth"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "potential-energy",
+    "role": "survivor",
+    "name": {
+      "en": "Potential Energy",
+      "ru": "Потенциальная энергия"
+    },
+    "character": "Vittorio",
+    "icon": "/perks/survivor/potential-energy.webp",
+    "tags": [
+      "generator",
+      "items"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "power-struggle",
+    "role": "survivor",
+    "name": {
+      "en": "Power Struggle",
+      "ru": "Отчаянная борьба"
+    },
+    "character": "Élodie",
+    "icon": "/perks/survivor/power-struggle.webp",
+    "tags": [
+      "aura",
+      "unhooking"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "premonition",
+    "role": "survivor",
+    "name": {
+      "en": "Premonition",
+      "ru": "Предчувствие"
+    },
+    "character": "All",
+    "icon": "/perks/survivor/premonition.webp",
+    "tags": [
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "prove-thyself",
+    "role": "survivor",
+    "name": {
+      "en": "Prove Thyself",
+      "ru": "Прояви себя"
+    },
+    "character": "Dwight",
+    "icon": "/perks/survivor/prove-thyself.webp",
+    "tags": [
+      "generator"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "quick-and-quiet",
+    "role": "survivor",
+    "name": {
+      "en": "Quick & Quiet",
+      "ru": "Быстрый и тихий"
+    },
+    "character": "Meg",
+    "icon": "/perks/survivor/quick-and-quiet.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "quick-gambit",
+    "role": "survivor",
+    "name": {
+      "en": "Quick Gambit",
+      "ru": "Быстрый гамбит"
+    },
+    "character": "Vittorio",
+    "icon": "/perks/survivor/quick-gambit.webp",
+    "tags": [
+      "generator",
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "rapid-response",
+    "role": "survivor",
+    "name": {
+      "en": "Rapid Response",
+      "ru": "Быстрое реагирование"
+    },
+    "character": "Orela",
+    "icon": "/perks/survivor/rapid-response.webp",
+    "tags": [
+      "aura",
+      "exhaustion"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "reactive-healing",
+    "role": "survivor",
+    "name": {
+      "en": "Reactive Healing",
+      "ru": "Поспешное лечение"
+    },
+    "character": "Ada",
+    "icon": "/perks/survivor/reactive-healing.webp",
+    "tags": [
+      "healing"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "reassurance",
+    "role": "survivor",
+    "name": {
+      "en": "Reassurance",
+      "ru": "Ободрение"
+    },
+    "character": "Rebecca",
+    "icon": "/perks/survivor/reassurance.webp",
+    "tags": [
+      "unhooking"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "red-herring",
+    "role": "survivor",
+    "name": {
+      "en": "Red Herring",
+      "ru": "Обман во благо"
+    },
+    "character": "Zarina",
+    "icon": "/perks/survivor/red-herring.webp",
+    "tags": [
+      "generator",
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "repressed-alliance",
+    "role": "survivor",
+    "name": {
+      "en": "Repressed Alliance",
+      "ru": "Скрытый союз"
+    },
+    "character": "Cheryl",
+    "icon": "/perks/survivor/repressed-alliance.webp",
+    "tags": [
+      "generator",
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "residual-manifest",
+    "role": "survivor",
+    "name": {
+      "en": "Residual Manifest",
+      "ru": "Остаточное проявление"
+    },
+    "character": "Haddie",
+    "icon": "/perks/survivor/residual-manifest.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "resilience",
+    "role": "survivor",
+    "name": {
+      "en": "Resilience",
+      "ru": "Устойчивость"
+    },
+    "character": "All",
+    "icon": "/perks/survivor/resilience.webp",
+    "tags": [
+      "generator",
+      "healing",
+      "totems",
+      "unhooking"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "resurgence",
+    "role": "survivor",
+    "name": {
+      "en": "Resurgence",
+      "ru": "Поправка"
+    },
+    "character": "Jill",
+    "icon": "/perks/survivor/resurgence.webp",
+    "tags": [
+      "healing",
+      "unhooking"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "road-life",
+    "role": "survivor",
+    "name": {
+      "en": "Road Life",
+      "ru": "Жизнь в дороге"
+    },
+    "character": "Vee",
+    "icon": "/perks/survivor/road-life.webp",
+    "tags": [
+      "generator",
+      "healing"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "rookie-spirit",
+    "role": "survivor",
+    "name": {
+      "en": "Rookie Spirit",
+      "ru": "Дух новичка"
+    },
+    "character": "Leon",
+    "icon": "/perks/survivor/rookie-spirit.webp",
+    "tags": [
+      "generator",
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "saboteur",
+    "role": "survivor",
+    "name": {
+      "en": "Saboteur",
+      "ru": "Крушитель"
+    },
+    "character": "Jake",
+    "icon": "/perks/survivor/saboteur.webp",
+    "tags": [
+      "generator",
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "salvation-s-cry",
+    "role": "survivor",
+    "name": {
+      "en": "Salvation's Cry",
+      "ru": "Зов на помощь"
+    },
+    "character": "Aurora",
+    "icon": "/perks/survivor/salvation-s-cry.webp",
+    "tags": [
+      "aura"
+    ],
+    "addedAt": "2026-08-26T03:38:19.039Z"
+  },
+  {
+    "slug": "scavenger",
+    "role": "survivor",
+    "name": {
+      "en": "Scavenger",
+      "ru": "Утилизатор"
+    },
+    "character": "Gabriel",
+    "icon": "/perks/survivor/scavenger.webp",
+    "tags": [
+      "generator"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "scene-partner",
+    "role": "survivor",
+    "name": {
+      "en": "Scene Partner",
+      "ru": "Партнер по сцене"
+    },
+    "character": "Nicolas",
+    "icon": "/perks/survivor/scene-partner.webp",
+    "tags": [
+      "aura",
+      "stealth"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "second-wind",
+    "role": "survivor",
+    "name": {
+      "en": "Second Wind",
+      "ru": "Второе дыхание"
+    },
+    "character": "Steve",
+    "icon": "/perks/survivor/second-wind.webp",
+    "tags": [
+      "healing",
+      "unhooking"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "self-care",
+    "role": "survivor",
+    "name": {
+      "en": "Self-Care",
+      "ru": "Сам себе доктор"
+    },
+    "character": "Claudette",
+    "icon": "/perks/survivor/self-care.webp",
+    "tags": [
+      "healing"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "self-preservation",
+    "role": "survivor",
+    "name": {
+      "en": "Self-Preservation",
+      "ru": "Самосохранение"
+    },
+    "character": "Yun-Jin",
+    "icon": "/perks/survivor/self-preservation.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "shoulder-the-burden",
+    "role": "survivor",
+    "name": {
+      "en": "Shoulder the Burden",
+      "ru": "Бремя на себя"
+    },
+    "character": "Taurie",
+    "icon": "/perks/survivor/shoulder-the-burden.webp",
+    "tags": [
+      "unhooking"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "slippery-meat",
+    "role": "survivor",
+    "name": {
+      "en": "Slippery Meat",
+      "ru": "Скользкое мясо"
+    },
+    "character": "All",
+    "icon": "/perks/survivor/slippery-meat.webp",
+    "tags": [
+      "unhooking"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "small-game",
+    "role": "survivor",
+    "name": {
+      "en": "Small Game",
+      "ru": "Мелкая дичь"
+    },
+    "character": "All",
+    "icon": "/perks/survivor/small-game.webp",
+    "tags": [
+      "aura",
+      "totems"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "smash-hit",
+    "role": "survivor",
+    "name": {
+      "en": "Smash Hit",
+      "ru": "Ударный забег"
+    },
+    "character": "Yun-Jin",
+    "icon": "/perks/survivor/smash-hit.webp",
+    "tags": [
+      "exhaustion"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "solidarity",
+    "role": "survivor",
+    "name": {
+      "en": "Solidarity",
+      "ru": "Солидарность"
+    },
+    "character": "Jane",
+    "icon": "/perks/survivor/solidarity.webp",
+    "tags": [
+      "healing"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "soul-guard",
+    "role": "survivor",
+    "name": {
+      "en": "Soul Guard",
+      "ru": "Оберег души"
+    },
+    "character": "Cheryl",
+    "icon": "/perks/survivor/soul-guard.webp",
+    "tags": [
+      "healing"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "specialist",
+    "role": "survivor",
+    "name": {
+      "en": "Specialist",
+      "ru": "Специалист"
+    },
+    "character": "Lara",
+    "icon": "/perks/survivor/specialist.webp",
+    "tags": [
+      "generator",
+      "items"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "spine-chill",
+    "role": "survivor",
+    "name": {
+      "en": "Spine Chill",
+      "ru": "Мурашки по спине"
+    },
+    "character": "All",
+    "icon": "/perks/survivor/spine-chill.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "sprint-burst",
+    "role": "survivor",
+    "name": {
+      "en": "Sprint Burst",
+      "ru": "Спринтер"
+    },
+    "character": "Meg",
+    "icon": "/perks/survivor/sprint-burst.webp",
+    "tags": [
+      "exhaustion"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "stake-out",
+    "role": "survivor",
+    "name": {
+      "en": "Stake Out",
+      "ru": "Выслеживание подозреваемого"
+    },
+    "character": "David Tapp",
+    "icon": "/perks/survivor/stake-out.webp",
+    "tags": [
+      "stealth"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "still-sight",
+    "role": "survivor",
+    "name": {
+      "en": "Still Sight",
+      "ru": "Замри и увидишь"
+    },
+    "character": "Aestri",
+    "icon": "/perks/survivor/still-sight.webp",
+    "tags": [
+      "generator",
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "streetwise",
+    "role": "survivor",
+    "name": {
+      "en": "Streetwise",
+      "ru": "Уроки улиц"
+    },
+    "character": "Nea",
+    "icon": "/perks/survivor/streetwise.webp",
+    "tags": [
+      "aura",
+      "items"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "strength-in-shadows",
+    "role": "survivor",
+    "name": {
+      "en": "Strength in Shadows",
+      "ru": "Сила во мраке"
+    },
+    "character": "Sable",
+    "icon": "/perks/survivor/strength-in-shadows.webp",
+    "tags": [
+      "healing",
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "teamwork-collective-stealth",
+    "role": "survivor",
+    "name": {
+      "en": "Teamwork: Collective Stealth",
+      "ru": "Командная работа: общая скрытность"
+    },
+    "character": "Renato",
+    "icon": "/perks/survivor/teamwork-collective-stealth.webp",
+    "tags": [
+      "healing",
+      "stealth"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "teamwork-full-circuit",
+    "role": "survivor",
+    "name": {
+      "en": "Teamwork: Full Circuit",
+      "ru": "Командная работа: полная схема"
+    },
+    "character": "Dustin",
+    "icon": "/perks/survivor/teamwork-full-circuit.webp",
+    "tags": [
+      "generator"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "teamwork-power-of-two",
+    "role": "survivor",
+    "name": {
+      "en": "Teamwork: Power of Two",
+      "ru": "Командная работа: быстрая пара"
+    },
+    "character": "Thalita",
+    "icon": "/perks/survivor/teamwork-power-of-two.webp",
+    "tags": [
+      "healing"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "teamwork-soft-spoken",
+    "role": "survivor",
+    "name": {
+      "en": "Teamwork: Soft-Spoken",
+      "ru": "Командная работа: приглушение"
+    },
+    "character": "Eleven",
+    "icon": "/perks/survivor/teamwork-soft-spoken.webp",
+    "tags": [
+      "generator"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "teamwork-throw-down",
+    "role": "survivor",
+    "name": {
+      "en": "Teamwork: Throw Down",
+      "ru": "Командная работа: скромная победа"
+    },
+    "character": "Michonne",
+    "icon": "/perks/survivor/teamwork-throw-down.webp",
+    "tags": [],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "teamwork-toughen-up",
+    "role": "survivor",
+    "name": {
+      "en": "Teamwork: Toughen Up",
+      "ru": "Командная работа: собраться с силами"
+    },
+    "character": "Rick",
+    "icon": "/perks/survivor/teamwork-toughen-up.webp",
+    "tags": [
+      "stealth"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "technician",
+    "role": "survivor",
+    "name": {
+      "en": "Technician",
+      "ru": "Техник"
+    },
+    "character": "Feng",
+    "icon": "/perks/survivor/technician.webp",
+    "tags": [
+      "generator"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "tenacity",
+    "role": "survivor",
+    "name": {
+      "en": "Tenacity",
+      "ru": "Выдержка"
+    },
+    "character": "David Tapp",
+    "icon": "/perks/survivor/tenacity.webp",
+    "tags": [
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "this-is-not-happening",
+    "role": "survivor",
+    "name": {
+      "en": "This Is Not Happening",
+      "ru": "Этому не бывать"
+    },
+    "character": "All",
+    "icon": "/perks/survivor/this-is-not-happening.webp",
+    "tags": [
+      "generator",
+      "healing"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "troubleshooter",
+    "role": "survivor",
+    "name": {
+      "en": "Troubleshooter",
+      "ru": "Ремонтник"
+    },
+    "character": "Gabriel",
+    "icon": "/perks/survivor/troubleshooter.webp",
+    "tags": [
+      "generator",
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "unbreakable",
+    "role": "survivor",
+    "name": {
+      "en": "Unbreakable",
+      "ru": "Несокрушимый"
+    },
+    "character": "Bill",
+    "icon": "/perks/survivor/unbreakable.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "up-the-ante",
+    "role": "survivor",
+    "name": {
+      "en": "Up the Ante",
+      "ru": "Повысить ставки"
+    },
+    "character": "Ace",
+    "icon": "/perks/survivor/up-the-ante.webp",
+    "tags": [
+      "unhooking"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "urban-evasion",
+    "role": "survivor",
+    "name": {
+      "en": "Urban Evasion",
+      "ru": "Городской бег"
+    },
+    "character": "Nea",
+    "icon": "/perks/survivor/urban-evasion.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "vigil",
+    "role": "survivor",
+    "name": {
+      "en": "Vigil",
+      "ru": "Бессонница"
+    },
+    "character": "Quentin",
+    "icon": "/perks/survivor/vigil.webp",
+    "tags": [
+      "exhaustion"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "visionary",
+    "role": "survivor",
+    "name": {
+      "en": "Visionary",
+      "ru": "Визионер"
+    },
+    "character": "Felix",
+    "icon": "/perks/survivor/visionary.webp",
+    "tags": [
+      "generator",
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "wake-up",
+    "role": "survivor",
+    "name": {
+      "en": "Wake Up!",
+      "ru": "Проснись"
+    },
+    "character": "Quentin",
+    "icon": "/perks/survivor/wake-up.webp",
+    "tags": [
+      "generator",
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "we-see-you",
+    "role": "survivor",
+    "name": {
+      "en": "We See You",
+      "ru": "Мы тебя видим"
+    },
+    "character": "Eleven",
+    "icon": "/perks/survivor/we-see-you.webp",
+    "tags": [
+      "aura"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "we-ll-make-it",
+    "role": "survivor",
+    "name": {
+      "en": "We'll Make It",
+      "ru": "Мы справимся"
+    },
+    "character": "All",
+    "icon": "/perks/survivor/we-ll-make-it.webp",
+    "tags": [
+      "healing",
+      "unhooking"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "we-re-gonna-live-forever",
+    "role": "survivor",
+    "name": {
+      "en": "We're Gonna Live Forever",
+      "ru": "Мы будем жить вечно"
+    },
+    "character": "David King",
+    "icon": "/perks/survivor/we-re-gonna-live-forever.webp",
+    "tags": [
+      "healing"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "wicked",
+    "role": "survivor",
+    "name": {
+      "en": "Wicked",
+      "ru": "Дерзость"
+    },
+    "character": "Sable",
+    "icon": "/perks/survivor/wicked.webp",
+    "tags": [
+      "aura",
+      "unhooking"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "wide-open-throttle",
+    "role": "survivor",
+    "name": {
+      "en": "Wide Open Throttle",
+      "ru": "Полный газ!"
+    },
+    "character": "Shane",
+    "icon": "/perks/survivor/wide-open-throttle.webp",
+    "tags": [],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "will-to-live",
+    "role": "survivor",
+    "name": {
+      "en": "Will to Live",
+      "ru": "Воля к жизни"
+    },
+    "character": "All",
+    "icon": "/perks/survivor/will-to-live.webp",
+    "tags": [
+      "unhooking"
+    ],
+    "addedAt": "2026-08-19T08:56:09.086Z"
+  },
+  {
+    "slug": "windows-of-opportunity",
+    "role": "survivor",
+    "name": {
+      "en": "Windows of Opportunity",
+      "ru": "Уникальная возможность"
+    },
+    "character": "Kate",
+    "icon": "/perks/survivor/windows-of-opportunity.webp",
+    "tags": [
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "wiretap",
+    "role": "survivor",
+    "name": {
+      "en": "Wiretap",
+      "ru": "Жучок"
+    },
+    "character": "Ada",
+    "icon": "/perks/survivor/wiretap.webp",
+    "tags": [
+      "generator",
+      "aura"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "best-gift-ever",
+    "role": "survivor",
+    "name": {
+      "en": "Best Gift Ever",
+      "ru": "Best Gift Ever"
+    },
+    "character": "Sienna",
+    "icon": "/perks/survivor/best-gift-ever.webp",
+    "tags": [
+      "generator",
+      "healing",
+      "aura",
+      "stealth",
+      "items"
+    ],
+    "addedAt": "2026-11-01T12:30:34.926Z",
+    "availableFrom": "2026-11-24"
+  },
+  {
+    "slug": "shared-trauma",
+    "role": "survivor",
+    "name": {
+      "en": "Shared Trauma",
+      "ru": "Shared Trauma"
+    },
+    "character": "Sienna",
+    "icon": "/perks/survivor/shared-trauma.webp",
+    "tags": [
+      "aura",
+      "exhaustion"
+    ],
+    "addedAt": "2026-11-01T12:30:34.926Z",
+    "availableFrom": "2026-11-24"
+  },
+  {
+    "slug": "valkyrie-s-rage",
+    "role": "survivor",
+    "name": {
+      "en": "Valkyrie's Rage",
+      "ru": "Valkyrie's Rage"
+    },
+    "character": "Sienna",
+    "icon": "/perks/survivor/valkyrie-s-rage.webp",
+    "tags": [],
+    "addedAt": "2026-11-01T12:30:34.926Z",
+    "availableFrom": "2026-11-24"
+  },
+  {
+    "slug": "a-nurse-s-calling",
+    "role": "killer",
+    "name": {
+      "en": "A Nurse's Calling",
+      "ru": "Зов Медсестры"
+    },
+    "character": "Nurse",
+    "icon": "/perks/killer/a-nurse-s-calling.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "agitation",
+    "role": "killer",
+    "name": {
+      "en": "Agitation",
+      "ru": "Нетерпимость"
+    },
+    "character": "Trapper",
+    "icon": "/perks/killer/agitation.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "alien-instinct",
+    "role": "killer",
+    "name": {
+      "en": "Alien Instinct",
+      "ru": "Инстинкт чужого"
+    },
+    "character": "Xenomorph",
+    "icon": "/perks/killer/alien-instinct.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "all-shaking-thunder",
+    "role": "killer",
+    "name": {
+      "en": "All-Shaking Thunder",
+      "ru": "Оглушительный гром"
+    },
+    "character": "Houndmaster",
+    "icon": "/perks/killer/all-shaking-thunder.webp",
+    "tags": [
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "awakened-awareness",
+    "role": "killer",
+    "name": {
+      "en": "Awakened Awareness",
+      "ru": "Развитая внимательность"
+    },
+    "character": "Mastermind",
+    "icon": "/perks/killer/awakened-awareness.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "bamboozle",
+    "role": "killer",
+    "name": {
+      "en": "Bamboozle",
+      "ru": "Розыгрыш"
+    },
+    "character": "Clown",
+    "icon": "/perks/killer/bamboozle.webp",
+    "tags": [
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "barbecue-and-chilli",
+    "role": "killer",
+    "name": {
+      "en": "Barbecue & Chilli",
+      "ru": "Барбекю и чили"
+    },
+    "character": "Cannibal",
+    "icon": "/perks/killer/barbecue-and-chilli.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "batteries-included",
+    "role": "killer",
+    "name": {
+      "en": "Batteries Included",
+      "ru": "Батарейки в комплекте"
+    },
+    "character": "Good Guy",
+    "icon": "/perks/killer/batteries-included.webp",
+    "tags": [
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "beast-of-prey",
+    "role": "killer",
+    "name": {
+      "en": "Beast of Prey",
+      "ru": "Хищный зверь"
+    },
+    "character": "Huntress",
+    "icon": "/perks/killer/beast-of-prey.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "bitter-murmur",
+    "role": "killer",
+    "name": {
+      "en": "Bitter Murmur",
+      "ru": "Тихий шорох"
+    },
+    "character": "All",
+    "icon": "/perks/killer/bitter-murmur.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "blood-echo",
+    "role": "killer",
+    "name": {
+      "en": "Blood Echo",
+      "ru": "Отзвук крови"
+    },
+    "character": "Oni",
+    "icon": "/perks/killer/blood-echo.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "blood-warden",
+    "role": "killer",
+    "name": {
+      "en": "Blood Warden",
+      "ru": "Кровавый смотритель"
+    },
+    "character": "Nightmare",
+    "icon": "/perks/killer/blood-warden.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "bloodhound",
+    "role": "killer",
+    "name": {
+      "en": "Bloodhound",
+      "ru": "Ищейка"
+    },
+    "character": "Wraith",
+    "icon": "/perks/killer/bloodhound.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "brutal-strength",
+    "role": "killer",
+    "name": {
+      "en": "Brutal Strength",
+      "ru": "Зверская сила"
+    },
+    "character": "Trapper",
+    "icon": "/perks/killer/brutal-strength.webp",
+    "tags": [
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "call-of-brine",
+    "role": "killer",
+    "name": {
+      "en": "Call of Brine",
+      "ru": "Соленое море"
+    },
+    "character": "Onryō",
+    "icon": "/perks/killer/call-of-brine.webp",
+    "tags": [
+      "gen-regression",
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "celestial-witness",
+    "role": "killer",
+    "name": {
+      "en": "Celestial Witness",
+      "ru": "Небесный свидетель"
+    },
+    "character": "Judgment",
+    "icon": "/perks/killer/celestial-witness.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2026-08-26T03:38:19.039Z"
+  },
+  {
+    "slug": "corrupt-intervention",
+    "role": "killer",
+    "name": {
+      "en": "Corrupt Intervention",
+      "ru": "Вмешательство скверны"
+    },
+    "character": "Plague",
+    "icon": "/perks/killer/corrupt-intervention.webp",
+    "tags": [
+      "gen-regression",
+      "exposure"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "coulrophobia",
+    "role": "killer",
+    "name": {
+      "en": "Coulrophobia",
+      "ru": "Клоунофобия"
+    },
+    "character": "Clown",
+    "icon": "/perks/killer/coulrophobia.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "coup-de-grace",
+    "role": "killer",
+    "name": {
+      "en": "Coup de Grâce",
+      "ru": "Добивание"
+    },
+    "character": "Twins",
+    "icon": "/perks/killer/coup-de-grace.webp",
+    "tags": [
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "cruel-limits",
+    "role": "killer",
+    "name": {
+      "en": "Cruel Limits",
+      "ru": "Жестокая изоляция"
+    },
+    "character": "Demogorgon",
+    "icon": "/perks/killer/cruel-limits.webp",
+    "tags": [
+      "gen-regression",
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "cull-the-weak",
+    "role": "killer",
+    "name": {
+      "en": "Cull the Weak",
+      "ru": "Истребление слабых"
+    },
+    "character": "All",
+    "icon": "/perks/killer/cull-the-weak.webp",
+    "tags": [],
+    "addedAt": "2026-08-19T08:56:09.086Z"
+  },
+  {
+    "slug": "dark-arrogance",
+    "role": "killer",
+    "name": {
+      "en": "Dark Arrogance",
+      "ru": "Темное высокомерие"
+    },
+    "character": "Lich",
+    "icon": "/perks/killer/dark-arrogance.webp",
+    "tags": [
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "dark-devotion",
+    "role": "killer",
+    "name": {
+      "en": "Dark Devotion",
+      "ru": "Темная преданность"
+    },
+    "character": "Plague",
+    "icon": "/perks/killer/dark-devotion.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "darkness-revealed",
+    "role": "killer",
+    "name": {
+      "en": "Darkness Revealed",
+      "ru": "Явление мрака"
+    },
+    "character": "Dredge",
+    "icon": "/perks/killer/darkness-revealed.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "dead-man-s-switch",
+    "role": "killer",
+    "name": {
+      "en": "Dead Man's Switch",
+      "ru": "Аварийная кнопка"
+    },
+    "character": "Deathslinger",
+    "icon": "/perks/killer/dead-man-s-switch.webp",
+    "tags": [
+      "gen-regression"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "deathbound",
+    "role": "killer",
+    "name": {
+      "en": "Deathbound",
+      "ru": "Смертельные узы"
+    },
+    "character": "Executioner",
+    "icon": "/perks/killer/deathbound.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "deerstalker",
+    "role": "killer",
+    "name": {
+      "en": "Deerstalker",
+      "ru": "Охотник на оленей"
+    },
+    "character": "All",
+    "icon": "/perks/killer/deerstalker.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "discordance",
+    "role": "killer",
+    "name": {
+      "en": "Discordance",
+      "ru": "Разлад"
+    },
+    "character": "Legion",
+    "icon": "/perks/killer/discordance.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "dissolution",
+    "role": "killer",
+    "name": {
+      "en": "Dissolution",
+      "ru": "Растворение"
+    },
+    "character": "Dredge",
+    "icon": "/perks/killer/dissolution.webp",
+    "tags": [
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "distressing",
+    "role": "killer",
+    "name": {
+      "en": "Distressing",
+      "ru": "Сеющий страх"
+    },
+    "character": "All",
+    "icon": "/perks/killer/distressing.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "dominance",
+    "role": "killer",
+    "name": {
+      "en": "Dominance",
+      "ru": "Владычество"
+    },
+    "character": "Dark Lord",
+    "icon": "/perks/killer/dominance.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "dragon-s-grip",
+    "role": "killer",
+    "name": {
+      "en": "Dragon's Grip",
+      "ru": "Драконья хватка"
+    },
+    "character": "Blight",
+    "icon": "/perks/killer/dragon-s-grip.webp",
+    "tags": [
+      "aura-info",
+      "exposure"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "enduring",
+    "role": "killer",
+    "name": {
+      "en": "Enduring",
+      "ru": "Стойкий"
+    },
+    "character": "Hillbilly",
+    "icon": "/perks/killer/enduring.webp",
+    "tags": [
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "eruption",
+    "role": "killer",
+    "name": {
+      "en": "Eruption",
+      "ru": "Подрыв"
+    },
+    "character": "Nemesis",
+    "icon": "/perks/killer/eruption.webp",
+    "tags": [
+      "gen-regression",
+      "aura-info",
+      "exposure"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "fire-up",
+    "role": "killer",
+    "name": {
+      "en": "Fire Up",
+      "ru": "Яркое пламя"
+    },
+    "character": "Nightmare",
+    "icon": "/perks/killer/fire-up.webp",
+    "tags": [
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "forced-hesitation",
+    "role": "killer",
+    "name": {
+      "en": "Forced Hesitation",
+      "ru": "Вынужденная нерешительность"
+    },
+    "character": "Singularity",
+    "icon": "/perks/killer/forced-hesitation.webp",
+    "tags": [
+      "exposure"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "forced-penance",
+    "role": "killer",
+    "name": {
+      "en": "Forced Penance",
+      "ru": "Принудительная мера"
+    },
+    "character": "Executioner",
+    "icon": "/perks/killer/forced-penance.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "forever-entwined",
+    "role": "killer",
+    "name": {
+      "en": "Forever Entwined",
+      "ru": "Переплетенные навсегда"
+    },
+    "character": "Ghoul",
+    "icon": "/perks/killer/forever-entwined.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "franklin-s-demise",
+    "role": "killer",
+    "name": {
+      "en": "Franklin's Demise",
+      "ru": "Гибель Франклина"
+    },
+    "character": "Cannibal",
+    "icon": "/perks/killer/franklin-s-demise.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "friends-til-the-end",
+    "role": "killer",
+    "name": {
+      "en": "Friends 'til the End",
+      "ru": "Друзья до гроба"
+    },
+    "character": "Good Guy",
+    "icon": "/perks/killer/friends-til-the-end.webp",
+    "tags": [
+      "aura-info",
+      "exposure"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "furtive-chase",
+    "role": "killer",
+    "name": {
+      "en": "Furtive Chase",
+      "ru": "Скрытная погоня"
+    },
+    "character": "Ghost Face",
+    "icon": "/perks/killer/furtive-chase.webp",
+    "tags": [
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "game-afoot",
+    "role": "killer",
+    "name": {
+      "en": "Game Afoot",
+      "ru": "Догонялки"
+    },
+    "character": "Skull Merchant",
+    "icon": "/perks/killer/game-afoot.webp",
+    "tags": [
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "gearhead",
+    "role": "killer",
+    "name": {
+      "en": "Gearhead",
+      "ru": "Знаток техники"
+    },
+    "character": "Deathslinger",
+    "icon": "/perks/killer/gearhead.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "genetic-limits",
+    "role": "killer",
+    "name": {
+      "en": "Genetic Limits",
+      "ru": "Генетические ограничения"
+    },
+    "character": "Singularity",
+    "icon": "/perks/killer/genetic-limits.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "grim-embrace",
+    "role": "killer",
+    "name": {
+      "en": "Grim Embrace",
+      "ru": "Мрачные объятья"
+    },
+    "character": "Artist",
+    "icon": "/perks/killer/grim-embrace.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "haywire",
+    "role": "killer",
+    "name": {
+      "en": "Haywire",
+      "ru": "Неполадки"
+    },
+    "character": "Animatronic",
+    "icon": "/perks/killer/haywire.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "help-wanted",
+    "role": "killer",
+    "name": {
+      "en": "Help Wanted",
+      "ru": "Требуются работники"
+    },
+    "character": "Animatronic",
+    "icon": "/perks/killer/help-wanted.webp",
+    "tags": [
+      "gen-regression"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "hex-blood-favour",
+    "role": "killer",
+    "name": {
+      "en": "Hex: Blood Favour",
+      "ru": "Порча: благоволение крови"
+    },
+    "character": "Blight",
+    "icon": "/perks/killer/hex-blood-favour.webp",
+    "tags": [
+      "hex",
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "hex-crowd-control",
+    "role": "killer",
+    "name": {
+      "en": "Hex: Crowd Control",
+      "ru": "Порча: контроль толпы"
+    },
+    "character": "Trickster",
+    "icon": "/perks/killer/hex-crowd-control.webp",
+    "tags": [
+      "hex",
+      "aura-info",
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "hex-devour-hope",
+    "role": "killer",
+    "name": {
+      "en": "Hex: Devour Hope",
+      "ru": "Порча: пожирание надежды"
+    },
+    "character": "Hag",
+    "icon": "/perks/killer/hex-devour-hope.webp",
+    "tags": [
+      "hex",
+      "chase",
+      "exposure"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "hex-face-the-darkness",
+    "role": "killer",
+    "name": {
+      "en": "Hex: Face the Darkness",
+      "ru": "Порча: лик мрака"
+    },
+    "character": "Knight",
+    "icon": "/perks/killer/hex-face-the-darkness.webp",
+    "tags": [
+      "hex",
+      "aura-info",
+      "exposure"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "hex-fortune-s-fool",
+    "role": "killer",
+    "name": {
+      "en": "Hex: Fortune's Fool",
+      "ru": "Порча: шут судьбы"
+    },
+    "character": "All",
+    "icon": "/perks/killer/hex-fortune-s-fool.webp",
+    "tags": [
+      "hex",
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "hex-haunted-ground",
+    "role": "killer",
+    "name": {
+      "en": "Hex: Haunted Ground",
+      "ru": "Порча: проклятая земля"
+    },
+    "character": "Spirit",
+    "icon": "/perks/killer/hex-haunted-ground.webp",
+    "tags": [
+      "hex",
+      "exposure"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "hex-hive-mind",
+    "role": "killer",
+    "name": {
+      "en": "Hex: Hive Mind",
+      "ru": "Порча: разум улья"
+    },
+    "character": "First",
+    "icon": "/perks/killer/hex-hive-mind.webp",
+    "tags": [
+      "hex",
+      "gen-regression",
+      "aura-info"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "hex-huntress-lullaby",
+    "role": "killer",
+    "name": {
+      "en": "Hex: Huntress Lullaby",
+      "ru": "Порча: колыбельная охотницы"
+    },
+    "character": "Huntress",
+    "icon": "/perks/killer/hex-huntress-lullaby.webp",
+    "tags": [
+      "hex"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "hex-no-one-escapes-death",
+    "role": "killer",
+    "name": {
+      "en": "Hex: No One Escapes Death",
+      "ru": "Порча: никому не скрыться от смерти"
+    },
+    "character": "All",
+    "icon": "/perks/killer/hex-no-one-escapes-death.webp",
+    "tags": [
+      "hex",
+      "aura-info",
+      "chase",
+      "exposure"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "hex-nothing-but-misery",
+    "role": "killer",
+    "name": {
+      "en": "Hex: Nothing but Misery",
+      "ru": "Порча: только отчаяние"
+    },
+    "character": "Ghoul",
+    "icon": "/perks/killer/hex-nothing-but-misery.webp",
+    "tags": [
+      "hex"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "hex-overture-of-doom",
+    "role": "killer",
+    "name": {
+      "en": "Hex: Overture of Doom",
+      "ru": "Порча: предвестие рока"
+    },
+    "character": "Krasue",
+    "icon": "/perks/killer/hex-overture-of-doom.webp",
+    "tags": [
+      "hex",
+      "aura-info"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "hex-pentimento",
+    "role": "killer",
+    "name": {
+      "en": "Hex: Pentimento",
+      "ru": "Порча: пентименто"
+    },
+    "character": "Artist",
+    "icon": "/perks/killer/hex-pentimento.webp",
+    "tags": [
+      "hex",
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "hex-retribution",
+    "role": "killer",
+    "name": {
+      "en": "Hex: Retribution",
+      "ru": "Порча: кара"
+    },
+    "character": "Deathslinger",
+    "icon": "/perks/killer/hex-retribution.webp",
+    "tags": [
+      "hex",
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "hex-ruin",
+    "role": "killer",
+    "name": {
+      "en": "Hex: Ruin",
+      "ru": "Порча: погибель"
+    },
+    "character": "Hag",
+    "icon": "/perks/killer/hex-ruin.webp",
+    "tags": [
+      "hex",
+      "gen-regression"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "hex-scared-to-death",
+    "role": "killer",
+    "name": {
+      "en": "Hex: Scared to Death",
+      "ru": "Порча: смертельный испуг"
+    },
+    "character": "Slasher",
+    "icon": "/perks/killer/hex-scared-to-death.webp",
+    "tags": [
+      "hex",
+      "chase"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "hex-the-third-seal",
+    "role": "killer",
+    "name": {
+      "en": "Hex: The Third Seal",
+      "ru": "Порча: третья печать"
+    },
+    "character": "Hag",
+    "icon": "/perks/killer/hex-the-third-seal.webp",
+    "tags": [
+      "hex",
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "hex-thrill-of-the-hunt",
+    "role": "killer",
+    "name": {
+      "en": "Hex: Thrill of the Hunt",
+      "ru": "Порча: охотничий азарт"
+    },
+    "character": "All",
+    "icon": "/perks/killer/hex-thrill-of-the-hunt.webp",
+    "tags": [
+      "hex"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "hex-two-can-play",
+    "role": "killer",
+    "name": {
+      "en": "Hex: Two Can Play",
+      "ru": "Порча: игра для двоих"
+    },
+    "character": "Good Guy",
+    "icon": "/perks/killer/hex-two-can-play.webp",
+    "tags": [
+      "hex"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "hex-under-your-thumb",
+    "role": "killer",
+    "name": {
+      "en": "Hex: Under Your Thumb",
+      "ru": "Порча: в твоей власти"
+    },
+    "character": "Judgment",
+    "icon": "/perks/killer/hex-under-your-thumb.webp",
+    "tags": [
+      "hex",
+      "aura-info",
+      "chase"
+    ],
+    "addedAt": "2026-08-26T03:38:19.039Z"
+  },
+  {
+    "slug": "hex-undying",
+    "role": "killer",
+    "name": {
+      "en": "Hex: Undying",
+      "ru": "Порча: не-смерть"
+    },
+    "character": "Blight",
+    "icon": "/perks/killer/hex-undying.webp",
+    "tags": [
+      "hex",
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "hex-wretched-fate",
+    "role": "killer",
+    "name": {
+      "en": "Hex: Wretched Fate",
+      "ru": "Порча: горькая участь"
+    },
+    "character": "Dark Lord",
+    "icon": "/perks/killer/hex-wretched-fate.webp",
+    "tags": [
+      "hex",
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "hoarder",
+    "role": "killer",
+    "name": {
+      "en": "Hoarder",
+      "ru": "Скопидом"
+    },
+    "character": "Twins",
+    "icon": "/perks/killer/hoarder.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "hubris",
+    "role": "killer",
+    "name": {
+      "en": "Hubris",
+      "ru": "Свирепая гордыня"
+    },
+    "character": "Knight",
+    "icon": "/perks/killer/hubris.webp",
+    "tags": [
+      "exposure"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "human-greed",
+    "role": "killer",
+    "name": {
+      "en": "Human Greed",
+      "ru": "Алчность"
+    },
+    "character": "Dark Lord",
+    "icon": "/perks/killer/human-greed.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "hysteria",
+    "role": "killer",
+    "name": {
+      "en": "Hysteria",
+      "ru": "Истерия"
+    },
+    "character": "Nemesis",
+    "icon": "/perks/killer/hysteria.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "i-m-all-ears",
+    "role": "killer",
+    "name": {
+      "en": "I'm All Ears",
+      "ru": "Чуткий слух"
+    },
+    "character": "Ghost Face",
+    "icon": "/perks/killer/i-m-all-ears.webp",
+    "tags": [
+      "aura-info",
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "infectious-fright",
+    "role": "killer",
+    "name": {
+      "en": "Infectious Fright",
+      "ru": "Заразительный ужас"
+    },
+    "character": "Plague",
+    "icon": "/perks/killer/infectious-fright.webp",
+    "tags": [
+      "aura-info",
+      "exposure"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "insidious",
+    "role": "killer",
+    "name": {
+      "en": "Insidious",
+      "ru": "Коварство"
+    },
+    "character": "All",
+    "icon": "/perks/killer/insidious.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "iron-grasp",
+    "role": "killer",
+    "name": {
+      "en": "Iron Grasp",
+      "ru": "Мертвая хватка"
+    },
+    "character": "All",
+    "icon": "/perks/killer/iron-grasp.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "iron-maiden",
+    "role": "killer",
+    "name": {
+      "en": "Iron Maiden",
+      "ru": "Железная дева"
+    },
+    "character": "Legion",
+    "icon": "/perks/killer/iron-maiden.webp",
+    "tags": [
+      "exposure"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "keep-them-waiting",
+    "role": "killer",
+    "name": {
+      "en": "Keep Them Waiting",
+      "ru": "Пусть ждут"
+    },
+    "character": "All",
+    "icon": "/perks/killer/keep-them-waiting.webp",
+    "tags": [],
+    "addedAt": "2026-08-26T03:38:19.039Z"
+  },
+  {
+    "slug": "knock-out",
+    "role": "killer",
+    "name": {
+      "en": "Knock Out",
+      "ru": "Нокаут"
+    },
+    "character": "Cannibal",
+    "icon": "/perks/killer/knock-out.webp",
+    "tags": [
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "languid-touch",
+    "role": "killer",
+    "name": {
+      "en": "Languid Touch",
+      "ru": "Безжизненное касание"
+    },
+    "character": "Lich",
+    "icon": "/perks/killer/languid-touch.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "lay-waste",
+    "role": "killer",
+    "name": {
+      "en": "Lay Waste",
+      "ru": "Опустошение"
+    },
+    "character": "Judgment",
+    "icon": "/perks/killer/lay-waste.webp",
+    "tags": [
+      "gen-regression",
+      "chase"
+    ],
+    "addedAt": "2026-08-26T03:38:19.039Z"
+  },
+  {
+    "slug": "lethal-pursuer",
+    "role": "killer",
+    "name": {
+      "en": "Lethal Pursuer",
+      "ru": "Преследователь-убийца"
+    },
+    "character": "Nemesis",
+    "icon": "/perks/killer/lethal-pursuer.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "leverage",
+    "role": "killer",
+    "name": {
+      "en": "Leverage",
+      "ru": "Рычаг влияния"
+    },
+    "character": "Skull Merchant",
+    "icon": "/perks/killer/leverage.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "lightborn",
+    "role": "killer",
+    "name": {
+      "en": "Lightborn",
+      "ru": "Детище света"
+    },
+    "character": "Hillbilly",
+    "icon": "/perks/killer/lightborn.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "machine-learning",
+    "role": "killer",
+    "name": {
+      "en": "Machine Learning",
+      "ru": "Машинное обучение"
+    },
+    "character": "Singularity",
+    "icon": "/perks/killer/machine-learning.webp",
+    "tags": [
+      "aura-info",
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "mad-grit",
+    "role": "killer",
+    "name": {
+      "en": "Mad Grit",
+      "ru": "Безумное упорство"
+    },
+    "character": "Legion",
+    "icon": "/perks/killer/mad-grit.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "make-your-choice",
+    "role": "killer",
+    "name": {
+      "en": "Make Your Choice",
+      "ru": "Выбор за тобой"
+    },
+    "character": "Pig",
+    "icon": "/perks/killer/make-your-choice.webp",
+    "tags": [
+      "aura-info",
+      "exposure"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "merciless-storm",
+    "role": "killer",
+    "name": {
+      "en": "Merciless Storm",
+      "ru": "Безжалостный шторм"
+    },
+    "character": "Onryō",
+    "icon": "/perks/killer/merciless-storm.webp",
+    "tags": [
+      "gen-regression"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "mindbreaker",
+    "role": "killer",
+    "name": {
+      "en": "Mindbreaker",
+      "ru": "Разрушитель разума"
+    },
+    "character": "Demogorgon",
+    "icon": "/perks/killer/mindbreaker.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "monitor-and-abuse",
+    "role": "killer",
+    "name": {
+      "en": "Monitor & Abuse",
+      "ru": "Слежка и наказание"
+    },
+    "character": "Doctor",
+    "icon": "/perks/killer/monitor-and-abuse.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "nemesis",
+    "role": "killer",
+    "name": {
+      "en": "Nemesis",
+      "ru": "Возмездие"
+    },
+    "character": "Oni",
+    "icon": "/perks/killer/nemesis.webp",
+    "tags": [
+      "aura-info",
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "no-holds-barred",
+    "role": "killer",
+    "name": {
+      "en": "No Holds Barred",
+      "ru": "Все средства хороши"
+    },
+    "character": "All",
+    "icon": "/perks/killer/no-holds-barred.webp",
+    "tags": [
+      "gen-regression",
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "no-quarter",
+    "role": "killer",
+    "name": {
+      "en": "No Quarter",
+      "ru": "Без пощады"
+    },
+    "character": "Houndmaster",
+    "icon": "/perks/killer/no-quarter.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "no-way-out",
+    "role": "killer",
+    "name": {
+      "en": "No Way Out",
+      "ru": "Выхода нет"
+    },
+    "character": "Trickster",
+    "icon": "/perks/killer/no-way-out.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "none-are-free",
+    "role": "killer",
+    "name": {
+      "en": "None Are Free",
+      "ru": "Все несвободны"
+    },
+    "character": "Ghoul",
+    "icon": "/perks/killer/none-are-free.webp",
+    "tags": [
+      "gen-regression",
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "nowhere-to-hide",
+    "role": "killer",
+    "name": {
+      "en": "Nowhere to Hide",
+      "ru": "Им не укрыться"
+    },
+    "character": "Knight",
+    "icon": "/perks/killer/nowhere-to-hide.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "oppression",
+    "role": "killer",
+    "name": {
+      "en": "Oppression",
+      "ru": "Притеснение"
+    },
+    "character": "Twins",
+    "icon": "/perks/killer/oppression.webp",
+    "tags": [
+      "gen-regression"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "overcharge",
+    "role": "killer",
+    "name": {
+      "en": "Overcharge",
+      "ru": "Перегрузка"
+    },
+    "character": "Doctor",
+    "icon": "/perks/killer/overcharge.webp",
+    "tags": [
+      "gen-regression"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "overwhelming-presence",
+    "role": "killer",
+    "name": {
+      "en": "Overwhelming Presence",
+      "ru": "Невыносимое присутствие"
+    },
+    "character": "Doctor",
+    "icon": "/perks/killer/overwhelming-presence.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "phantom-fear",
+    "role": "killer",
+    "name": {
+      "en": "Phantom Fear",
+      "ru": "Фантомный страх"
+    },
+    "character": "Animatronic",
+    "icon": "/perks/killer/phantom-fear.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "pop-goes-the-weasel",
+    "role": "killer",
+    "name": {
+      "en": "Pop Goes the Weasel",
+      "ru": "Чертик из табакерки"
+    },
+    "character": "Clown",
+    "icon": "/perks/killer/pop-goes-the-weasel.webp",
+    "tags": [
+      "gen-regression"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "predator",
+    "role": "killer",
+    "name": {
+      "en": "Predator",
+      "ru": "Хищник"
+    },
+    "character": "Wraith",
+    "icon": "/perks/killer/predator.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "rampage",
+    "role": "killer",
+    "name": {
+      "en": "Rampage",
+      "ru": "Неистовство"
+    },
+    "character": "Slasher",
+    "icon": "/perks/killer/rampage.webp",
+    "tags": [
+      "chase"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "rancor",
+    "role": "killer",
+    "name": {
+      "en": "Rancor",
+      "ru": "Ненависть"
+    },
+    "character": "Spirit",
+    "icon": "/perks/killer/rancor.webp",
+    "tags": [
+      "aura-info",
+      "exposure"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "rapid-brutality",
+    "role": "killer",
+    "name": {
+      "en": "Rapid Brutality",
+      "ru": "Быстрая жестокость"
+    },
+    "character": "Xenomorph",
+    "icon": "/perks/killer/rapid-brutality.webp",
+    "tags": [
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "ravenous",
+    "role": "killer",
+    "name": {
+      "en": "Ravenous",
+      "ru": "Голод"
+    },
+    "character": "Krasue",
+    "icon": "/perks/killer/ravenous.webp",
+    "tags": [
+      "chase",
+      "exposure"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "remember-me",
+    "role": "killer",
+    "name": {
+      "en": "Remember Me",
+      "ru": "Помни меня"
+    },
+    "character": "Nightmare",
+    "icon": "/perks/killer/remember-me.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "scourge-hook-floods-of-rage",
+    "role": "killer",
+    "name": {
+      "en": "Scourge Hook: Floods of Rage",
+      "ru": "Секущий крюк: пучина ярости"
+    },
+    "character": "Onryō",
+    "icon": "/perks/killer/scourge-hook-floods-of-rage.webp",
+    "tags": [
+      "scourge-hook",
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "scourge-hook-hangman-s-trick",
+    "role": "killer",
+    "name": {
+      "en": "Scourge Hook: Hangman's Trick",
+      "ru": "Секущий крюк: секрет палача"
+    },
+    "character": "Pig",
+    "icon": "/perks/killer/scourge-hook-hangman-s-trick.webp",
+    "tags": [
+      "scourge-hook",
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "scourge-hook-jagged-compass",
+    "role": "killer",
+    "name": {
+      "en": "Scourge Hook: Jagged Compass",
+      "ru": "Секущий крюк: щербатый компас"
+    },
+    "character": "Houndmaster",
+    "icon": "/perks/killer/scourge-hook-jagged-compass.webp",
+    "tags": [
+      "scourge-hook",
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "scourge-hook-monstrous-shrine",
+    "role": "killer",
+    "name": {
+      "en": "Scourge Hook: Monstrous Shrine",
+      "ru": "Секущий крюк: чудовищный храм"
+    },
+    "character": "All",
+    "icon": "/perks/killer/scourge-hook-monstrous-shrine.webp",
+    "tags": [
+      "scourge-hook",
+      "gen-regression",
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "scourge-hook-pain-resonance",
+    "role": "killer",
+    "name": {
+      "en": "Scourge Hook: Pain Resonance",
+      "ru": "Секущий крюк: резонанс боли"
+    },
+    "character": "Artist",
+    "icon": "/perks/killer/scourge-hook-pain-resonance.webp",
+    "tags": [
+      "scourge-hook",
+      "gen-regression",
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "scourge-hook-weeping-wounds",
+    "role": "killer",
+    "name": {
+      "en": "Scourge Hook: Weeping Wounds",
+      "ru": "Секущий крюк: сочащиеся раны"
+    },
+    "character": "All",
+    "icon": "/perks/killer/scourge-hook-weeping-wounds.webp",
+    "tags": [
+      "scourge-hook",
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "secret-project",
+    "role": "killer",
+    "name": {
+      "en": "Secret Project",
+      "ru": "Секретный проект"
+    },
+    "character": "First",
+    "icon": "/perks/killer/secret-project.webp",
+    "tags": [
+      "gen-regression"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "see-how-they-run",
+    "role": "killer",
+    "name": {
+      "en": "See How They Run",
+      "ru": "Смотри, они бегут"
+    },
+    "character": "All",
+    "icon": "/perks/killer/see-how-they-run.webp",
+    "tags": [
+      "chase"
+    ],
+    "addedAt": "2026-08-19T08:56:09.086Z"
+  },
+  {
+    "slug": "septic-touch",
+    "role": "killer",
+    "name": {
+      "en": "Septic Touch",
+      "ru": "Тлетворное касание"
+    },
+    "character": "Dredge",
+    "icon": "/perks/killer/septic-touch.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "shadowborn",
+    "role": "killer",
+    "name": {
+      "en": "Shadowborn",
+      "ru": "Детище тьмы"
+    },
+    "character": "Wraith",
+    "icon": "/perks/killer/shadowborn.webp",
+    "tags": [
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "shattered-hope",
+    "role": "killer",
+    "name": {
+      "en": "Shattered Hope",
+      "ru": "Разбитые надежды"
+    },
+    "character": "All",
+    "icon": "/perks/killer/shattered-hope.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "silent-shadow",
+    "role": "killer",
+    "name": {
+      "en": "Silent Shadow",
+      "ru": "Безмолвная тень"
+    },
+    "character": "Slasher",
+    "icon": "/perks/killer/silent-shadow.webp",
+    "tags": [],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "sloppy-butcher",
+    "role": "killer",
+    "name": {
+      "en": "Sloppy Butcher",
+      "ru": "Небрежный мясник"
+    },
+    "character": "All",
+    "icon": "/perks/killer/sloppy-butcher.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "spies-from-the-shadows",
+    "role": "killer",
+    "name": {
+      "en": "Spies from the Shadows",
+      "ru": "Сумеречные шпионы"
+    },
+    "character": "All",
+    "icon": "/perks/killer/spies-from-the-shadows.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "spirit-fury",
+    "role": "killer",
+    "name": {
+      "en": "Spirit Fury",
+      "ru": "Ярость духа"
+    },
+    "character": "Spirit",
+    "icon": "/perks/killer/spirit-fury.webp",
+    "tags": [
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "starstruck",
+    "role": "killer",
+    "name": {
+      "en": "Starstruck",
+      "ru": "Фанатение"
+    },
+    "character": "Trickster",
+    "icon": "/perks/killer/starstruck.webp",
+    "tags": [
+      "exposure"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "stridor",
+    "role": "killer",
+    "name": {
+      "en": "Stridor",
+      "ru": "Стридор"
+    },
+    "character": "Nurse",
+    "icon": "/perks/killer/stridor.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "superior-anatomy",
+    "role": "killer",
+    "name": {
+      "en": "Superior Anatomy",
+      "ru": "Лучшая анатомия"
+    },
+    "character": "Mastermind",
+    "icon": "/perks/killer/superior-anatomy.webp",
+    "tags": [
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "surge",
+    "role": "killer",
+    "name": {
+      "en": "Surge",
+      "ru": "Выброс"
+    },
+    "character": "Demogorgon",
+    "icon": "/perks/killer/surge.webp",
+    "tags": [
+      "gen-regression",
+      "exposure"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "surveillance",
+    "role": "killer",
+    "name": {
+      "en": "Surveillance",
+      "ru": "Наблюдение"
+    },
+    "character": "Pig",
+    "icon": "/perks/killer/surveillance.webp",
+    "tags": [
+      "gen-regression",
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "thwack",
+    "role": "killer",
+    "name": {
+      "en": "THWACK!",
+      "ru": "Бац!"
+    },
+    "character": "Skull Merchant",
+    "icon": "/perks/killer/thwack.webp",
+    "tags": [
+      "aura-info",
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "terminus",
+    "role": "killer",
+    "name": {
+      "en": "Terminus",
+      "ru": "Последний этап"
+    },
+    "character": "Mastermind",
+    "icon": "/perks/killer/terminus.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "territorial-imperative",
+    "role": "killer",
+    "name": {
+      "en": "Territorial Imperative",
+      "ru": "Территориальный императив"
+    },
+    "character": "Huntress",
+    "icon": "/perks/killer/territorial-imperative.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "thanatophobia",
+    "role": "killer",
+    "name": {
+      "en": "Thanatophobia",
+      "ru": "Танатофобия"
+    },
+    "character": "Nurse",
+    "icon": "/perks/killer/thanatophobia.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "thrilling-tremors",
+    "role": "killer",
+    "name": {
+      "en": "Thrilling Tremors",
+      "ru": "Пугающая тряска"
+    },
+    "character": "Ghost Face",
+    "icon": "/perks/killer/thrilling-tremors.webp",
+    "tags": [
+      "gen-regression",
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "tinkerer",
+    "role": "killer",
+    "name": {
+      "en": "Tinkerer",
+      "ru": "Умелец"
+    },
+    "character": "Hillbilly",
+    "icon": "/perks/killer/tinkerer.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "trail-of-torment",
+    "role": "killer",
+    "name": {
+      "en": "Trail of Torment",
+      "ru": "Тропа терзаний"
+    },
+    "character": "Executioner",
+    "icon": "/perks/killer/trail-of-torment.webp",
+    "tags": [
+      "gen-regression",
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "turn-back-the-clock",
+    "role": "killer",
+    "name": {
+      "en": "Turn Back the Clock",
+      "ru": "Перевести часы назад"
+    },
+    "character": "First",
+    "icon": "/perks/killer/turn-back-the-clock.webp",
+    "tags": [
+      "gen-regression"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "ultimate-weapon",
+    "role": "killer",
+    "name": {
+      "en": "Ultimate Weapon",
+      "ru": "Совершенное оружие"
+    },
+    "character": "Xenomorph",
+    "icon": "/perks/killer/ultimate-weapon.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "unbound",
+    "role": "killer",
+    "name": {
+      "en": "Unbound",
+      "ru": "Свободное"
+    },
+    "character": "Unknown",
+    "icon": "/perks/killer/unbound.webp",
+    "tags": [
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "undone",
+    "role": "killer",
+    "name": {
+      "en": "Undone",
+      "ru": "Незавершенное"
+    },
+    "character": "Unknown",
+    "icon": "/perks/killer/undone.webp",
+    "tags": [
+      "gen-regression"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "unforeseen",
+    "role": "killer",
+    "name": {
+      "en": "Unforeseen",
+      "ru": "Непредвиденное"
+    },
+    "character": "Unknown",
+    "icon": "/perks/killer/unforeseen.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "unnerving-presence",
+    "role": "killer",
+    "name": {
+      "en": "Unnerving Presence",
+      "ru": "Пугающее присутствие"
+    },
+    "character": "Trapper",
+    "icon": "/perks/killer/unnerving-presence.webp",
+    "tags": [],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "unrelenting",
+    "role": "killer",
+    "name": {
+      "en": "Unrelenting",
+      "ru": "Безжалостный"
+    },
+    "character": "All",
+    "icon": "/perks/killer/unrelenting.webp",
+    "tags": [
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "wandering-eye",
+    "role": "killer",
+    "name": {
+      "en": "Wandering Eye",
+      "ru": "Блуждающий взгляд"
+    },
+    "character": "Krasue",
+    "icon": "/perks/killer/wandering-eye.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2026-08-17T19:11:57.577Z"
+  },
+  {
+    "slug": "weave-attunement",
+    "role": "killer",
+    "name": {
+      "en": "Weave Attunement",
+      "ru": "Связь с плетением"
+    },
+    "character": "Lich",
+    "icon": "/perks/killer/weave-attunement.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "whispers",
+    "role": "killer",
+    "name": {
+      "en": "Whispers",
+      "ru": "Шепоты"
+    },
+    "character": "All",
+    "icon": "/perks/killer/whispers.webp",
+    "tags": [
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "zanshin-tactics",
+    "role": "killer",
+    "name": {
+      "en": "Zanshin Tactics",
+      "ru": "Тактика зансин"
+    },
+    "character": "Oni",
+    "icon": "/perks/killer/zanshin-tactics.webp",
+    "tags": [
+      "aura-info",
+      "chase"
+    ],
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "slug": "funny-business",
+    "role": "killer",
+    "name": {
+      "en": "Funny Business",
+      "ru": "Funny Business"
+    },
+    "character": "Terrifier",
+    "icon": "/perks/killer/funny-business.webp",
+    "tags": [
+      "gen-regression",
+      "chase"
+    ],
+    "addedAt": "2026-11-01T12:30:34.926Z",
+    "availableFrom": "2026-11-24"
+  },
+  {
+    "slug": "kill-spree",
+    "role": "killer",
+    "name": {
+      "en": "Kill Spree",
+      "ru": "Kill Spree"
+    },
+    "character": "Terrifier",
+    "icon": "/perks/killer/kill-spree.webp",
+    "tags": [],
+    "addedAt": "2026-11-01T12:30:34.926Z",
+    "availableFrom": "2026-11-24"
+  },
+  {
+    "slug": "laughingstock",
+    "role": "killer",
+    "name": {
+      "en": "Laughingstock",
+      "ru": "Laughingstock"
+    },
+    "character": "Terrifier",
+    "icon": "/perks/killer/laughingstock.webp",
+    "tags": [
+      "aura-info"
+    ],
+    "addedAt": "2026-11-01T12:30:34.926Z",
+    "availableFrom": "2026-11-24"
+  }
+]

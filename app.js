@@ -1,86 +1,167 @@
-const API='https://dbd-stats.info/api';
 const SOURCE='https://dbd.source.gs/api';
 const TYPES={
-characters:{title:'Персонажи',label:'THE ROSTER',endpoint:'characters',source:SOURCE+'/characters/'},
-perks:{title:'Перки',label:'TEACHABLES & ABILITIES',endpoint:'perks'},
-items:{title:'Предметы',label:'SURVIVAL GEAR',endpoint:'items',source:SOURCE+'/items/'},
-offerings:{title:'Подношения',label:'OFFERINGS',endpoint:'offerings'},
-addons:{title:'Аддоны',label:'ADD-ONS',endpoint:'itemaddons'},
-maps:{title:'Карты',label:'THE REALMS',endpoint:'maps'}
+ characters:{title:'Персонажи',label:'THE ROSTER',endpoint:'characters',source:SOURCE+'/characters/'},
+ perks:{title:'Перки',label:'TEACHABLES & ABILITIES',endpoint:'perks'},
+ items:{title:'Предметы',label:'SURVIVAL GEAR',endpoint:'items',source:SOURCE+'/items/'},
+ offerings:{title:'Подношения',label:'OFFERINGS',endpoint:'offerings'},
+ addons:{title:'Аддоны',label:'ADD-ONS',endpoint:'itemaddons'},
+ maps:{title:'Карты',label:'REALM ATLAS',endpoint:'maps'}
 };
-let tab='characters',all=[],filter='Все',favorites=[];
-try{favorites=JSON.parse(localStorage.getItem('dbd-favorites')||'[]')}catch{}
-const $=s=>document.querySelector(s);
-const norm=x=>String(x??'').toLowerCase();
-function arr(d){if(Array.isArray(d))return d;for(const k of ['data','results','items','characters','perks','maps','realms','killers','survivors','offerings','addons','itemAddons','item_addons','killerAddons','killer_addons','survivorAddons','survivor_addons','entries','list'])if(Array.isArray(d?.[k]))return d[k];if(d&&typeof d==='object'){const nested=Object.values(d).find(v=>Array.isArray(v));if(nested)return nested}return []}
-function name(x){return x.displayName||x.name||x.display_name||x.title||x.killerName||x.id||'Без названия'}
-function desc(x){return x.description||x.desc||x.effect||x.power||x.contentText||x.content||''}
-function image(x){
- const direct=x.image||x.imageUrl||x.image_url||x.icon||x.iconUrl||x.icon_url||x.iconURL||x.perkIcon||x.perk_icon||x.perkIconUrl||x.perk_icon_url||x.iconPath||x.icon_path||x.iconFile||x.icon_file||x.portrait||x.portraitURL||x.imagePath||x.image_path;
- if(direct)return typeof direct==="string"?direct:(direct.url||direct.src||direct.href||"");
- const nested=x.assets||x.media||x.images||{};
- return nested.icon||nested.perk||nested.image||nested.url||"";
+const ALL_TABS=[...Object.keys(TYPES),'builds','mybuilds','tiers','favorites'];
+function tabFromHash(){const value=decodeURIComponent(location.hash.replace(/^#/,'')).trim();return ALL_TABS.includes(value)?value:'characters'}
+let tab=tabFromHash(),all=[],filter='Все',favorites=[];
+window.__dbdCurrentTab=tab;
+try{
+ const saved=JSON.parse(localStorage.getItem('dbd-favorites')||'[]');
+ favorites=(Array.isArray(saved)?saved:[]).filter(x=>x&&x.data).map(x=>({...x,key:x.key||favKey(x.sourceTab||'catalog',x.data),sourceTab:x.sourceTab||x.source||'catalog'}));
+}catch{}
+const $=selector=>document.querySelector(selector);
+const norm=value=>String(value??'').toLocaleLowerCase('ru');
+function sharedName(value,kind){return typeof window.dbdDisplayName==='function'?window.dbdDisplayName(value,kind):''}
+function sharedEnglish(value,kind){return typeof window.dbdRecordEnglish==='function'?window.dbdRecordEnglish(value,kind):''}
+function formattedSharedName(value,kind){const text=sharedName(value,kind);return /[А-Яа-яЁё][^()]*\([^)]*[A-Za-z][^)]*\)/.test(text)?text:''}
+function ownerDisplayName(value){return value?(sharedName(value,'character')||String(value)):''}
+function arr(data){if(Array.isArray(data))return data;for(const key of ['data','results','items','characters','perks','maps','realms','killers','survivors','offerings','addons','itemAddons','item_addons','killerAddons','killer_addons','survivorAddons','survivor_addons','entries','list'])if(Array.isArray(data?.[key]))return data[key];if(data&&typeof data==='object'){const nested=Object.values(data).find(value=>Array.isArray(value));if(nested)return nested}return []}
+function name(item){
+ if(!item||typeof item!=='object')return sharedName(item,'')||String(item??'Без названия');
+ const kind=item.__sourceTab||item.sourceTab||(typeof tab!=='undefined'?tab:'');
+ return sharedName(item,kind)||item.displayName||item.name||item.display_name||item.title||item.killerName||item.id||'Без названия';
 }
-function category(x){return x.role||x.type||x.category||x.realm||x.faction||x.characterName||x.character||''}
-function cosmetic(x){const v=norm([x.type,x.category,x.subcategory,x.kind,x.itemType,x.item_type,x.tags,x.name,x.displayName].join(' '));return /outfit|cosmetic|skin|wardrobe|charm|badge|banner|portrait|headwear|torso|legwear|customization|store outfit/.test(v)}
-function usableGear(x){return !cosmetic(x)&&!x.isCosmetic&&!x.is_cosmetic&&!x.cosmetic}
-function id(x){return String(x.id||x._id||x.name||name(x))}
-function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function safeText(value){
+ let text=String(value??'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
+ if(!text)return '';
+ if((text.match(/,/g)||[]).length>18&&/(?:survivor|killer|chapter|character|roster|персонаж|глава)/i.test(text))return '';
+ if(/(?:[A-Z][A-Za-z’'\-]+(?:\s+[A-Z][A-Za-z’'\-]+){1,4},\s*){6,}/.test(text))return '';
+ if(text.length>1400)text=text.slice(0,1400).replace(/\s+\S*$/,'')+'…';
+ return text;
+}
+function desc(item){return safeText(item.description||item.desc||item.effect||item.power||item.contentText||item.content||item.lore||'')}
+function safeUrl(value,protocols){
+ const text=String(value??'').trim();if(!text)return '';
+ if(protocols==='image'&&/^data:image\//i.test(text))return text;
+ try{const parsed=new URL(text,location.href);if(parsed.protocol==='http:'||parsed.protocol==='https:')return text;}catch{}
+ return '';
+}
+function safeImageUrl(value){return safeUrl(value,'image')}
+function imageValue(value){
+ if(!value)return '';
+ if(typeof value==='string')return safeImageUrl(value);
+ if(Array.isArray(value))return imageValue(value[0]);
+ if(typeof value==='object')return safeImageUrl(value.url||value.src||value.href||value.image||'');
+ return '';
+}
+function image(item){
+ const fields=['image','imageUrl','image_url','icon','iconUrl','icon_url','iconURL','perkIcon','perk_icon','perkIconUrl','perk_icon_url','iconPath','icon_path','iconFile','icon_file','portrait','portraitURL','portraitUrl','imageFull','sourceImage','imagePath','image_path'];
+ for(const field of fields){const url=imageValue(item?.[field]);if(url)return url}
+ const nested=item?.assets||item?.media||item?.images||{};
+ for(const field of ['icon','perk','portrait','image','url','full']){const url=imageValue(nested?.[field]);if(url)return url}
+ return '';
+}
+function category(item){return item.role||item.type||item.category||item.realm||item.faction||item.characterName||item.character||''}
+function cosmetic(item){const value=norm([item.type,item.category,item.subcategory,item.kind,item.itemType,item.item_type,item.tags,item.name,item.displayName].join(' '));return /outfit|cosmetic|skin|wardrobe|charm|badge|banner|portrait|headwear|torso|legwear|customization|store outfit/.test(value)}
+function usableGear(item){return !cosmetic(item)&&!item.isCosmetic&&!item.is_cosmetic&&!item.cosmetic}
+function id(item){return String(item.id||item._id||item.name||name(item))}
+function esc(value){return String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function favKey(sourceTab,item){return String(sourceTab||'catalog')+':'+id(item)}
+function cleanFavoriteData(item){if(!item||typeof item!=='object')return item;const copy={...item};delete copy.__favKey;delete copy.__sourceTab;return copy}
+function favoriteRecords(){return favorites.filter(entry=>entry&&entry.data).map(entry=>({...entry.data,__favKey:entry.key,__sourceTab:entry.sourceTab||'catalog'}))}
+function currentRecords(){return tab==='favorites'?favoriteRecords():all}
+function recordKey(item){return item?.__favKey||favKey(item?.__sourceTab||tab,item)}
+function findRecordByKey(key){
+ const records=currentRecords();
+ return records.find(item=>recordKey(item)===key)||records.find(item=>id(item)===key)||favorites.find(entry=>entry.key===key)?.data||all.find(item=>id(item)===key)||null;
+}
+function setGridLayout(className){const grid=$('#grid');if(grid)grid.className='grid'+(className?' '+className:'')}
+window.setGridLayout=setGridLayout;
+function fallbackArt(sourceTab){return sourceTab==='maps'?'./assets/ui/map-fallback.webp':'./assets/ui/asset-fallback.webp'}
+function artTag(src,options){return typeof picture==='function'?picture(src,options):(safeImageUrl(src)?'<img loading="lazy" src="'+esc(src)+'" alt="'+esc(options?.alt||'')+'">':'<span class="picture-fallback">✣</span>')}
+function safeLink(value){return safeUrl(value)}
 
-function translationKey(v){return String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'')}
+function translationKey(value){return String(value||'').toLocaleLowerCase('ru').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^\p{L}\p{N}]+/gu,'')}
 function applyCatalogNames(records,catalog,kind){
- const maps=catalog?.translations||{},map=maps[kind]||{},descriptionMap=maps.descriptions?.[kind]||{};
+ const translations=catalog?.translations||{},map=translations[kind]||{},descriptionMap=translations.descriptions?.[kind]||{};
  return records.map(item=>{
-  const en=String(item.nameEn||item.name||item.display_name||item.title||'');
-  const normalized=translationKey(en),shortName=translationKey(en.replace(/^the\\s+/i,''));
-  const ru=map[normalized]||map[shortName]||Object.entries(map).find(([key])=>translationKey(key)===normalized||translationKey(key)===shortName)?.[1]||maps.perksById?.[String(item.id||'')];
-  const ruDescription=descriptionMap[normalized]||descriptionMap[shortName]||'';
-  const named=ru?{...item,nameEn:en,name:ru,displayName:ru+' ('+en+')'}:item;
+  const en=String(item.nameEn||item.englishName||item.name_en||item.english_name||item.name||item.title||'');
+  const normalized=translationKey(en),shortName=translationKey(en.replace(/^the\s+/i,''));
+  const catalogRu=map[normalized]||map[shortName]||Object.entries(map).find(([key])=>translationKey(key)===normalized||translationKey(key)===shortName)?.[1]||translations.perksById?.[String(item.id||'')];
+  const info=typeof window.dbdNameInfo==='function'?(window.dbdNameInfo(en,kind)||window.dbdNameInfo(item,kind)):null;
+  const english=info?.en||en,russian=info?.ru||catalogRu;
+  const display=formattedSharedName(english,kind)||(russian?russian+' ('+english+')':formattedSharedName(item,kind))||item.displayName||item.name;
+  const named={...item,nameEn:english,name:russian||item.name||english,displayName:display};
+  const ruDescription=safeText(descriptionMap[normalized]||descriptionMap[shortName]||'');
   return ruDescription?{...named,description:ruDescription}:named;
  });
 }
-
-function updateFav(){$('#favCount').textContent=favorites.length;localStorage.setItem('dbd-favorites',JSON.stringify(favorites))}
-async function getData(url){const r=await fetch(url,{cache:'no-store',credentials:'omit'});if(!r.ok)throw Error('HTTP '+r.status);return r.json()}
+function updateFav(){const counter=$('#favCount');if(counter)counter.textContent=favorites.length;try{localStorage.setItem('dbd-favorites',JSON.stringify(favorites))}catch{}}
+async function getData(url){const response=await fetch(url,{cache:'no-store',credentials:'omit'});if(!response.ok)throw Error('HTTP '+response.status);return response.json()}
 let catalogPromise;
+function fallbackCatalog(){
+ const catalog={...(window.DBD_FALLBACK_CATALOG||{})};
+ if((!Array.isArray(catalog.maps)||!catalog.maps.length)&&Array.isArray(window.DBD_FALLBACK_MAPS))catalog.maps=window.DBD_FALLBACK_MAPS.slice();
+ catalog.translations={...(catalog.translations||{})};
+ return catalog;
+}
 async function localCatalog(){
- if(!catalogPromise)catalogPromise=fetch('./catalog-data.json',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Локальный каталог ещё не опубликован');return r.json()}).catch(e=>{catalogPromise=null;throw e});
+ if(!catalogPromise)catalogPromise=(async()=>{
+  const fallback=fallbackCatalog();
+  for(const url of ['./catalog-data.json','./catalog-fallback.json']){
+   try{
+    const response=await fetch(url,{cache:'no-store',credentials:'omit'});
+    if(!response.ok)continue;
+    const data=await response.json();
+    if(!Array.isArray(data.maps)||!data.maps.length)data.maps=fallback.maps||[];
+    return {...fallback,...data,translations:{...fallback.translations,...(data.translations||{})}};
+   }catch{}
+  }
+  if(Object.values(fallback).some(Array.isArray))return fallback;
+  throw Error('Локальный каталог недоступен');
+ })().catch(error=>{catalogPromise=null;throw error});
  return catalogPromise;
 }
 async function load(){
  if(tab==='favorites'){render();return}
+ const cfg=TYPES[tab];if(!cfg){render();return}
  $('#notice').textContent='Ищем записи в Тумане…';$('#grid').innerHTML='';
- const cfg=TYPES[tab];let lastError;
+ let lastError;
  if(['perks','offerings','maps','addons','items'].includes(tab)){
   let local=null;
-  try{local=await localCatalog()}catch(e){lastError=e}
+  try{local=await localCatalog()}catch(error){lastError=error}
   const data=local?arr(local[tab]):[];
   if(data.length){
    all=applyCatalogNames(data,local,tab);
-   $('#connection').textContent=tab==='addons'?'Улучшения загружены: '+all.length:'Локальная база загружена';
+   $('#connection').textContent=tab==='maps'?'Атлас карт готов':(local.fallback?'Локальный мини-каталог':(tab==='addons'?'Улучшения загружены: '+all.length:'Локальная база загружена'));
    $('#connection').classList.add('ok');
-   try{render()}catch(e){console.error('DBD catalog render error:',tab,e);$('#notice').textContent='Данные загружены, но произошла ошибка отображения: '+(e?.message||'ошибка');}
+   try{render()}catch(error){console.error('DBD catalog render error:',tab,error);$('#notice').textContent='Данные загружены, но произошла ошибка отображения: '+(error?.message||'ошибка')}
    return;
   }
-  if(tab==='addons')lastError=lastError||Error('Локальный каталог улучшений пуст. Публикация должна содержать не менее 500 записей.');
+  if(tab==='addons')lastError=lastError||Error('Локальный каталог улучшений пуст');
  }
- const sources=tab==='addons'?[]:[...(cfg.source?(Array.isArray(cfg.source)?cfg.source:[cfg.source]):[]),API+'/'+cfg.endpoint+'?branch=live',API+'/'+cfg.endpoint,API+'/'+cfg.endpoint+'/'];
- for(const url of sources){try{
-  let data=arr(await getData(url));
-  if(['items','characters','offerings'].includes(tab)){try{data=applyCatalogNames(data,await localCatalog(),tab)}catch(e){}}
-  if(['items','addons','offerings'].includes(tab))data=data.filter(usableGear);
-  if(!data.length)throw Error('Источник вернул пустой список');
-  all=data;$('#connection').textContent=url.startsWith(SOURCE)?'Резервная база подключена':'База подключена';$('#connection').classList.add('ok');render();return;
- }catch(e){lastError=e}}
+ const sources=tab==='addons'?[]:Array.isArray(cfg.source)?cfg.source:(cfg.source?[cfg.source]:[]);
+ for(const url of sources){
+  try{
+   let data=arr(await getData(url));
+   if(['items','characters','offerings','perks','maps'].includes(tab)){try{data=applyCatalogNames(data,await localCatalog(),tab)}catch{}}
+   if(['items','addons','offerings'].includes(tab))data=data.filter(usableGear);
+   if(!data.length)throw Error('Источник вернул пустой список');
+   all=data;
+   $('#connection').textContent=url.startsWith(SOURCE)?'База dbd.source.gs подключена':'База подключена';$('#connection').classList.add('ok');render();return;
+  }catch(error){lastError=error}
+ }
  if(tab==='addons'){
   try{
-   const [chars,items]=await Promise.all([getData(SOURCE+'/characters/'),getData(SOURCE+'/items/')]);
-   const nested=[...arr(chars),...arr(items)].flatMap(x=>x.addons||x.addOns||x.add_ons||x.itemAddons||x.item_addons||x.powerAddons||x.power_addons||[]);
+   const [characters,items]=await Promise.all([getData(SOURCE+'/characters/'),getData(SOURCE+'/items/')]);
+   const nested=[...arr(characters),...arr(items)].flatMap(x=>x.addons||x.addOns||x.add_ons||x.itemAddons||x.item_addons||x.powerAddons||x.power_addons||[]);
    if(nested.length){all=nested.filter(usableGear);$('#connection').textContent='Резервная база подключена';$('#connection').classList.add('ok');render();return}
-  }catch(e){lastError=e}
+  }catch(error){lastError=error}
  }
- if(['perks','offerings','maps','items'].includes(tab)){try{const local=await localCatalog();const data=arr(local[tab]);if(data.length){all=applyCatalogNames(data,local,tab);$('#connection').textContent='Локальная база загружена';$('#connection').classList.add('ok');render();return}}catch(e){lastError=e}}
- all=[];$('#notice').textContent=tab==='addons'?'Не удалось открыть каталог улучшений. ('+(lastError?.message||'каталог не опубликован')+')':'Не удалось загрузить этот раздел. Источник данных временно недоступен. ('+(lastError?.message||'ошибка')+')';
+ // A small bundled catalog is always available, even on a fresh checkout with
+ // no generated catalog-data.json and no network access.
+ try{
+  const local=await localCatalog(),data=arr(local[tab]);
+  if(data.length){all=applyCatalogNames(data,local,tab);$('#connection').textContent=tab==='maps'?'Атлас карт готов':'Локальный мини-каталог';$('#connection').classList.add('ok');render();return}
+ }catch(error){lastError=error}
+ all=[];
+ $('#notice').textContent='Не удалось загрузить этот раздел. Источник данных временно недоступен. ('+(lastError?.message||'ошибка')+')';
  $('#connection').textContent='Нет соединения';$('#connection').classList.remove('ok');render();
 }
 
@@ -138,64 +219,92 @@ function buildPerk(wanted) {
   records.find(p=>fields(p).some(v=>{const k=buildPerkKey(v);return k.length>5&&key.length>5&&(k.includes(key)||key.includes(k))}))||null;
 }
 function buildPerkRussianName(p,wanted){
+ const label=String(wanted||p?.nameEn||p?.englishName||p?.name_en||p?.id||p?.name||"");
+ const formatted=sharedName(label,'perk');
+ if(formatted&&formatted!==label)return formatted;
+ const info=typeof window.dbdNameInfo==='function'?(window.dbdNameInfo(p,'perk')||window.dbdNameInfo(label,'perk')):null;
+ if(info?.display)return info.display;
+ let ru="";
  for(const value of [p?.nameRu,p?.name_ru,p?.russianName,p?.russian_name,p?.translation,p?.name]){
   const text=String(value||"").trim();
-  if(/[А-Яа-яЁё]/.test(text))return text.replace(/\s*\([^)]*\)\s*$/,"").trim();
+  if(/[А-Яа-яЁё]/.test(text)){ru=text.replace(/\s*\([^)]*\)\s*$/,"").trim();break}
  }
  const display=String(p?.displayName||p?.display_name||"");
  const prefix=display.split(/\s*\([^)]*\)\s*$/)[0];
- if(/[А-Яа-яЁё]/.test(prefix))return prefix;
- return BUILD_PERK_RU[wanted]||wanted;
+ if(!ru&&/[А-Яа-яЁё]/.test(prefix))ru=prefix.trim();
+ const english=sharedEnglish(p,'perk')||label;
+ if(ru&&english&&ru!==english)return ru+' ('+english+')';
+ const curated=BUILD_PERK_RU[wanted];
+ return curated?curated+' ('+wanted+')':(formatted||label||"Перк");
 }
 function buildPerkOwner(p) { return String(p?.characterName||p?.character_name||p?.character||p?.owner||p?.survivor||p?.killer||""); }
 const LICENSED_PERK_OWNERS = ["Laurie Strode","Quentin Smith","Detective Tapp","Ash Williams","Nancy Wheeler","Steve Harrington","Cheryl Mason","Jill Valentine","Leon Kennedy","Rebecca Chambers","Ada Wong","Ellen Ripley","Pinhead","Alan Wake","Lara Croft"];
 const LICENSED_PERK_NAMES = ["Decisive Strike","Hyperfocus","Chemical Trap","Background Player","Troubleshooter","Champion of Light","Moment of Glory","Invocation: Treacherous Crows"];
 function buildPerkIsPaid(p) {
  const owner=buildPerkOwner(p).toLowerCase();
- return !!(p.isLicensed||p.is_licensed||p.licensed||p.dlc||p.isDlc||p.is_dlc||LICENSED_PERK_OWNERS.some(n=>owner.includes(n.toLowerCase()))||LICENSED_PERK_NAMES.some(n=>norm(name(p))===norm(n)));
+ const perkEnglish=sharedEnglish(p,'perk')||p.nameEn||p.englishName||p.name_en||p.id||p.name||'';
+ return !!(p.isLicensed||p.is_licensed||p.licensed||p.dlc||p.isDlc||p.is_dlc||LICENSED_PERK_OWNERS.some(n=>owner.includes(n.toLowerCase()))||LICENSED_PERK_NAMES.some(n=>norm(perkEnglish)===norm(n)));
 }
-async function loadBuilds(){try{const catalog=await localCatalog();allPerks=arr(catalog.perks);renderBuilds()}catch(e){allPerks=[];renderBuilds();$('#notice').textContent='Каталог перков недоступен — названия сборок всё равно доступны, иконки появятся после загрузки базы.'}}
+async function loadBuilds(){
+ try{
+  const catalog=await localCatalog();allPerks=arr(catalog.perks);
+ }catch(error){
+  allPerks=[];
+ }
+ renderBuilds();
+ if(!allPerks.length&&tab==='builds')$('#notice').textContent='Локальный мини-каталог: иконки появятся после публикации полной базы.';
+}
 function renderBuilds() {
+ setGridLayout('build-grid');
  const q=norm($('#search').value.trim());
  const groups=UNIVERSAL_BUILDS.filter(b=>norm(b.title+' '+b.tag+' '+b.desc+' '+b.perks.join(' ')).includes(q));
  $('#sectionTitle').textContent='Готовые билды';
  $('#sectionLabel').textContent='UNIVERSAL SURVIVOR BUILDS';
  $('#filters').innerHTML='<span class="builds-hint">Выбери стиль игры — в каждой сборке четыре перка</span>';
  $('#notice').textContent='Подборки для выжившего • '+groups.length+' сборок';
- $('#grid').classList.add('build-grid');
  $('#grid').innerHTML=groups.map(b=>{
   const perks=b.perks.map(wanted=>{
-   const p=buildPerk(wanted),src=p?image(p):'';const perkTitle=buildPerkRussianName(p,wanted);
-   return '<div class="build-perk"><div class="build-perk-icon">'+(src?'<img loading="lazy" src="'+esc(src)+'" alt="" onerror="this.outerHTML=\'<span class=&quot;build-perk-placeholder&quot;>✣</span>\'">':'<span class="build-perk-placeholder">✣</span>')+'</div><div class="build-perk-info"><b><button type="button" class="build-perk-link" data-loadout-type="perk" data-loadout-name="'+esc(p?(p.nameEn||p.englishName||p.name_en||p.english_name||p.id||wanted):wanted)+'">'+esc(perkTitle)+'</button></b><small>'+esc(p?(buildPerkOwner(p)||'Игровой перк'):'Перк не найден в базе')+'</small></div>'+(p&&buildPerkIsPaid(p)?'<span class="auric-cell" title="Платный персонаж / лицензированный контент">◈</span>':'')+'</div>';
+   const p=buildPerk(wanted),src=p?image(p):'',perkTitle=buildPerkRussianName(p,wanted),ownerLabel=p?(ownerDisplayName(buildPerkOwner(p))||'Игровой перк'):'Перк не найден в базе';
+   const icon=artTag(src,{className:'build-perk-icon',alt:'',fallback:'./assets/ui/asset-fallback.webp',label:'✦'});
+   return '<div class="build-perk"><div class="build-perk-icon">'+icon+'</div><div class="build-perk-info"><b><button type="button" class="build-perk-link" data-loadout-type="perk" data-loadout-name="'+esc(p?(p.nameEn||p.englishName||p.name_en||p.english_name||p.id||wanted):wanted)+'">'+esc(perkTitle)+'</button></b><small>'+esc(ownerLabel)+'</small></div>'+(p&&buildPerkIsPaid(p)?'<span class="auric-cell" title="Платный персонаж / лицензированный контент">◈</span>':'')+'</div>';
   }).join('');
   return '<article class="build-card"><div class="build-head"><span class="build-tag">'+esc(b.tag)+'</span><h3>'+esc(b.title)+'</h3><p>'+esc(b.desc)+'</p></div><div class="build-perks">'+perks+'</div><div class="build-foot"><span>4 ПЕРКА • ВЫЖИВШИЙ</span><button class="build-copy" data-copy-build="'+b.id+'">Скопировать названия</button></div></article>';
  }).join('') || '<div class="empty">По этому запросу сборок не найдено.</div>';
 }
 function render(){
+ if(tab==='maps'&&typeof window.renderMaps==='function'){window.renderMaps();return}
  if(tab==='mybuilds'&&typeof renderMyBuilds==='function'){renderMyBuilds();return}
- if(tab==='builds'){renderBuilds();return} if(tab==='tiers'){renderTierList();return}
- $('#grid').classList.remove('build-grid');
- const cfg=TYPES[tab];$('#sectionTitle').textContent=tab==='favorites'?'Избранное':cfg.title;$('#sectionLabel').textContent=tab==='favorites'?'YOUR COLLECTION':cfg.label;
- const data=tab==='favorites'?favorites.filter(Boolean).map(x=>x.data):all,q=norm($('#search').value.trim()),cats=['Все',...new Set(data.map(category).filter(Boolean))];
+ if(tab==='builds'){renderBuilds();return}
+ if(tab==='tiers'&&typeof renderTierList==='function'){renderTierList();return}
+ setGridLayout('');
+ const cfg=TYPES[tab]||{title:'Избранное',label:'YOUR COLLECTION'};
+ $('#sectionTitle').textContent=tab==='favorites'?'Избранное':cfg.title;
+ $('#sectionLabel').textContent=tab==='favorites'?'YOUR COLLECTION':cfg.label;
+ const data=currentRecords(),q=norm($('#search').value.trim()),cats=['Все',...new Set(data.filter(usableGear).map(category).filter(Boolean))].slice(0,16);
  if(!cats.includes(filter))filter='Все';
  $('#filters').innerHTML=cats.length>2?cats.map(c=>'<button class="'+(filter===c?'active':'')+'" data-filter="'+esc(c)+'">'+esc(c)+'</button>').join(''):'';
- const shown=data.filter(x=>(filter==='Все'||category(x)===filter)&&(!q||norm(name(x)+' '+(x.nameEn||'')+' '+desc(x)+' '+category(x)).includes(q)));
+ const shown=data.filter(x=>(filter==='Все'||category(x)===filter||norm(category(x)).includes(norm(filter)))&&(!q||norm([name(x),x.nameEn,x.englishName,desc(x),category(x),x.realm].join(' ')).includes(q)));
  $('#notice').textContent=shown.length?'Найдено: '+shown.length+(tab==='items'?' • скины и косметика исключены':''):'Ничего не найдено';
- $('#grid').innerHTML=shown.map(x=>{const key=id(x),src=image(x),saved=favorites.some(f=>f&&f.key===key);return '<article class="item" data-item-detail="'+esc(key)+'"><button class="art item-art-button" type="button" data-item-detail="'+esc(key)+'" aria-label="Подробнее: '+esc(name(x))+'">'+(src?'<img loading="lazy" src="'+esc(src)+'" alt="" onerror="this.remove()">':'<span class="placeholder">✣</span>')+'</button><div class="itembody"><div class="kind">'+esc(category(x)||cfg?.title||'DBD')+'</div><h3>'+(tab==='perks'?'<button class="catalog-perk-link" type="button" data-loadout-type="perk" data-loadout-name="'+esc(name(x))+'">'+esc(name(x))+'</button>':'<button class="item-name-link" type="button" data-item-detail="'+esc(key)+'">'+esc(name(x))+'</button>')+'</h3><div class="cardbottom"><small>'+esc(x.realm||x.characterName||x.character||'DEAD BY DAYLIGHT')+'</small><button class="fav '+(saved?'saved':'')+'" data-fav="'+esc(key)+'">'+(saved?'♥':'♡')+'</button></div><button class="item-more" type="button" data-item-detail="'+esc(key)+'">Открыть описание и эффект ↗</button></div></article>'}).join('')||'<div class="empty">В этой части Тумана пока пусто.</div>';
+ $('#grid').innerHTML=shown.map(x=>{
+  const key=recordKey(x),src=image(x),saved=favorites.some(f=>f&&f.key===key),sourceTab=x.__sourceTab||tab;
+  const art=artTag(src,{className:'item-art-img',alt:'',fallback:fallbackArt(sourceTab),label:sourceTab==='characters'?'◈':'✣'});
+  const perkLink=sourceTab==='perks'||tab==='perks';
+  const title=perkLink?'<button class="catalog-perk-link" type="button" data-loadout-type="perk" data-loadout-name="'+esc(sharedEnglish(x,'perk')||x.nameEn||x.englishName||x.name_en||x.id||name(x))+'">'+esc(name(x))+'</button>':'<button class="item-name-link" type="button" data-item-detail="'+esc(key)+'">'+esc(name(x))+'</button>';
+  return '<article class="item'+(sourceTab==='characters'?' character-card':'')+'" data-item-detail="'+esc(key)+'" data-source-tab="'+esc(sourceTab)+'" tabindex="0"><button class="art item-art-button" type="button" data-item-detail="'+esc(key)+'" aria-label="Подробнее: '+esc(name(x))+'">'+art+'</button><div class="itembody"><div class="kind">'+esc(category(x)||cfg.title||'DBD')+'</div><h3>'+title+'</h3><div class="cardbottom"><small>'+esc(x.realm||ownerDisplayName(x.characterName||x.character||x.owner)||x.nameEn||'DEAD BY DAYLIGHT')+'</small><button class="fav '+(saved?'saved':'')+'" data-fav="'+esc(key)+'" aria-pressed="'+(saved?'true':'false')+'" aria-label="'+(saved?'Убрать из избранного':'Добавить в избранное')+'">'+(saved?'♥':'♡')+'</button></div><button class="item-more" type="button" data-item-detail="'+esc(key)+'">Открыть описание и эффект ↗</button></div></article>';
+ }).join('')||'<div class="empty">В этой части Тумана пока пусто.</div>';
+ document.querySelectorAll('.item[data-item-detail]').forEach(card=>card.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();card.click()}}));
 }
 function detailValue(v){
- if(v===null||v===undefined||v==="")return "";
- if(Array.isArray(v))return v.map(detailValue).filter(Boolean).join(" • ");
- if(typeof v==="object")return Object.entries(v).map(([k,val])=>k+": "+detailValue(val)).filter(Boolean).join(" • ");
- return String(v);
+ if(v===null||v===undefined||v==='')return '';
+ if(Array.isArray(v))return safeText(v.map(detailValue).filter(Boolean).join(' • '));
+ if(typeof v==='object')return safeText(Object.entries(v).map(([k,val])=>k+': '+detailValue(val)).filter(Boolean).join(' • '));
+ return safeText(v);
 }
-function openItemDetail(item){
- const modalId='itemDetailModal';let modal=document.getElementById(modalId);
- if(!modal){modal=document.createElement('div');modal.id=modalId;modal.className='detail-overlay';document.body.appendChild(modal)}
- const title=name(item),english=item.nameEn||item.englishName||item.name_en||item.display_name_en||'';
- const imageUrl=image(item);
- const description=item.descriptionRu||item.description_ru||item.description||item.desc||item.contentText||item.content||item.lore||'';
- const effect=item.effectDescription||item.effect_description||item.effect||item.effects||item.powerDescription||item.power_description||item.power||item.bonus||'';
+function detailMarkup(item){
+ const sourceTab=item.__sourceTab||tab,title=name(item),english=sharedEnglish(item,sourceTab)||item.nameEn||item.englishName||item.name_en||item.display_name_en||'',imageUrl=image(item);
+ const englishLine=english&&!title.includes('('+english+')')?'<p class="item-detail-en">'+esc(english)+'</p>':'';
+ const description=safeText(item.descriptionRu||item.description_ru||item.description||item.desc||item.contentText||item.content||item.lore||'');
+ const effect=item.effectDescription||item.effect_description||item.effect||item.effects||item.powerDescription||item.power_description||item.bonus||'';
  const sections=[
   ['Игровой эффект',effect],
   ['Дополнительное описание',item.detailedDescription||item.detailed_description||item.longDescription||item.long_description||item.gameDescription||item.game_description],
@@ -209,84 +318,115 @@ function openItemDetail(item){
  const fields=[
   ['Категория',item.type||item.category||item.itemType||item.item_type],
   ['Редкость',item.rarity||item.quality],
-  ['Персонаж / владелец',item.characterName||item.character_name||item.owner||item.character],
+  ['Персонаж / владелец',ownerDisplayName(item.characterName||item.character_name||item.owner||item.character)],
   ['Стоимость',item.price||item.cost],
   ['Источник',item.source||item.unlock||item.obtain||item.acquisition]
  ].map(([label,value])=>({label,value:detailValue(value)})).filter(x=>x.value);
- const descriptionText=detailValue(description)||'Подробное описание для этого объекта пока отсутствует в доступной базе. Не буду придумывать игровые эффекты.';
- const source=item.sourceUrl||item.source_url||item.wiki||item.url||'';
- modal.innerHTML='<section class="detail-panel item-detail-panel item-detail-readable"><button class="detail-close" aria-label="Закрыть">×</button><div class="eyebrow">СПРАВОЧНИК DEAD BY DAYLIGHT</div><div class="item-detail-head">'+(imageUrl?'<img src="'+esc(imageUrl)+'" alt="" class="item-detail-icon" onerror="this.style.display=\'none\'">':'<div class="item-detail-icon item-detail-noicon">✣</div>')+'<div><h2>'+esc(title)+'</h2>'+(english&&english!==title?'<p class="item-detail-en">'+esc(english)+'</p>':'')+'<span class="item-detail-kind">'+esc(category(item)||tab)+'</span></div></div><section class="item-detail-section"><h3>Что это и что делает</h3><p class="item-detail-description">'+esc(descriptionText)+'</p></section>'+(sections.length?'<section class="item-detail-section"><h3>Подробности игрового эффекта</h3>'+sections.map(x=>'<div class="item-detail-field"><b>'+esc(x.label)+'</b><span>'+esc(x.value)+'</span></div>').join('')+'</section>':'')+(fields.length?'<section class="item-detail-section"><h3>Характеристики и получение</h3>'+fields.map(x=>'<div class="item-detail-field"><b>'+esc(x.label)+'</b><span>'+esc(x.value)+'</span></div>').join('')+'</section>':'')+(source?'<a class="item-detail-source" href="'+esc(source)+'" target="_blank" rel="noopener">Открыть источник информации ↗</a>':'')+'<p class="item-detail-note">Показываются только сведения, которые действительно есть в базе игры или справочника. Если у объекта не хватает подробностей, это отмечено отдельно.</p></section>';
- modal.classList.add('open');document.body.classList.add('modal-open');
+ const descriptionText=description||'Подробное описание для этого объекта пока отсутствует в доступной базе. Не буду придумывать игровые эффекты.';
+ const source=safeLink(item.sourceUrl||item.source_url||item.wiki||item.url||'');
+ const icon=artTag(imageUrl,{className:'item-detail-icon',alt:'',fallback:fallbackArt(sourceTab),eager:true,label:'✣'});
+ return '<section class="detail-panel item-detail-panel item-detail-readable"><button class="detail-close" aria-label="Закрыть">×</button><div class="eyebrow">СПРАВОЧНИК DEAD BY DAYLIGHT</div><div class="item-detail-head">'+icon+'<div><h2>'+esc(title)+'</h2>'+englishLine+'<span class="item-detail-kind">'+esc(category(item)||sourceTab)+'</span></div></div><section class="item-detail-section"><h3>Что это и что делает</h3><p class="item-detail-description">'+esc(descriptionText)+'</p></section>'+(sections.length?'<section class="item-detail-section"><h3>Подробности игрового эффекта</h3>'+sections.map(x=>'<div class="item-detail-field"><b>'+esc(x.label)+'</b><span>'+esc(x.value)+'</span></div>').join('')+'</section>':'')+(fields.length?'<section class="item-detail-section"><h3>Характеристики и получение</h3>'+fields.map(x=>'<div class="item-detail-field"><b>'+esc(x.label)+'</b><span>'+esc(x.value)+'</span></div>').join('')+'</section>':'')+(source?'<a class="item-detail-source" href="'+esc(source)+'" target="_blank" rel="noopener">Открыть источник информации ↗</a>':'')+'<p class="item-detail-note">Показываются только сведения, которые действительно есть в базе игры или справочника. Если у объекта не хватает подробностей, это отмечено отдельно.</p></section>';
 }
-function switchTab(t){tab=t;filter='Все';document.querySelectorAll('[data-tab]').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));$('#search').value='';if(t==='mybuilds'&&typeof loadMyBuilds==='function'){loadMyBuilds();return}if(t==='builds'){loadBuilds();return}if(t==='tiers'){loadTierList();return}load()}
+function openItemDetail(item){openModal('itemDetailModal',detailMarkup(item))}
+function openDetail(item){
+ if(!item)return;
+ const sourceTab=item.__sourceTab||tab;
+ if(sourceTab==='maps'&&typeof window.openMapDetail==='function'){window.openMapDetail(window.mapRecordKey?window.mapRecordKey(item):String(item.mapKey||item.id||''));return}
+ if(sourceTab==='characters'&&typeof showDbdCharacter==='function'){showDbdCharacter(item);return}
+ if(sourceTab==='perks'&&typeof window.__dbdOpenPerkDetail==='function'){window.__dbdOpenPerkDetail(sharedEnglish(item,'perk')||item.nameEn||item.englishName||item.name_en||item.id||name(item));return}
+ openItemDetail(item);
+}
+window.openDetail=openDetail;
+function switchTab(value,options){
+ const next=ALL_TABS.includes(value)?value:'characters';
+ const opts=options||{};
+ if(typeof closeAllModals==='function')closeAllModals();
+ tab=next;window.__dbdCurrentTab=next;filter='Все';
+ const search=$('#search');if(search){search.value='';search.placeholder=next==='maps'?'Поиск карт и владений…':'Поиск в Тумане…'}
+ document.querySelectorAll('[data-tab]').forEach(button=>{
+  const active=button.dataset.tab===tab;
+  button.classList.toggle('active',active);
+  if(active)button.setAttribute('aria-current','page');else button.removeAttribute('aria-current');
+ });
+ setGridLayout('');
+ if(opts.history!==false){
+  const state={...(history.state||{}),tab,modalDepth:0};
+  try{if(opts.replace)history.replaceState(state,'','#'+tab);else history.pushState(state,'','#'+tab);}catch{}
+ }
+ if(tab==='maps'){
+  // The full published catalog adds lore text and official cover art; the
+  // bundled fallback keeps all 49 maps and their local plans available offline.
+  $('#connection').textContent='Загружаем атлас карт…';
+  load();return;
+ }
+ if(tab==='builds'){loadBuilds();return}
+ if(tab==='mybuilds'){if(typeof loadMyBuilds==='function')loadMyBuilds();else render();return}
+ if(tab==='tiers'){if(typeof loadTierList==='function')loadTierList();else render();return}
+ if(tab==='favorites'){render();return}
+ load();
+}
+window.switchTab=switchTab;
+window.navigateToTab=value=>{switchTab(value);window.scrollTo({top:0,behavior:'smooth'})};
 
-const DBD_MAP_LAYOUTS={"Azarov’s Resting Place":"Autohaven Wreckers/Azarov’s Resting Place.webp",
-"Blood Lodge":"Autohaven Wreckers/Blood Lodge.webp",
-"Gas Heaven":"Autohaven Wreckers/Gas Heaven.webp",
-"Wreckers' Yard":"Autohaven Wreckers/Wreckers' Yard.webp",
-"Wretched Shop":"Autohaven Wreckers/Wretched Shop.webp",
-"Grim Pantry":"Backwater Swamp/Grim Pantry.webp",
-"The Pale Rose":"Backwater Swamp/The Pale Rose.webp",
-"Fractured Cowshed":"Coldwind Farm/Fractured Cowshed.webp",
-"Rancid Abattoir":"Coldwind Farm/Rancid Abbatoir.webp",
-"Rotten Fields":"Coldwind Farm/Rotten Fields.webp",
-"The Thompson House":"Coldwind Farm/The Thompson House.webp",
-"Torment Creek":"Coldwind Farm/Torment Creek.webp",
-"Disturbed Ward":"Crotus Prenn Asylum/Disturbed Ward.webp",
-"Father Campbell's Chapel":"Crotus Prenn Asylum/Father Campbell's Chapel.webp",
-"Nostromo Wreckage":"Dvarka Deepwood/Nostromo Wreckage.webp",
-"Toba Landing":"Dvarka Deepwood/Toba Landing.webp",
-"Dead Sands":"Forsaken Boneyard/Dead Sands.webp",
-"Eyrie of Crows":"Forsaken Boneyard/Eyrie of Crows.webp",
-"The Game":"Gideon Meat Plant/The Game.webp",
-"Dead Dawg Saloon":"Grave of Glenvale/Dead Dawg Saloon.webp",
-"Lampkin Lane":"Haddonfield/Lampkin Lane.webp",
-"The Underground Complex":"Hawkins National Laboratory/The Underground Complex.webp",
-"Treatment Theatre":"Léry's Memorial Institute/Treatment Theatre.webp",
-"Mount Ormond Resort":"Ormond/Mount Ormond Resort.webp",
-"Ormond Lake Mine":"Ormond/Ormond Lake Mine.webp",
-"Raccoon City Police Station East Wing":"Raccoon City/Raccoon City Police Station East Wing.webp",
-"Raccoon City Police Station West Wing":"Raccoon City/Raccoon City Police Station West Wing.webp",
-"Mother's Dwelling":"Red Forest/Mother's Dwelling.webp",
-"Temple of Purgation":"Red Forest/Temple of Purgation.webp",
-"Midwich Elementary School":"Silent Hill/Midwich Elementary School.webp",
-"Trickster's Delusion":"Sleepless District/Tricksters Delusion.webp",
-"Badham Preschool":"Springwood/Badham Preschool.webp",
-"Forgotten Ruins":"The Decimated Borgo/Forgotten Ruins.webp",
-"The Shattered Square":"The Decimated Borgo/The Shattered Square.webp",
-"Coal Tower":"The MacMillan Estate/Coal Tower.webp",
-"Groaning Storehouse":"The MacMillan Estate/Groaning Storehouse.webp",
-"Ironworks of Misery":"The MacMillan Estate/Ironworks Of Misery.webp",
-"Shelter Woods":"The MacMillan Estate/Shelter Woods.webp",
-"Suffocation Pit":"The MacMillan Estate/Suffocation Pit.webp",
-"Fallen Refuge":"Withered Isle/Fallen Refuge.webp",
-"Freddy Fazbear's Pizza":"Withered Isle/Freddy Fazbear's Pizza.webp",
-"Garden of Joy":"Withered Isle/Garden of Joy.webp",
-"Greenville Square":"Withered Isle/Greenville Square.webp",
-"Family Residence":"Yamaoka Estate/Family Residence.webp",
-"Sanctum of Wrath":"Yamaoka Estate/Sanctum of Wrath.webp"};
-function mapKey(v){return String(v||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[^a-z0-9]/g,"")}
-function mapLayoutPath(label){
- const n=mapKey(label);
- const aliases=[
-  ["raccooncitypolicestationeast","Raccoon City Police Station East Wing"],["raccooncitypolicestationwest","Raccoon City Police Station West Wing"],
-  ["rancid","Rancid Abattoir"],["templeofpurgation","Temple of Purgation"],["ironworksofmisery","Ironworks of Misery"],
-  ["trickstersdelusion","Trickster's Delusion"],["badham","Badham Preschool"],["midwich","Midwich Elementary School"],
-  ["thegame","The Game"],["forgottenruins","Forgotten Ruins"],["shatteredsquare","The Shattered Square"]
- ];
- for(const [part,key] of aliases)if(n.includes(part))return DBD_MAP_LAYOUTS[key];
- for(const key of Object.keys(DBD_MAP_LAYOUTS))if(mapKey(key)===n||n.includes(mapKey(key)))return DBD_MAP_LAYOUTS[key];
- return "";
+// The old numbered-square viewer has been replaced by maps.js: local 3D views,
+// detailed top-down plans, realm grouping, zoom/pan and artist credits.
+function openMapTactics(map){if(typeof window.openMapDetail==='function')window.openMapDetail(window.mapRecordKey?window.mapRecordKey(map):String(map?.mapKey||map?.id||''))}
+function handleGlobalClick(event){
+ const fav=event.target.closest('[data-fav]');
+ if(fav){
+  event.preventDefault();event.stopPropagation();
+  const key=fav.dataset.fav,index=favorites.findIndex(entry=>entry.key===key);
+  let sourceTab=fav.closest('[data-source-tab]')?.dataset.sourceTab||tab;
+  if(index>=0){sourceTab=favorites[index].sourceTab||sourceTab;favorites.splice(index,1)}
+  else{
+   const item=findRecordByKey(key);
+   if(item)favorites.push({key,sourceTab:item.__sourceTab||sourceTab,data:cleanFavoriteData(item)});
+  }
+  updateFav();render();
+  const selector=typeof CSS!=='undefined'&&CSS.escape?'.fav[data-fav="'+CSS.escape(key)+'"]':null;
+  const buttons=selector?document.querySelectorAll(selector):[];
+  buttons.forEach(button=>{
+   const saved=favorites.some(entry=>entry.key===key);
+   button.classList.toggle('saved',saved);button.setAttribute('aria-pressed',saved?'true':'false');
+   button.setAttribute('aria-label',saved?'Убрать из избранного':'Добавить в избранное');
+   if(!button.textContent.includes('избран'))button.textContent=saved?'♥':'♡';
+  });
+  return;
+ }
+ const route=event.target.closest('[data-route]');
+ if(route&&typeof window.navigateToTab==='function'){event.preventDefault();window.navigateToTab(route.dataset.route);return}
+ const tabButton=event.target.closest('[data-tab]');
+ if(tabButton){switchTab(tabButton.dataset.tab);return}
+ const copy=event.target.closest('[data-copy-build]');
+ if(copy){
+  const build=UNIVERSAL_BUILDS.find(item=>item.id===copy.dataset.copyBuild);
+  if(build){
+   const value=build.title+'\n'+build.perks.join('\n');
+   if(navigator.clipboard?.writeText)navigator.clipboard.writeText(value).then(()=>copy.textContent='Скопировано ✓').catch(()=>copy.textContent='Не удалось скопировать');
+   else copy.textContent='Буфер обмена недоступен';
+  }
+  return;
+ }
+ const filterButton=event.target.closest('[data-filter]');
+ if(filterButton){filter=filterButton.dataset.filter;render();return}
+ const detail=event.target.closest('[data-item-detail]');
+ if(detail&&!event.target.closest('[data-fav]')){
+  event.preventDefault();
+  const item=findRecordByKey(detail.dataset.itemDetail);
+  if(item)openDetail(item);
+ }
 }
-function mapAssetUrl(path){return "https://raw.githubusercontent.com/LucaFontanot/dbd-map-overlay/master/maps/Hens333/"+path.split("/").map(encodeURIComponent).join("/")}
-function openMapTactics(map){
- const label=name(map),path=mapLayoutPath(label),src=path?mapAssetUrl(path):image(map);
- let modal=document.getElementById("mapTacticsModal");
- if(!modal){modal=document.createElement("div");modal.id="mapTacticsModal";modal.className="detail-overlay";document.body.appendChild(modal)}
- modal.innerHTML='<section class="detail-panel map-tactics-panel"><button class="detail-close" aria-label="Закрыть">×</button><div class="eyebrow">TOP-DOWN MAP VIEW</div><h2>'+esc(label)+'</h2><p class="map-tactics-intro">Полная схема локации сверху. Можно увеличить план и прокручивать его, чтобы рассмотреть строения, тайлы и соединения.</p><div class="map-route-controls"><button class="active" data-map-zoom="1">Вписать</button><button data-map-zoom="1.35">Увеличить</button><button data-map-zoom="1.8">Крупно</button></div><div class="map-stage"><div class="map-image-canvas">'+(src?'<img class="map-layout-image" src="'+esc(src)+'" alt="План карты '+esc(label)+'" onerror="this.closest(\'.map-stage\').classList.add(\'map-image-missing\')">':'<div class="map-image-fallback">План этой карты пока не найден в библиотеке схем</div>')+'</div></div><div class="map-legend"><span>Вид сверху · вся карта</span><span>Нажми «Увеличить», чтобы рассмотреть детали</span></div><p class="map-warning">Это схема планировки, а не точная раскладка объектов конкретного матча. Паллеты, окна, генераторы и выходы могут менять расположение в зависимости от варианта карты и генерации.</p><div class="map-art-credit">Схема карты: Hens333 / проект <a href="https://github.com/LucaFontanot/dbd-map-overlay" target="_blank" rel="noopener">DBD Map Overlay</a></div></section>';
- modal.classList.add("open");document.body.classList.add("modal-open");
- modal.querySelectorAll("[data-map-zoom]").forEach(b=>b.addEventListener("click",()=>{modal.querySelectorAll("[data-map-zoom]").forEach(x=>x.classList.toggle("active",x===b));const img=modal.querySelector(".map-layout-image");if(img)img.style.transform="scale("+b.dataset.mapZoom+")";}));
-}
-document.addEventListener('click',e=>{const itemDetail=e.target.closest('[data-item-detail]');if(itemDetail&&tab!=='maps'&&!e.target.closest('[data-fav]')){const item=all.find(x=>id(x)===itemDetail.dataset.itemDetail);if(item){openItemDetail(item);return}}if(e.target.closest('#itemDetailModal .detail-close')||e.target.id==='itemDetailModal'){const m=document.getElementById('itemDetailModal');if(m)m.classList.remove('open');document.body.classList.remove('modal-open');return}const mapCard=e.target.closest('#grid .item');if(tab==='maps'&&mapCard&&!e.target.closest('[data-fav]')){openMapTactics(all.find(x=>name(x)===mapCard.querySelector('h3')?.textContent)||{name:mapCard.querySelector('h3')?.textContent});return}if(e.target.closest('#mapTacticsModal .detail-close')||e.target.id==='mapTacticsModal'){const m=document.getElementById('mapTacticsModal');if(m)m.classList.remove('open');document.body.classList.remove('modal-open');return}const routeBtn=e.target.closest('[data-route]');if(routeBtn&&e.target.closest('#mapTacticsModal'))return;const t=e.target.closest('[data-tab]');if(t){switchTab(t.dataset.tab);return}const copy=e.target.closest('[data-copy-build]');if(copy){const b=UNIVERSAL_BUILDS.find(x=>x.id===copy.dataset.copyBuild);if(b){const value=b.title+'\n'+b.perks.join('\n');if(navigator.clipboard?.writeText){navigator.clipboard.writeText(value).then(()=>copy.textContent='Скопировано ✓').catch(()=>copy.textContent='Не удалось скопировать')}else{copy.textContent='Буфер обмена недоступен'}}return}const f=e.target.closest('[data-filter]');if(f){filter=f.dataset.filter;render();return}const b=e.target.closest('[data-fav]');if(b){const key=b.dataset.fav,item=(tab==='favorites'?favorites.map(x=>x.data):all).find(x=>id(x)===key);if(favorites.some(x=>x.key===key))favorites=favorites.filter(x=>x.key!==key);else if(item)favorites.push({key,data:item});updateFav();render()}});
-$('#search').addEventListener('input',()=>tab==='builds'?renderBuilds():tab==='tiers'?renderTierList():tab==='mybuilds'?renderMyBuilds():render());$('#refresh').addEventListener('click',()=>tab==='mybuilds'?loadMyBuilds():load());updateFav();load();
-if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+document.addEventListener('click',handleGlobalClick);
+$('#search').addEventListener('input',()=>render());
+window.addEventListener('hashchange',()=>{const value=tabFromHash();if(value!==tab)switchTab(value,{history:false})});
+$('#refresh').addEventListener('click',()=>{
+ catalogPromise=null;
+ if(tab==='tiers'&&typeof loadTierList==='function')loadTierList(true);
+ else if(tab==='builds')loadBuilds();
+ else if(tab==='mybuilds'&&typeof loadMyBuilds==='function')loadMyBuilds();
+ else if(tab==='maps')render();
+ else if(tab==='favorites')render();
+ else load();
+});
+updateFav();switchTab(tab,{replace:true});
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));

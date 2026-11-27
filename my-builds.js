@@ -24,8 +24,9 @@
  const key=v=>String(v||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9а-яё]/gi,'');
  const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const records=d=>Array.isArray(d)?d:(d&&Object.values(d).find(Array.isArray))||[];
- const charName=c=>String(c.nameEn||c.englishName||c.name_en||c.english_name||c.name||c.displayName||c.display_name||c.title||'');
- const displayName=c=>String(c.displayName||c.display_name||c.nameRu||c.name_ru||c.name||charName(c));
+ const charName=c=>String((typeof window.dbdRecordEnglish==='function'?window.dbdRecordEnglish(c,'character'):'')||c.nameEn||c.englishName||c.name_en||c.english_name||c.name||c.displayName||c.display_name||c.title||'');
+ const formattedName=(value,kind)=>typeof window.dbdDisplayName==='function'?window.dbdDisplayName(value,kind):String((value&&typeof value==='object')?(value.displayName||value.name||charName(value)):value||'');
+ const canonicalKey=value=>typeof window.dbdCharacterKey==='function'?window.dbdCharacterKey(value):key(value);
  const isKiller=c=>{const h=[c.role,c.type,c.category,c.faction,c.side,c.characterType,c.character_type,c.group].filter(Boolean).join(' ').toLowerCase();return c.isKiller===true||c.is_killer===true||/killer|убийц/.test(h)||!!(c.power||c.ability||c.killerPower)};
  const imageOf=x=>{const v=x.image||x.imageUrl||x.image_url||x.icon||x.iconUrl||x.icon_url||x.portrait||x.portraitURL||x.perkIcon||x.perk_icon;return typeof v==='string'?v:(v?.url||v?.src||'')};
  const ownerMap=()=>catalog?.translations?.perkOwners||{};
@@ -37,12 +38,13 @@
   return '';
  }
  function isGeneral(p){const o=perkOwner(p),names=[p.nameEn,p.englishName,p.name_en,p.english_name,p.slug,p.id,p.name,p.displayName].filter(Boolean).map(key);return p.isGeneral===true||p.is_general===true||p.general===true||/^(general|общие перки|общий перк|all characters)$/i.test(o)||GENERAL[side].some(n=>names.includes(key(n)))||/general|общ(ий|ая|ие)|без владельца/i.test(String(p.sourceType||p.source_type||p.unlockType||p.unlock_type||''))}
- function perkName(p){return String(p.nameRu||p.name_ru||p.russianName||p.russian_name||p.displayName||p.display_name||p.name||p.nameEn||p.id||'Перк')}
+ function perkName(p){return formattedName(p,'perk')||String(p.nameEn||p.id||'Перк')}
+ function ownerDisplay(o){return o&&!(typeof window.dbdIsGeneralOwner==='function'&&window.dbdIsGeneralOwner(o))?(formattedName(o,'character')||String(o)):'Общий перк'}
  function perkDescription(p){return String(p.descriptionRu||p.description_ru||p.description||p.desc||p.effect||'')}
  function availablePerks(){
   const chars=catalog.characters.filter(c=>isKiller(c)===(side==='killers'));
-  const chosen=new Set(chars.filter(c=>owned[side].some(n=>key(n)===key(charName(c)))).map(c=>key(charName(c))));
-  return catalog.perks.filter(p=>{const o=perkOwner(p);return o?(/^(general|общие перки|общий перк|all characters)$/i.test(o)||chosen.has(key(o))):isGeneral(p)});
+  const chosen=new Set(chars.filter(c=>owned[side].some(n=>canonicalKey(n)===canonicalKey(charName(c)))).map(c=>canonicalKey(charName(c))));
+  return catalog.perks.filter(p=>{const o=perkOwner(p);return o?(/^(general|общие перки|общий перк|all characters)$/i.test(o)||chosen.has(canonicalKey(o))):isGeneral(p)});
  }
  function makeBuild(){
   const t=TASKS[side].find(x=>x.id===task)||TASKS[side][0],available=availablePerks();
@@ -61,22 +63,22 @@
  function save(){try{localStorage.setItem(STORE,JSON.stringify(owned))}catch(e){}}
  function loadSaved(){try{const x=JSON.parse(localStorage.getItem(STORE)||'{}');owned={survivors:Array.isArray(x.survivors)?x.survivors:[],killers:Array.isArray(x.killers)?x.killers:[]}}catch(e){}}
  function render(){
-  const grid=$('#grid');if(!grid)return;
+  const grid=$('#grid');if(!grid||!catalog)return;
+  search=$('#search')?.value||'';
   const chars=catalog.characters.filter(c=>isKiller(c)===(side==='killers'));
-  const chosen=new Set(owned[side].map(key)),query=key(search),build=makeBuild();
+  const chosen=new Set(owned[side].map(canonicalKey)),query=key(search),build=makeBuild();
   $('#sectionTitle').textContent='Мои персонажи';$('#sectionLabel').textContent='MY UNLOCKED ROSTER';
   $('#filters').innerHTML='<div class="mybuild-side"><button data-my-side="survivors" class="'+(side==='survivors'?'active':'')+'">Выжившие</button><button data-my-side="killers" class="'+(side==='killers'?'active':'')+'">Убийцы</button></div><div class="mybuild-task-label">Задача для билда</div><div class="mybuild-tasks">'+TASKS[side].map(t=>'<button data-my-task="'+t.id+'" class="'+(task===t.id?'active':'')+'">'+esc(t.title)+'</button>').join('')+'</div>';
   $('#notice').textContent='Отмечено персонажей: '+owned[side].length+' • доступно перков: '+build.availableCount;
-  grid.classList.remove('build-grid','tier-grid');grid.classList.add('mybuild-layout');
-  const roster='<section class="mybuild-roster"><div class="mybuild-roster-head"><h3>Твои '+(side==='killers'?'убийцы':'выжившие')+'</h3><span>'+owned[side].length+' выбрано</span></div><p>Отметь персонажей, чьи уникальные перки открыты на аккаунте. Выбор сохранится на этом устройстве.</p><div class="mybuild-character-list">'+chars.filter(c=>!query||key(charName(c)+' '+displayName(c)).includes(query)).map(c=>{const n=charName(c),on=chosen.has(key(n)),img=imageOf(c);return '<label class="mybuild-character '+(on?'selected':'')+'"><input type="checkbox" data-owned-character="'+esc(n)+'" '+(on?'checked':'')+'><span class="mybuild-check">'+(on?'✓':'')+'</span>'+(img?'<img src="'+esc(img)+'" alt="" loading="lazy" onerror="this.style.visibility=\'hidden\'">':'<span class="mybuild-no-portrait">✣</span>')+'<span class="mybuild-character-name">'+esc(displayName(c))+'</span></label>'}).join('')||'<div class="empty">Персонажи не найдены.</div>'+'</div></section>';
-  const cards=build.picked.map(p=>{const img=imageOf(p);return '<article class="mybuild-perk"><div class="mybuild-perk-image">'+(img?'<img src="'+esc(img)+'" alt="" loading="lazy" onerror="this.remove()">':'<span>✣</span>')+'</div><div><b>'+esc(perkName(p))+'</b><small>'+esc(perkOwner(p)||'Общий перк')+'</small><p>'+esc(perkDescription(p)||'Описание отсутствует в каталоге.')+'</p></div></article>'}).join('');
+  if(typeof setGridLayout==='function')setGridLayout('mybuild-layout');else grid.className='grid mybuild-layout';
+  const roster='<section class="mybuild-roster"><div class="mybuild-roster-head"><h3>Твои '+(side==='killers'?'убийцы':'выжившие')+'</h3><span>'+owned[side].length+' выбрано</span></div><p>Отметь персонажей, чьи уникальные перки открыты на аккаунте. Выбор сохранится на этом устройстве.</p><div class="mybuild-character-list">'+chars.filter(c=>!query||key(charName(c)+' '+formattedName(c,'character')).includes(query)).map(c=>{const n=charName(c),on=chosen.has(canonicalKey(n)),img=imageOf(c);return '<label class="mybuild-character '+(on?'selected':'')+'"><input type="checkbox" data-owned-character="'+esc(n)+'" '+(on?'checked':'')+'><span class="mybuild-check">'+(on?'✓':'')+'</span>'+picture(img,{className:'mybuild-character-art',alt:'',fallback:'./assets/ui/asset-fallback.webp',label:'✣'})+'<span class="mybuild-character-name">'+esc(formattedName(c,'character'))+'</span></label>'}).join('')||'<div class="empty">Персонажи не найдены.</div>'+'</div></section>';
+  const cards=build.picked.map(p=>{const img=imageOf(p);return '<article class="mybuild-perk"><div class="mybuild-perk-image">'+picture(img,{className:'mybuild-perk-art',alt:'',fallback:'./assets/ui/asset-fallback.webp',label:'✣'})+'</div><div><b>'+esc(perkName(p))+'</b><small>'+esc(ownerDisplay(perkOwner(p)))+'</small><p>'+esc(perkDescription(p)||'Описание отсутствует в каталоге.')+'</p></div></article>'}).join('');
   const empty=!owned[side].length?'Сначала отметь открытых персонажей.':!build.availableCount?'Для выбранных персонажей не удалось сопоставить доступные перки в каталоге.':!build.picked.length?'В базе пока нет надёжного совпадения перков с этой задачей. Не буду подставлять случайные перки.':'';
   const buildHtml='<section class="mybuild-result"><div class="mybuild-result-top"><div><span class="eyebrow">PERSONAL LOADOUT</span><h3>'+esc(build.taskData.title)+'</h3><p>'+esc(build.taskData.desc)+'</p></div><button type="button" data-my-copy '+(!build.picked.length?'disabled':'')+'>Копировать</button></div><div class="mybuild-perks">'+(cards||'<p class="mybuild-empty">'+esc(empty)+'</p>')+'</div><div class="mybuild-foot">'+build.picked.length+' из 4 перков подобрано · '+build.availableCount+' доступно · '+build.matched+' совпадений по задаче</div></section>';
   grid.innerHTML='<div class="mybuild-main">'+roster+buildHtml+'</div>';
  }
  async function init(){loadSaved();try{catalog=await localCatalog();catalog={...catalog,characters:records(catalog.characters),perks:records(catalog.perks),translations:catalog.translations||{}};render()}catch(e){$('#notice').textContent='Не удалось загрузить каталог персонажей и перков. Попробуй обновить данные позже.';$('#grid').innerHTML='<div class="empty">Каталог недоступен.</div>'}}
- const searchInput=$('#search');if(searchInput)searchInput.addEventListener('input',()=>{if(tab==='mybuilds'){search=searchInput.value;render()}});
- document.addEventListener('change',e=>{const input=e.target.closest('[data-owned-character]');if(input&&tab==='mybuilds'){const n=input.dataset.ownedCharacter;owned[side]=input.checked?[...owned[side].filter(x=>key(x)!==key(n)),n]:owned[side].filter(x=>key(x)!==key(n));save();render()}});
+ document.addEventListener('change',e=>{const input=e.target.closest('[data-owned-character]');if(input&&tab==='mybuilds'){const n=input.dataset.ownedCharacter;owned[side]=input.checked?[...owned[side].filter(x=>canonicalKey(x)!==canonicalKey(n)),n]:owned[side].filter(x=>canonicalKey(x)!==canonicalKey(n));save();render()}});
  document.addEventListener('click',e=>{
   const s=e.target.closest('[data-my-side]');if(s&&tab==='mybuilds'){side=s.dataset.mySide;task=TASKS[side][0].id;render();return}
   const t=e.target.closest('[data-my-task]');if(t&&tab==='mybuilds'){task=t.dataset.myTask;render();return}

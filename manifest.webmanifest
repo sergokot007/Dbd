@@ -1,1 +1,25 @@
-{"name":"DBD Fog Companion","short_name":"DBD Fog","start_url":"./","display":"standalone","background_color":"#101014","theme_color":"#111116","description":"Справочник Dead by Daylight"}
+{
+  "id": "./",
+  "name": "DBD Fog Companion — справочник и атлас карт",
+  "short_name": "DBD Fog",
+  "description": "Персонажи, перки, предметы, сборки и локальный атлас карт Dead by Daylight.",
+  "lang": "ru",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#101014",
+  "theme_color": "#111116",
+  "categories": ["games", "reference", "utilities"],
+  "icons": [
+    {"src": "./assets/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any"},
+    {"src": "./assets/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any"},
+    {"src": "./assets/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ],
+  "shortcuts": [
+    {"name": "Атлас карт", "short_name": "Карты", "description": "Локальные 3D-схемы и планы владений", "url": "./#maps", "icons": [{"src": "./assets/icons/icon-192.png", "sizes": "192x192"}]},
+    {"name": "Готовые билды", "short_name": "Билды", "description": "Подборки перков для разных задач", "url": "./#builds", "icons": [{"src": "./assets/icons/icon-192.png", "sizes": "192x192"}]}
+  ]
+}

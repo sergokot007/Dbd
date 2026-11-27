@@ -1,6 +1,8 @@
 (function(){
-  const key = value => String(value || "").toLowerCase().normalize("NFKD").replace(/[’']/g,"'").replace(/[^a-z0-9]/g,"");
-  const esc = value => String(value ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  "use strict";
+  const key = value => typeof window.dbdNormalizeName === "function" ? window.dbdNormalizeName(value) : String(value || "").toLowerCase().normalize("NFKD").replace(/[’']/g, "'").replace(/[^a-z0-9]/g, "");
+  const canonicalPerk = value => typeof window.dbdRecordEnglish === "function" ? window.dbdRecordEnglish(value, "perk") : String(value || "");
+  const esc = value => String(value ?? "").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
   const original = window.openLoadoutInfo;
   if (typeof original !== "function") return;
   window.openLoadoutInfo = async function(type,label){
@@ -13,28 +15,16 @@
     const catalogPerk = perkList.find(p =>
       [p.name,p.displayName,p.display_name,p.nameEn,p.englishName,p.id].some(v=>key(v)===key(label))
     );
-    const names = [label,catalogPerk && catalogPerk.name,catalogPerk && catalogPerk.displayName,catalogPerk && catalogPerk.display_name,catalogPerk && catalogPerk.nameEn,catalogPerk && catalogPerk.englishName,catalogPerk && catalogPerk.id].filter(Boolean).map(key);
+    const names = [canonicalPerk(label),label,catalogPerk && catalogPerk.name,catalogPerk && catalogPerk.displayName,catalogPerk && catalogPerk.display_name,catalogPerk && catalogPerk.nameEn,catalogPerk && catalogPerk.englishName,catalogPerk && catalogPerk.id].filter(Boolean).map(key);
     // Restore the original in-game perk artwork in the detail header.
     const perkImage = catalogPerk && (catalogPerk.image || catalogPerk.imageUrl || catalogPerk.image_url || catalogPerk.icon || catalogPerk.iconUrl || catalogPerk.icon_url || catalogPerk.iconURL || catalogPerk.perkIcon || catalogPerk.perk_icon || catalogPerk.iconPath || catalogPerk.icon_path);
-    if (perkImage) {
+    if (perkImage && typeof window.picture === "function") {
       const head = panel.querySelector(".detail-head");
       const oldImage = head && head.querySelector(":scope > img");
-      const placeholder = head && head.querySelector(":scope > .detail-placeholder");
-      if (oldImage) {
-        oldImage.src = perkImage;
-        oldImage.alt = "Иконка перка " + label;
-        oldImage.classList.add("perk-original-artwork");
-        oldImage.style.objectFit = "contain";
-        oldImage.style.background = "rgba(0,0,0,.22)";
-      } else if (placeholder) {
-        const img = document.createElement("img");
-        img.src = perkImage;
-        img.alt = "Иконка перка " + label;
-        img.className = "perk-original-artwork";
-        img.style.objectFit = "contain";
-        img.style.background = "rgba(0,0,0,.22)";
-        placeholder.replaceWith(img);
-      }
+      const placeholder = head && head.querySelector(":scope > .detail-placeholder, :scope > .picture-fallback");
+      const artwork = window.picture(perkImage,{className:'detail-portrait-art perk-original-artwork',alt:'Иконка перка '+label,eager:true,fallback:'./assets/ui/asset-fallback.webp'});
+      if (oldImage) oldImage.outerHTML = artwork;
+      else if (placeholder) placeholder.outerHTML = artwork;
     }
     const includes = list => list.some(p=>names.includes(key(p)) || names.some(n=>n && (n.includes(key(p)) || key(p).includes(n))));
     const rows = [];

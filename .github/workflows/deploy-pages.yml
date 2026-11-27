@@ -22,14 +22,32 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
-      - name: Validate JavaScript syntax
-        run: node --check app.js
-      - name: Validate catalog builder syntax
-        run: python -m py_compile scripts/build_catalog.py
+      - name: Regenerate the committed offline mini-catalog
+        run: node scripts/build_fallback_data.mjs
+      - name: Regenerate the shared RU/EN name index
+        run: node scripts/build_name_data.mjs
+      - name: Validate RU/EN names and perk-owner aliases
+        run: node scripts/validate_name_data.mjs
+      - name: Validate all JavaScript syntax
+        run: |
+          for f in *.js; do node --check "$f"; done
+          for f in scripts/*.mjs; do node --check "$f"; done
+      - name: Validate Python scripts
+        run: python -m py_compile scripts/*.py
+      - name: Validate bundled map artwork and offline shell
+        run: node scripts/validate_assets.mjs
       - name: Build local game catalog
         run: |
           python -m pip install --disable-pip-version-check requests beautifulsoup4
           python scripts/build_catalog.py
+      - name: Runtime smoke test
+        run: |
+          npm install --no-save --no-package-lock jsdom
+          python3 -m http.server 8080 --bind 127.0.0.1 >/tmp/dbd-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" 2>/dev/null || true; rm -rf node_modules' EXIT
+          sleep 1
+          node scripts/runtime_test.mjs
       - name: Configure Pages
         uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
