@@ -91,7 +91,7 @@ async function openTab(tab) {
   assert.ok(el('#sectionTitle').textContent.trim(), `section title for ${tab}`);
 }
 
-await waitFor(() => typeof window.switchTab === 'function' && document.querySelectorAll('#grid .item').length > 0, 'initial catalog');
+await waitFor(() => typeof window.switchTab === 'function' && typeof window.openCharacterByOwner === 'function' && document.querySelectorAll('#grid .item').length > 0, 'initial catalog');
 assert.equal(window.__dbdCurrentTab, 'characters');
 assert.equal(window.dbdDisplayName('David Tapp', 'character'), 'Детектив Тэпп (Detective Tapp)', 'short owner alias resolves to canonical RU/EN character');
 assert.equal(window.dbdDisplayName('Stake Out', 'perk'), 'Наблюдение (Stake Out)', 'curated perk translation is catalog-wide');
@@ -133,8 +133,23 @@ click(el('.detail-overlay.open .detail-close'), 'favorite close');
 await tick(40);
 assert.equal(window.__dbdModalStack().length, 0);
 
-// Search and catalog filters.
+// Perk cards expose a real owner portrait that opens the character dossier.
 await openTab('perks');
+await waitFor(() => document.querySelector('#grid .perk-owner-mini'), 'perk card owner chip');
+const perkOwnerMini = el('#grid .perk-owner-mini');
+assertRuEn(perkOwnerMini.textContent, 'perk card owner chip');
+assert.match(perkOwnerMini.querySelector('img')?.getAttribute('src') || '', /^\.\/assets\/characters\//, 'bundled perk-card owner portrait');
+click(perkOwnerMini, 'perk card owner chip');
+await waitFor(() => document.querySelector('#characterModal.open'), 'perk card owner dossier');
+assertRuEn(el('#characterModal h2').textContent, 'perk card owner dossier title');
+window.closeAllModals();
+await tick(40);
+perkOwnerMini.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+await waitFor(() => document.querySelector('#characterModal.open'), 'keyboard owner dossier');
+window.closeAllModals();
+await tick(40);
+
+// Search and catalog filters.
 input('#search', 'дежавю');
 await tick(60);
 assert.match(el('#notice').textContent, /Найдено/, 'perk search notice');
@@ -223,6 +238,7 @@ assertRuEn(el('#perkDetailModal h2').textContent, 'Stake Out detail title');
 const ownerCard = el('#perkDetailModal [data-perk-owner-open]');
 assert.match(ownerCard.textContent, /Детектив Тэпп \(Detective Tapp\)/, 'owner card shows canonical RU/EN name');
 assertRuEn(ownerCard.querySelector('button')?.textContent, 'perk owner card');
+assert.match(ownerCard.querySelector('img')?.getAttribute('src') || '', /^\.\/assets\/characters\//, 'bundled perk-detail owner portrait');
 click(ownerCard, 'perk owner card');
 await waitFor(() => document.querySelector('#characterModal.open'), 'owner character dossier');
 assert.equal(window.__dbdModalStack().length, 2, 'owner dossier stacks over perk detail');
@@ -246,6 +262,7 @@ assert.ok(document.querySelectorAll('.build-card').length >= 5, 'build cards');
 assertRuEn(el('.build-perk-link').textContent, 'build perk name');
 const ownerMini = el('.perk-owner-mini');
 assertRuEn(ownerMini.textContent, 'build owner mini chip');
+assert.match(ownerMini.querySelector('img')?.getAttribute('src') || '', /^\.\/assets\/characters\//, 'bundled build owner portrait');
 click(ownerMini, 'build owner mini chip');
 await waitFor(() => document.querySelector('#characterModal.open'), 'owner mini character dossier');
 assertRuEn(el('#characterModal h2').textContent, 'owner mini dossier title');
@@ -299,5 +316,5 @@ for (const tab of ['characters', 'perks', 'items', 'addons', 'offerings', 'maps'
 }
 
 assert.deepEqual(errors, [], 'no runtime errors');
-console.log('✓ Runtime smoke test passed: 10 tabs, RU (EN) names, perk-owner navigation, favorites, modal stack, map viewer, hero route, browser Back and refresh.');
+console.log('✓ Runtime smoke test passed: 10 tabs, RU (EN) names, local owner portraits, perk-to-character navigation, favorites, modal stack, map viewer, hero route, browser Back and refresh.');
 await dom.window.close();

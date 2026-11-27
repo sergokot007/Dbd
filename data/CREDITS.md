@@ -10,6 +10,9 @@
   `loadout-translations.ru.json`, `characters.json`, `perks.json`, `items.json`,
   `addons.json`, `offerings.json`, `description-ru-raw.json`,
   `loadout-description-ru-raw.json`) сохранены из `data/` upstream-репозитория.
+- WebP-портреты из `public/characters/` того же репозитория сохранены в
+  `assets/characters/`; отдельная атрибуция — `assets/characters/CREDITS.md`.
+  Их локальные пути включены в `names-data.js` и кэш Service Worker.
 - `scripts/build_name_data.mjs` превращает их в компактный `names-data.js`;
   runtime не обращается к GitHub. Кураторские названия из интерфейса имеют
   приоритет, чтобы один и тот же английский термин не менял перевод между

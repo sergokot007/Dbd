@@ -15,6 +15,7 @@ const jsonFrom = (source, name) => {
 };
 
 const mapData = read('maps-data.js');
+const nameData = jsonFrom(read('names-data.js'), 'DBD_NAME_DATA');
 const meta = jsonFrom(mapData, 'DBD_MAP_META');
 const aliases = jsonFrom(mapData, 'DBD_MAP_ALIASES');
 const fallbackMaps = jsonFrom(mapData, 'DBD_FALLBACK_MAPS');
@@ -51,7 +52,7 @@ assert(localPaths.size >= 120, `${localPaths.size} bundled map images are refere
 for (const file of [
   'assets/ui/hero-fog.webp', 'assets/ui/map-fallback.webp', 'assets/ui/asset-fallback.webp',
   'assets/icons/icon-192.png', 'assets/icons/icon-512.png', 'assets/icons/icon-maskable-512.png',
-  'assets/maps/CREDITS.md', 'data/map-sources.json', 'data/CREDITS.md', 'data/LICENSE-MIT.txt',
+  'assets/maps/CREDITS.md', 'assets/characters/CREDITS.md', 'data/map-sources.json', 'data/CREDITS.md', 'data/LICENSE-MIT.txt',
   'maps-data.js', 'fallback-data.js', 'names-data.js', 'name-utils.js',
   'ui.js', 'maps.js', 'app.js', 'sw.js', 'index.html', 'style.css', 'manifest.webmanifest'
 ]) assert(exists(file), `${file} exists`);
@@ -73,12 +74,22 @@ for (const file of coreFiles) {
   assert(exists(file), `service worker core file ${file} exists`);
 }
 for (const file of ['./names-data.js', './name-utils.js']) assert(coreFiles.includes(file), `service worker caches ${file}`);
+const characterIcons = [...new Set([
+  ...(nameData.characters || []).map(character => character.icon),
+  ...Object.values(nameData.characterIcons || {})
+].filter(Boolean))];
+assert(characterIcons.length >= 95, `${characterIcons.length} bundled character portraits are indexed`);
+for (const icon of characterIcons) {
+  assert(exists(icon), `character portrait ${icon} exists`);
+  assert(coreFiles.includes(icon), `service worker caches character portrait ${icon}`);
+}
 const sources = JSON.parse(read('data/map-sources.json'));
 assert(Array.isArray(sources) && sources.length >= 45, `map source manifest has ${sources.length} entries`);
 assert(read('assets/maps/CREDITS.md').includes('Apache-2.0'), 'map artwork credits mention Apache-2.0');
 assert(read('fallback-data.js').includes('DBD_FALLBACK_CATALOG'), 'offline catalog is committed');
 assert(read('names-data.js').includes('window.DBD_NAME_DATA='), 'shared RU/EN name index is committed');
 assert(read('data/CREDITS.md').includes('MIT'), 'community localization credits mention MIT');
+assert(read('assets/characters/CREDITS.md').includes('MIT'), 'character portrait credits mention MIT');
 
 if (process.exitCode) process.exit(process.exitCode);
-console.log(`✓ Validated ${Object.keys(meta).length} maps, ${localPaths.size} bundled map assets, ${manifest.icons.length} icons and the offline shell.`);
+console.log(`✓ Validated ${Object.keys(meta).length} maps, ${localPaths.size} bundled map assets, ${characterIcons.length} character portraits, ${manifest.icons.length} icons and the offline shell.`);

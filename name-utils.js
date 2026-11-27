@@ -222,6 +222,7 @@
    for(const record of poolRecords(source)){
     const matches=fieldValues(record,'character').some(field=>aliases.has(norm(field))||aliases.has(norm(field).replace(/^the/,'')));
     if(matches){
+     const icon=canonical.icon||record.image||record.portrait||record.icon||'';
      return {
       ...record,
       id:record.id||slug(canonical.en),
@@ -230,16 +231,19 @@
       displayName:canonical.display||format(canonical.ru,canonical.en),
       role:canonical.role||record.role||record.type,
       type:record.type||canonical.role||record.role,
-      category:record.category||(canonical.role==='killer'?'Убийца':'Выживший')
+      category:record.category||(canonical.role==='killer'?'Убийца':'Выживший'),
+      image:icon,portrait:icon,imageFull:icon,icon
      };
     }
    }
   }
+  const icon=canonical.icon||'';
   return {
    id:slug(canonical.en),name:canonical.ru||canonical.en,nameEn:canonical.en,
    displayName:canonical.display||format(canonical.ru,canonical.en),
    role:canonical.role,type:canonical.role,
    category:canonical.role==='killer'?'Убийца':'Выживший',
+   image:icon,portrait:icon,imageFull:icon,icon,
    synthetic:true
   };
  }

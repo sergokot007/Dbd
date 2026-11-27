@@ -107,7 +107,7 @@ function descriptionOf(p,label){
 function openDetail(label){
  const p=findPerk(label),owner=ownerFor(p,label),character=owner?findCharacter(owner):null;
  const perkIcon=p?fieldImage(p):"",portrait=character?fieldImage(character):"",title=perkName(p,label),ownerText=ownerDisplay(owner),sections=descriptionOf(p,label);
- const ownerSection=owner?'<section class="perk-detail-copy"><h3>Персонаж, которому принадлежит перк</h3><div class="perk-owner-card" data-perk-owner-open="'+esc(owner)+'" role="button" tabindex="0" aria-label="Открыть досье: '+esc(ownerText)+'">'+picture(portrait,{className:'perk-owner-art',alt:'',fallback:'./assets/ui/asset-fallback.webp',label:'✣'})+'<div><button type="button">'+esc(ownerText)+'</button><small>Нажми на имя или портрет, чтобы открыть досье персонажа</small></div></div></section>':'<section class="perk-detail-copy"><h3>Источник</h3><p>Общий перк — не закреплён за одним персонажем.</p></section>';
+ const ownerSection=owner?'<section class="perk-detail-copy"><h3>Персонаж, которому принадлежит перк</h3><div class="perk-owner-card" data-perk-owner-open="'+esc(owner)+'" role="button" tabindex="0" aria-label="Открыть досье: '+esc(ownerText)+'">'+picture(portrait,{className:'perk-owner-art',alt:'',fallback:'./assets/ui/asset-fallback.webp',label:'✣'})+'<div><button type="button" data-perk-owner-open="'+esc(owner)+'">'+esc(ownerText)+'</button><small>Нажми на имя или портрет, чтобы открыть досье персонажа</small></div></div></section>':'<section class="perk-detail-copy"><h3>Источник</h3><p>Общий перк — не закреплён за одним персонажем.</p></section>';
  const html='<section class="detail-panel"><button class="detail-close" aria-label="Закрыть">×</button><div class="eyebrow">DEAD BY DAYLIGHT • PERK</div><div class="perk-detail-head">'+picture(perkIcon,{className:'perk-detail-art',alt:'Иконка перка',eager:true,fallback:'./assets/ui/asset-fallback.webp',label:'✦'})+'<div><div class="detail-role">'+(owner?"УНИКАЛЬНЫЙ ПЕРК":"ОБЩИЙ ПЕРК")+'</div><h2>'+esc(title)+'</h2><small style="color:#999">'+esc(english(p)||label)+'</small></div></div>'+(sections.length?sections.map(s=>'<section class="perk-detail-copy"><h3>'+esc(s.label)+'</h3><p>'+esc(s.text)+'</p></section>').join(""):'<section class="perk-detail-copy"><h3>Описание</h3><p>Подробное игровое описание этого перка отсутствует в опубликованном каталоге. Название и владелец показаны по доступным данным; описание не подменяется выдуманным текстом.</p></section>')+ownerSection+'<section class="perk-detail-copy"><h3>Как открыть</h3><p>'+(owner?'Повышение персонажа до престижа I открывает его уникальные перки всем персонажам соответствующей роли на I уровне. Престиж II и III открывают следующие уровни. Также перк может появляться в Святилище тайн.':'Общий перк открывается через Кровавую паутину или может появляться в Святилище тайн — в зависимости от текущей системы разблокировок.')+'</p></section></section>';
  openModal("perkDetailModal",html);
 }
@@ -130,7 +130,7 @@ function enhance(root){
 function onClick(e){
  const target=e.target;
  const owner=target.closest("[data-perk-owner-open]");
- if(owner){e.preventDefault();e.stopImmediatePropagation();const ch=findCharacter(owner.dataset.perkOwnerOpen);if(ch&&typeof showDbdCharacter==="function")showDbdCharacter(ch);return;}
+ if(owner){e.preventDefault();e.stopImmediatePropagation();const value=owner.dataset.perkOwnerOpen;if(typeof window.openCharacterByOwner==="function"&&window.openCharacterByOwner(value))return;const ch=findCharacter(value);if(ch&&typeof showDbdCharacter==="function")showDbdCharacter(ch);return;}
  if(target.closest("#perkDetailModal")||target.closest("[data-fav]"))return;
  let label="";
  const card=target.closest('#grid .item[data-item-detail]');
@@ -145,7 +145,7 @@ function onClick(e){
  if(label){e.preventDefault();e.stopImmediatePropagation();const canonical=sharedEnglish(label,"perk")||label;loadCatalog().then(()=>openDetail(canonical));}
 }
 document.addEventListener("click",onClick,true);
-document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches("[data-perk-owner-open]")){e.preventDefault();const ch=findCharacter(e.target.dataset.perkOwnerOpen);if(ch&&typeof showDbdCharacter==="function")showDbdCharacter(ch);}},true);
+document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches("[data-perk-owner-open]")){e.preventDefault();const value=e.target.dataset.perkOwnerOpen;if(typeof window.openCharacterByOwner==="function"&&window.openCharacterByOwner(value)){e.stopImmediatePropagation();return}const ch=findCharacter(value);if(ch&&typeof showDbdCharacter==="function")showDbdCharacter(ch);}},true);
 if(typeof MutationObserver==="function"){const observer=new MutationObserver(()=>enhance(document.getElementById("grid")));const grid=document.getElementById("grid");if(grid)observer.observe(grid,{childList:true,subtree:true});}
 loadCatalog().then(()=>{enhance(document);if(typeof ensureCharacterPortraits==="function")return ensureCharacterPortraits();}).then(()=>{enhance(document);if(typeof renderTierList==="function"&&typeof tab!=="undefined"&&tab==="tiers")renderTierList();});
 window.__dbdOpenPerkDetail=label=>loadCatalog().then(()=>openDetail(label));

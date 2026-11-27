@@ -208,6 +208,7 @@ function showDbdCharacter(cardOrData){
  refreshVisiblePerkIcons();
 }
 function closeDbdCharacter(){if(typeof closeModal==="function")closeModal("characterModal")}
+window.showDbdCharacter=showDbdCharacter;
 document.addEventListener("click",e=>{
  const tierButton=e.target.closest("[data-tier-character-open]");
  if(tierButton){
@@ -253,6 +254,26 @@ function findCharacter(owner){
  if(typeof window.dbdCharacterRecord==="function")return window.dbdCharacterRecord(owner,pool);
  return pool.find(x=>normDetail(x.displayName||x.display_name||x.name||x.title||x.killerName)===normDetail(owner))||characterPortraits[normDetail(owner)]||null;
 }
+// One owner-navigation path for perk cards, owner chips, detail cards and
+// legacy loadout panels. It resolves short aliases and uses bundled portraits.
+function openCharacterByOwner(owner){
+ if(!owner||(typeof window.dbdIsGeneralOwner==="function"&&window.dbdIsGeneralOwner(owner)))return false;
+ const ch=findCharacter(owner);
+ if(!ch)return false;
+ showDbdCharacter(ch);
+ return true;
+}
+window.openCharacterByOwner=openCharacterByOwner;
+document.addEventListener("click",e=>{
+ const owner=e.target.closest?.("[data-perk-owner-open]");
+ if(!owner)return;
+ if(openCharacterByOwner(owner.dataset.perkOwnerOpen)){e.preventDefault();e.stopImmediatePropagation();}
+},true);
+document.addEventListener("keydown",e=>{
+ if((e.key==="Enter"||e.key===" ")&&e.target.matches?.("[data-perk-owner-open]")){
+  if(openCharacterByOwner(e.target.dataset.perkOwnerOpen)){e.preventDefault();e.stopImmediatePropagation();}
+ }
+},true);
 function itemInfo(type,label){
  const n=String(label||"").toLowerCase();
  if(type==="item"){

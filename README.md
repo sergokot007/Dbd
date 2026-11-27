@@ -10,7 +10,8 @@
 - Навигация по вкладкам сохраняется в `#hash`; кнопка «Назад», `Escape`, клик по фону и крестик закрывают модалки через единый стек. Обновление данных корректно работает в каждом разделе.
 - Встроенный `fallback-data.js` содержит компактный офлайн-каталог: свежий checkout работает даже без сгенерированного `catalog-data.json` и без сети.
 - Все персонажи, перки, предметы, аддоны и подношения показываются единообразно как `Русское имя (English Name)`. Общий `names-data.js` + `name-utils.js` резолвер используется каталогом, деталями, избранным, досье, билдами, тир-листом и «Моими персонажами».
-- В карточке перка владелец теперь кликабельный: имя или портрет открывает досье персонажа, даже если в каталоге указан короткий алиас вроде `David Tapp` вместо полного `Detective Tapp`.
+- В карточке перка владелец теперь кликабельный: имя или портрет открывает досье персонажа, даже если в каталоге указан короткий алиас вроде `David Tapp` вместо полного `Detective Tapp`. Переход работает по клику и с клавиатуры через единый обработчик.
+- 100 портретов владельцев перков лежат локально в `assets/characters/` и заранее кэшируются Service Worker: иконки есть в карточках перков, карточке деталей, мини-чипах билдов и досье без зависимости от `cdn.source.gs`.
 
 ## Публикация
 
@@ -46,9 +47,12 @@ node scripts/runtime_test.mjs
 # Пересобрать компактный офлайн-каталог из таблиц названий в app.js
 node scripts/build_fallback_data.mjs
 
-# Пересобрать общий индекс RU (EN) и алиасов персонажей
+# Пересобрать общий индекс RU (EN), алиасов и локальных портретов
 node scripts/build_name_data.mjs
 node scripts/validate_name_data.mjs
+
+# Вручную обновить локальные WebP-портреты из upstream GitHub-репозитория (нужен gh CLI)
+python scripts/build_character_assets.py
 
 # Полный каталог и локальные иконки перков (нужны requests, beautifulsoup4)
 python scripts/build_catalog.py
@@ -60,13 +64,13 @@ python scripts/build_map_assets.py
 node scripts/validate_assets.mjs
 ```
 
-`maps-data.js`, `fallback-data.js`, `names-data.js` и `assets/maps/` уже закоммичены, поэтому обычный деплой не обращается к GitHub API за схемами или русскими названиями. Иконки перков офлайн-каталога используют относительные `./assets/perks/*.webp`; при свежем checkout без сгенерированных иконок показывается локальная заглушка.
+`maps-data.js`, `fallback-data.js`, `names-data.js`, `assets/maps/` и `assets/characters/` уже закоммичены, поэтому обычный деплой не обращается к GitHub API за схемами, русскими названиями или портретами. Иконки перков офлайн-каталога используют относительные `./assets/perks/*.webp`; при свежем checkout без сгенерированных иконок показывается локальная заглушка.
 
 ## Источники и лицензии
 
 - Игровые данные и арт локаций/персонажей: [dbd.source.gs](https://dbd.source.gs). Материалы Dead by Daylight принадлежат Behaviour Interactive и её лицензиарам; при переиспользовании сохраняется ссылка на источник.
 - 3D-карты SamoelColt и планы EagerFace: [LucaFontanot/dbd-map-overlay](https://github.com/LucaFontanot/dbd-map-overlay), лицензия Apache-2.0. Авторы и лицензия также указаны в `assets/maps/CREDITS.md` и в окне каждой карты.
-- Русские названия и часть описаний: [flexeykinDev/dbd-perk-randomizer](https://github.com/flexeykinDev/dbd-perk-randomizer), лицензия MIT. Атрибуция и текст лицензии — `data/CREDITS.md` и `data/LICENSE-MIT.txt`. Переводы сообщества могут отличаться от официального клиента.
+- Русские названия, часть описаний и портреты персонажей: [flexeykinDev/dbd-perk-randomizer](https://github.com/flexeykinDev/dbd-perk-randomizer), лицензия MIT. Атрибуция и текст лицензии — `data/CREDITS.md`, `assets/characters/CREDITS.md` и `data/LICENSE-MIT.txt`. Переводы сообщества могут отличаться от официального клиента; изображения Dead by Daylight принадлежат Behaviour Interactive и её лицензиарам.
 - Атмосферные изображения и иконки в `assets/ui/` и `assets/icons/` сгенерированы специально для этого интерфейса.
 - Планы показывают планировку владения, а не точную раскладку паллет, окон, генераторов и выходов конкретного матча.
 

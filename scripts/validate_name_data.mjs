@@ -37,6 +37,8 @@ for (const character of characters) {
   assert.match(character.ru, /[А-Яа-яЁё]/, `Russian name for ${character.en}`);
   assert.match(character.en, /[A-Za-z]/, `English name for ${character.en}`);
   assert.ok(ruEn(character.display), `RU (EN) display for ${character.en}`);
+  assert.match(character.icon || '', /^\.\/assets\/characters\/.+\.webp$/, `bundled portrait for ${character.en}`);
+  assert.ok(fs.existsSync(path.join(ROOT, character.icon)), `portrait file for ${character.en}`);
 }
 const names = data.names || {};
 assert.ok(Object.keys(names).length > 4000, `indexed names: ${Object.keys(names).length}`);
@@ -73,6 +75,7 @@ for (const owner of ownerAliases) {
   const record = window.dbdCharacterRecord(owner, fallback.characters || []);
   assert.ok(record, `owner ${owner} resolves to a character record`);
   assert.ok(ruEn(record.displayName), `owner ${owner} opens a RU (EN) dossier`);
+  assert.match(record.image || '', /^\.\/assets\/characters\/.+\.webp$/, `owner ${owner} has a bundled portrait`);
 }
 
 assert.equal(window.dbdDisplayName('David Tapp', 'character'), 'Детектив Тэпп (Detective Tapp)', 'short owner alias maps to full character');
@@ -80,4 +83,4 @@ assert.equal(window.dbdDisplayName('Stake Out', 'perk'), 'Наблюдение (
 assert.equal(window.dbdDisplayName('Med-Kit', 'item'), 'Аптечка (Med-Kit)', 'fallback item translation is indexed');
 assert.equal(window.dbdRecordEnglish('Наблюдение (Stake Out)', 'perk'), 'Stake Out', 'formatted label resolves to English lookup key');
 
-console.log(`✓ Validated ${characters.length} characters, ${Object.keys(names).length} name keys, ${ownerAliases.size} owner aliases and RU (EN) formatting.`);
+console.log(`✓ Validated ${characters.length} characters, ${Object.keys(names).length} name keys, ${ownerAliases.size} owner aliases, bundled portraits and RU (EN) formatting.`);
