@@ -1,0 +1,288 @@
+[
+  {
+    "kind": "item",
+    "itemType": "toolbox",
+    "icon": "/loadout/item/alex-s-toolbox.webp",
+    "slug": "alex-s-toolbox",
+    "name": {
+      "en": "Alex's Toolbox",
+      "ru": "Инструменты Алекса"
+    },
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "kind": "item",
+    "itemType": "medkit",
+    "icon": "/loadout/item/all-hallows-eve-lunchbox.webp",
+    "slug": "all-hallows-eve-lunchbox",
+    "name": {
+      "en": "All Hallows' Eve Lunchbox",
+      "ru": "Ланчбокс всех святых"
+    },
+    "addedAt": "2026-10-19T22:45:44.334Z"
+  },
+  {
+    "kind": "item",
+    "itemType": "map",
+    "icon": "/loadout/item/annotated-map.webp",
+    "slug": "annotated-map",
+    "name": {
+      "en": "Annotated Map",
+      "ru": "Карта с подписями"
+    },
+    "addedAt": "2026-08-19T08:56:36.678Z"
+  },
+  {
+    "kind": "item",
+    "itemType": "fog-vial",
+    "icon": "/loadout/item/apprentice-s-fog-vial.webp",
+    "slug": "apprentice-s-fog-vial",
+    "name": {
+      "en": "Apprentice's Fog Vial",
+      "ru": "Флакон подмастерья с туманом"
+    },
+    "addedAt": "2026-08-19T08:56:36.678Z"
+  },
+  {
+    "kind": "item",
+    "itemType": "fog-vial",
+    "icon": "/loadout/item/artisan-s-fog-vial.webp",
+    "slug": "artisan-s-fog-vial",
+    "name": {
+      "en": "Artisan's Fog Vial",
+      "ru": "Флакон мастерового с туманом"
+    },
+    "addedAt": "2026-08-19T08:56:36.678Z"
+  },
+  {
+    "kind": "item",
+    "itemType": "map",
+    "icon": "/loadout/item/bloodsense-map.webp",
+    "slug": "bloodsense-map",
+    "name": {
+      "en": "Bloodsense Map",
+      "ru": "Карта кровавого чувства"
+    },
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "kind": "item",
+    "itemType": "key",
+    "icon": "/loadout/item/broken-key.webp",
+    "slug": "broken-key",
+    "name": {
+      "en": "Broken Key",
+      "ru": "Сломанный ключ"
+    },
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "kind": "item",
+    "itemType": "medkit",
+    "icon": "/loadout/item/camping-aid-kit.webp",
+    "slug": "camping-aid-kit",
+    "name": {
+      "en": "Camping Aid Kit",
+      "ru": "Походная аптечка"
+    },
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "kind": "item",
+    "itemType": "toolbox",
+    "icon": "/loadout/item/commodious-toolbox.webp",
+    "slug": "commodious-toolbox",
+    "name": {
+      "en": "Commodious Toolbox",
+      "ru": "Вместительный ящик с инструментами"
+    },
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "kind": "item",
+    "itemType": "map",
+    "icon": "/loadout/item/cryptic-map.webp",
+    "slug": "cryptic-map",
+    "name": {
+      "en": "Cryptic Map",
+      "ru": "Загадочная карта"
+    },
+    "addedAt": "2026-08-19T08:56:36.678Z"
+  },
+  {
+    "kind": "item",
+    "itemType": "key",
+    "icon": "/loadout/item/dull-key.webp",
+    "slug": "dull-key",
+    "name": {
+      "en": "Dull Key",
+      "ru": "Потертый ключ"
+    },
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "kind": "item",
+    "itemType": "medkit",
+    "icon": "/loadout/item/emergency-med-kit.webp",
+    "slug": "emergency-med-kit",
+    "name": {
+      "en": "Emergency Med-Kit",
+      "ru": "Аптечка первой помощи"
+    },
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "kind": "item",
+    "itemType": "toolbox",
+    "icon": "/loadout/item/engineer-s-toolbox.webp",
+    "slug": "engineer-s-toolbox",
+    "name": {
+      "en": "Engineer's Toolbox",
+      "ru": "Инструменты инженера"
+    },
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "kind": "item",
+    "itemType": "toolbox",
+    "icon": "/loadout/item/festive-toolbox.webp",
+    "slug": "festive-toolbox",
+    "name": {
+      "en": "Festive Toolbox",
+      "ru": "Праздничный ящик с инструментами"
+    },
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "kind": "item",
+    "itemType": "medkit",
+    "icon": "/loadout/item/first-aid-kit.webp",
+    "slug": "first-aid-kit",
+    "name": {
+      "en": "First Aid Kit",
+      "ru": "Аптечка"
+    },
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "kind": "item",
+    "itemType": "flashlight",
+    "icon": "/loadout/item/flashlight.webp",
+    "slug": "flashlight",
+    "name": {
+      "en": "Flashlight",
+      "ru": "Фонарик"
+    },
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "kind": "item",
+    "itemType": "toolbox",
+    "icon": "/loadout/item/mechanic-s-toolbox.webp",
+    "slug": "mechanic-s-toolbox",
+    "name": {
+      "en": "Mechanic's Toolbox",
+      "ru": "Инструменты механика"
+    },
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "kind": "item",
+    "itemType": "medkit",
+    "icon": "/loadout/item/ranger-med-kit.webp",
+    "slug": "ranger-med-kit",
+    "name": {
+      "en": "Ranger Med-Kit",
+      "ru": "Аптечка лесничего"
+    },
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "kind": "item",
+    "itemType": "map",
+    "icon": "/loadout/item/scribbled-map.webp",
+    "slug": "scribbled-map",
+    "name": {
+      "en": "Scribbled Map",
+      "ru": "Небрежная карта"
+    },
+    "addedAt": "2026-08-19T08:56:36.678Z"
+  },
+  {
+    "kind": "item",
+    "itemType": "key",
+    "icon": "/loadout/item/skeleton-key.webp",
+    "slug": "skeleton-key",
+    "name": {
+      "en": "Skeleton Key",
+      "ru": "Ключ скелета"
+    },
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "kind": "item",
+    "itemType": "flashlight",
+    "icon": "/loadout/item/sport-flashlight.webp",
+    "slug": "sport-flashlight",
+    "name": {
+      "en": "Sport Flashlight",
+      "ru": "Спортивный фонарик"
+    },
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "kind": "item",
+    "itemType": "toolbox",
+    "icon": "/loadout/item/toolbox.webp",
+    "slug": "toolbox",
+    "name": {
+      "en": "Toolbox",
+      "ru": "Ящик с инструментами"
+    },
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "kind": "item",
+    "itemType": "flashlight",
+    "icon": "/loadout/item/utility-flashlight.webp",
+    "slug": "utility-flashlight",
+    "name": {
+      "en": "Utility Flashlight",
+      "ru": "Тяжелый фонарь"
+    },
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  },
+  {
+    "kind": "item",
+    "itemType": "fog-vial",
+    "icon": "/loadout/item/vigo-s-fog-vial.webp",
+    "slug": "vigo-s-fog-vial",
+    "name": {
+      "en": "Vigo's Fog Vial",
+      "ru": "Флакон Виго с туманом"
+    },
+    "addedAt": "2026-08-19T08:56:36.678Z"
+  },
+  {
+    "kind": "item",
+    "itemType": "flashlight",
+    "icon": "/loadout/item/will-o-wisp.webp",
+    "slug": "will-o-wisp",
+    "name": {
+      "en": "Will O' Wisp",
+      "ru": "Блуждающий огонек"
+    },
+    "addedAt": "2026-10-19T22:45:44.334Z"
+  },
+  {
+    "kind": "item",
+    "itemType": "toolbox",
+    "icon": "/loadout/item/worn-out-tools.webp",
+    "slug": "worn-out-tools",
+    "name": {
+      "en": "Worn-Out Tools",
+      "ru": "Изношенные инструменты"
+    },
+    "addedAt": "2020-01-01T00:00:00.000Z"
+  }
+]

@@ -7,6 +7,7 @@ import requests
 from bs4 import BeautifulSoup, Tag, NavigableString
 
 BASE = "https://dbd.source.gs"
+ROOT = Path(__file__).resolve().parents[1]
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; DBD-Fog-Companion/1.0)"}
 
 def clean(node):
@@ -88,44 +89,10 @@ def scrape_link_catalog(path, kind):
     return out
 
 def scrape_items(fallback_categories=None):
-    """Load survivor items from the live endpoint, then a maintained item-name map."""
-    api = "https://dbd-stats.info/api/items?branch=live"
-    try:
-        response = requests.get(api, headers=HEADERS, timeout=20)
-        response.raise_for_status()
-        payload = response.json()
-        candidates = payload if isinstance(payload, list) else []
-        if isinstance(payload, dict):
-            for key in ("data", "results", "items", "entries", "list"):
-                if isinstance(payload.get(key), list):
-                    candidates = payload[key]
-                    break
-        records = []
-        for item in candidates:
-            if not isinstance(item, dict):
-                continue
-            name = (item.get("name") or item.get("displayName") or
-                    item.get("display_name") or item.get("title"))
-            if not name:
-                continue
-            records.append({
-                **item,
-                "id": str(item.get("id") or item.get("_id") or name),
-                "name": str(name),
-                "description": str(item.get("description") or item.get("desc") or
-                                   item.get("effect") or item.get("lore") or ""),
-                "image": str(item.get("image") or item.get("imageUrl") or
-                             item.get("image_url") or item.get("icon") or
-                             item.get("iconUrl") or item.get("icon_url") or ""),
-                "source": api,
-                "category": str(item.get("category") or item.get("type") or "Предмет"),
-            })
-        if len(records) >= 20:
-            print("Items loaded from live JSON endpoint:", len(records))
-            return records
-        print("Items JSON endpoint returned", len(records), "usable records; trying HTML")
-    except Exception as exc:
-        print("Items JSON endpoint unavailable:", repr(exc))
+    """Load survivor items from dbd.source.gs, then a maintained item-name map.
+
+    The former dbd-stats.info endpoint has been parked; do not wait for it.
+    """
     linked = scrape_link_catalog("/items/", "items")
     if len(linked) >= 20:
         print("Items loaded from detail links:", len(linked))
@@ -191,31 +158,8 @@ def scrape_maps():
     return out
 
 def scrape_offerings():
-    # Prefer the documented JSON endpoint when available.
-    api = "https://dbd-stats.info/api/offerings?branch=live"
-    try:
-        response = requests.get(api, headers=HEADERS, timeout=8)
-        response.raise_for_status()
-        payload = response.json()
-        candidates = payload if isinstance(payload, list) else []
-        if isinstance(payload, dict):
-            for key in ("data", "results", "items", "offerings", "entries", "list"):
-                if isinstance(payload.get(key), list):
-                    candidates = payload[key]
-                    break
-        normalized = []
-        for item in candidates:
-            if not isinstance(item, dict):
-                continue
-            name = item.get("name") or item.get("displayName") or item.get("display_name") or item.get("title")
-            if name:
-                normalized.append({"id": str(item.get("id") or item.get("_id") or name), "name": str(name), "description": str(item.get("description") or item.get("desc") or item.get("effect") or ""), "image": str(item.get("image") or item.get("imageUrl") or item.get("image_url") or item.get("icon") or ""), "source": api, "category": str(item.get("category") or item.get("type") or "Подношение")})
-        if len(normalized) >= 80:
-            print("Offerings loaded from JSON endpoint:", len(normalized))
-            return normalized
-        print("Offerings JSON endpoint returned", len(normalized), "usable records; using HTML")
-    except Exception as exc:
-        print("Offerings JSON endpoint unavailable:", repr(exc))
+    # The former dbd-stats.info endpoint has been parked; dbd.source.gs pages
+    # are the maintained source for offerings.
     linked = scrape_link_catalog("/offerings/", "offerings")
     if len(linked) >= 80:
         print("Offerings loaded from detail links:", len(linked))
@@ -1170,6 +1114,14 @@ def fetch_external_ru_localization():
     }
     result = {}
     for key, filename in files.items():
+        local_file = ROOT / "data" / filename
+        if local_file.is_file():
+            try:
+                result[key] = json.loads(local_file.read_text(encoding="utf-8"))
+                print("Russian localization source loaded locally:", filename, len(result[key]))
+                continue
+            except Exception as exc:
+                print("Bundled Russian localization is unreadable:", filename, repr(exc))
         try:
             response = requests.get(root + filename, headers=HEADERS, timeout=30)
             response.raise_for_status()
@@ -1265,6 +1217,22 @@ def external_translation_maps(source):
                 descriptions[kind][norm_en(english)] = description
     return names, descriptions
 
+
+def sanitize_catalog_description(value):
+    """Drop roster/translation-table dumps accidentally captured as a description."""
+    text = re.sub(r"\s+", " ", re.sub(r"<[^>]*>", " ", str(value or ""))).strip()
+    if not text:
+        return ""
+    commas = text.count(",")
+    rosterish = re.search(r"(?:survivor|killer|chapter|character|roster|персонаж|глава)", text, re.I)
+    name_list = re.search(r"(?:[A-Z][A-Za-z’'\-]+(?:\s+[A-Z][A-Za-z’'\-]+){1,4},\s*){6,}", text)
+    if (commas > 18 and rosterish) or name_list:
+        return ""
+    if len(text) > 1400:
+        text = text[:1400].rsplit(" ", 1)[0] + "…"
+    return text
+
+
 def main():
     external_ru = fetch_external_ru_localization()
     external_names, external_descriptions = external_translation_maps(external_ru)
@@ -1278,6 +1246,15 @@ def main():
         "offerings": apply_external_ru_localization(apply_ru_article_names(scrape_offerings(), offering_ru_map), "offerings", external_ru),
         "maps": scrape_maps(),
         "addons": [],
+        "mapCredits": {
+            "locationArt": BASE,
+            "views3D": "SamoelColt",
+            "plans": "EagerFace",
+            "repository": "https://github.com/LucaFontanot/dbd-map-overlay",
+            "license": "Apache-2.0",
+            "creditsFile": "./assets/maps/CREDITS.md",
+            "note": "Планы показывают планировку владения, а не точную раскладку объектов конкретного матча.",
+        },
     }
     result["characters"] = apply_external_ru_localization(apply_ru_names(scrape_link_catalog("/killers/", "killers") + scrape_link_catalog("/survivors/", "survivors"), ru_maps, "characters"), "characters", external_ru)
     result["maps"], map_ru_map = scrape_ru_maps(result["maps"])
@@ -1300,6 +1277,20 @@ def main():
         print("Published add-on records:", len(result["addons"]))
     except Exception as exc:
         print("Add-on catalog unavailable; continuing without it:", repr(exc))
+    # Clean polluted card text before publishing. The UI also sanitises at runtime,
+    # but the generated JSON should not contain full roster strings as descriptions.
+    for kind in ("perks", "offerings", "maps", "addons", "characters", "items"):
+        for record in result.get(kind, []):
+            if isinstance(record, dict) and "description" in record:
+                record["description"] = sanitize_catalog_description(record["description"])
+    for desc_map in result.get("translations", {}).get("descriptions", {}).values():
+        if isinstance(desc_map, dict):
+            for key, value in list(desc_map.items()):
+                cleaned = sanitize_catalog_description(value)
+                if cleaned:
+                    desc_map[key] = cleaned
+                else:
+                    del desc_map[key]
     counts = {k: len(result[k]) for k in ("perks", "offerings", "maps", "addons", "characters", "items")}
     addon_ru_names = sum(bool(re.search(r"[А-Яа-яЁё]", str(x.get("name") or ""))) for x in result["addons"])
     addon_ru_descriptions = sum(bool(re.search(r"[А-Яа-яЁё]", str(x.get("description") or ""))) for x in result["addons"])

@@ -2,7 +2,7 @@
 // Load the current in-game perk artwork once and reuse it in every recommended build.
 const perkIconIndex = new Map();
 let perkIconLoadPromise = null;
-function perkKey(v){return String(v||"").toLowerCase().normalize("NFKD").replace(/[’']/g,"'").replace(/[^a-z0-9]/g,"")}
+function perkKey(v){return typeof window.dbdNormalizeName==="function"?window.dbdNormalizeName(v):String(v||"").toLowerCase().normalize("NFKD").replace(/[’']/g,"'").replace(/[^a-z0-9]/g,"")}
 function perkIconUrl(p){
  if(!p)return "";
  const direct=p.icon||p.iconUrl||p.icon_url||p.iconURL||p.image||p.imageUrl||p.image_url||p.perkIcon||p.perk_icon||p.perkIconUrl||p.perk_icon_url||p.iconPath||p.icon_path||p.iconFile||p.icon_file||p.imagePath||p.image_path;
@@ -36,18 +36,18 @@ const DOSSIER_PERK_RU={
 function renderCharacterPerks(data,key){
  const catalog=Array.isArray(allPerks)?allPerks:[];
  const owners=window.__dbdPerkOwners||{};
- const ownerKey=normDetail(key||data?.nameEn||data?.englishName||data?.name||"").replace(/^the /,"");
+ const ownerKey=typeof window.dbdCharacterKey==="function"?window.dbdCharacterKey(key||data?.nameEn||data?.englishName||data?.name||""):normDetail(key||data?.nameEn||data?.englishName||data?.name||"").replace(/^the /,"");
  const owned=catalog.filter(p=>{
   const id=String(p.id||p.slug||"");
   const owner=owners[perkKey(id)]||"";
-  return owner&&normDetail(owner).replace(/^the /,"")===ownerKey;
+  return owner&&(typeof window.dbdCharacterKey==="function"?window.dbdCharacterKey(owner)===ownerKey:normDetail(owner).replace(/^the /,"")===ownerKey);
  }).slice(0,3);
  if(!owned.length)return '<section class="build-section character-perks-section"><div class="eyebrow">CHARACTER PERKS</div><h3>Уникальные умения персонажа</h3><p class="addon-note">'+(catalog.length?'В каталоге пока не удалось подтвердить три личных умения этого персонажа.':'Загружаем игровые иконки и список личных умений…')+'</p></section>';
  return '<section class="build-section character-perks-section"><div class="eyebrow">CHARACTER PERKS</div><h3>Уникальные умения персонажа</h3><div class="character-perk-grid">'+owned.map(p=>{
   const english=p.nameEn||p.englishName||p.name_en||p.id||"Перк";
   const russian=typeof buildPerkRussianName==="function"?buildPerkRussianName(p,english):(p.name||english);
   const src=perkIconUrl(p);
-  return '<button type="button" class="character-perk-card" data-loadout-type="perk" data-loadout-name="'+detailEsc(english)+'">'+(src?'<img src="'+detailEsc(src)+'" alt="" loading="lazy">':'<span class="build-perk-placeholder">✦</span>')+'<span>'+detailEsc(russian)+'</span></button>';
+  return '<button type="button" class="character-perk-card" data-loadout-type="perk" data-loadout-name="'+detailEsc(english)+'">'+artTag(src,{className:'character-perk-art',alt:'',fallback:'./assets/ui/asset-fallback.webp',label:'✦'})+'<span>'+detailEsc(russian)+'</span></button>';
  }).join("")+'</div></section>';
 }
 function refreshCharacterPerks(){
@@ -63,15 +63,14 @@ function refreshVisiblePerkIcons(){
   const title=chip.querySelector(".build-perk-name");
   if(title){
    const translated=record&&typeof buildPerkRussianName==="function"?buildPerkRussianName(record,label):"";
-   title.textContent=(translated&&translated!==label?translated:"")||DOSSIER_PERK_RU[label]||label;
+   const shared=detailDisplayName(label,"perk",label);
+   const curated=DOSSIER_PERK_RU[label]?DOSSIER_PERK_RU[label]+" ("+label+")":"";
+   title.textContent=(shared&&shared!==label?shared:"")||(translated&&translated!==label?translated:"")||curated||label;
   }
   if(!src||chip.querySelector("img.build-perk-icon"))return;
   const placeholder=chip.querySelector(".build-perk-placeholder");
   if(!placeholder)return;
-  const img=document.createElement("img");
-  img.className="build-perk-icon";img.loading="lazy";img.alt="";img.src=src;
-  img.onerror=()=>{const fallback=document.createElement("span");fallback.className="build-perk-placeholder";fallback.textContent="✦";img.replaceWith(fallback)};
-  placeholder.replaceWith(img);
+  placeholder.outerHTML=artTag(src,{className:'build-perk-icon',alt:'',fallback:'./assets/ui/asset-fallback.webp',label:'✦'});
  });
  if(typeof tab!=="undefined"&&tab==="builds"&&typeof renderBuilds==="function")renderBuilds();
 }
@@ -81,11 +80,6 @@ function loadPerkIcons(){
   // Prefer the same curated local catalog used by the app, so icons and names
   // do not depend solely on a third-party endpoint being available.
   try{if(typeof localCatalog==="function"){const catalog=await localCatalog();if(typeof allPerks!=="undefined"&&(!Array.isArray(allPerks)||!allPerks.length))allPerks=Array.isArray(catalog?.perks)?catalog.perks:[];indexPerkIcons(catalog?.perks||[]);window.__dbdPerkOwners=catalog?.translations?.perkOwners||{};}}catch{}
-  if(!perkIconIndex.size){
-   for(const url of ["https://dbd-stats.info/api/perks?branch=live","https://dbd.tricky.lol/api/perks?branch=live"]){
-    try{const r=await fetch(url,{cache:"force-cache"});if(!r.ok)continue;const d=await r.json();const list=Array.isArray(d)?d:(d.data||d.perks||d.results||[]);indexPerkIcons(list);if(perkIconIndex.size)break;}catch{}
-   }
-  }
   refreshVisiblePerkIcons();
   refreshCharacterPerks();
   if(window.__dbdCurrentCharacter&&document.getElementById("characterModal")?.classList.contains("open"))showDbdCharacter(window.__dbdCurrentCharacter);
@@ -113,12 +107,12 @@ function personalCharacterBuilds(data,isK){
  const base=isK?killerBuilds:survivorBuilds;
  const catalog=Array.isArray(allPerks)?allPerks:[];
  const owners=window.__dbdPerkOwners||{};
- const owner=String(data.nameEn||data.englishName||data.name_en||data.english_name||data.name||data.displayName||"").replace(/^The\\s+/i,"");
- const ownerNorm=normDetail(owner);
+ const owner=String(data.nameEn||data.englishName||data.name_en||data.english_name||data.name||data.displayName||"");
+ const ownerNorm=typeof window.dbdCharacterKey==="function"?window.dbdCharacterKey(owner):normDetail(owner).replace(/^the /,"");
  const personal=catalog.filter(p=>{
   const id=String(p.id||p.slug||"");
   const source=String(owners[perkKey(id)]||"");
-  return source&&normDetail(source).replace(/^the /,"")===ownerNorm.replace(/^the /,"");
+  return source&&(typeof window.dbdCharacterKey==="function"?window.dbdCharacterKey(source)===ownerNorm:normDetail(source).replace(/^the /,"")===ownerNorm);
  }).slice(0,3);
  if(!personal.length)return base;
  const templates=isK?[
@@ -187,6 +181,8 @@ const dossiers = {
 "The Good Guy":"Маленький и скрытный убийца с рывком и режимом скрытности. Может неожиданно начинать и продолжать погони."
 };
 const detailEsc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function detailDisplayName(value,kind,fallback){return typeof window.dbdDisplayName==="function"?window.dbdDisplayName(value,kind,fallback):String(value??fallback??"")}
+function detailEnglish(value,kind){return typeof window.dbdRecordEnglish==="function"?window.dbdRecordEnglish(value,kind):String(value??"")}
 function isDbdKiller(x){const t=String(x.type||x.role||x.category||"").toLowerCase();return t.includes("killer")||!!x.killerName||!!x.power||!!x.ability}
 function showDbdCharacter(cardOrData){
  let data=null;
@@ -201,33 +197,31 @@ function showDbdCharacter(cardOrData){
  if(!data)return;
  const key=String(data.nameEn||data.englishName||data.name_en||data.english_name||data.name||data.displayName||data.title||data.killerName||"");
  window.__dbdCurrentCharacter=data;
- const displayKey=String(data.displayName||data.display_name||data.name||data.title||key);
+ const displayKey=detailDisplayName(data,"character",String(data.displayName||data.display_name||data.name||data.title||key));
  const isK=isDbdKiller(data),builds=personalCharacterBuilds(data,isK);
- const img=data.image||data.imageUrl||data.image_url||data.icon||data.iconUrl||data.icon_url||data.iconURL||data.portrait||data.portraitURL||"";
+ const img=image(data);
  let addons=data.addons||data.add_ons||data.addOns||data.powerAddons||data.power_addons; if(!Array.isArray(addons)||!addons.length){const owner=String(data.killerName||key).toLowerCase().replace(/^the /,"");const list=window.__dbdAddonIndex||[];addons=list.filter(a=>{const who=String(a.characterName||a.killerName||a.character||a.owner||a.parentName||a.killer||"").toLowerCase().replace(/^the /,"");return who===owner||who===key.toLowerCase()})}
- let modal=document.getElementById("characterModal");
- if(!modal){modal=document.createElement("div");modal.id="characterModal";modal.className="detail-overlay";document.body.appendChild(modal)}
- modal.innerHTML='<section class="detail-panel"><button class="detail-close" aria-label="Закрыть">×</button><div class="detail-head">'+(img?'<img src="'+detailEsc(img)+'" alt="">':'<div class="detail-placeholder">✣</div>')+'<div><div class="eyebrow">'+(isK?"KILLER DOSSIER":"SURVIVOR DOSSIER")+'</div><h2>'+detailEsc(displayKey)+'</h2><span class="detail-role">'+(isK?"Убийца":"Выживший")+'</span></div></div><div class="detail-copy"><h3>Описание персонажа</h3><p>'+detailEsc(dossiers[key]||(isK?"Убийца со своей уникальной силой и тактикой. Используй способность, чтобы создавать давление, выбирать выгодные маршруты и не давать выжившим спокойно выполнять генераторы.":"Выживший со своим набором личных перков. Базовые характеристики выживших одинаковы, поэтому выбор персонажа — это прежде всего выбор личных перков и любимого стиля игры."))+'</p>'+(data.description||data.desc||data.effect?'<p>'+detailEsc(data.description||data.desc||data.effect)+'</p>':"")+(data.power||data.ability?'<h3>Особенность</h3><p>'+detailEsc(data.power||data.ability)+'</p>':"")+'</div>'+renderCharacterPerks(data,key)+'<div class="build-section"><div class="eyebrow">RECOMMENDED LOADOUTS</div><h3>Подходящие билды</h3><div class="build-filters"><button type="button" class="active" data-build-filter="all">Все билды</button><button type="button" data-build-filter="free">Без доната</button></div>'+builds.map((b,i)=>{const buildPaid=b.perks.some(perkNeedsAuricCells);const notes=b.notes||buildNotes[b.title]||{strength:b.why,weakness:"Эффективность зависит от карты, действий команды и выбранного противника."};const gearLabel=(b.gear||"").split(" — ")[0];const addonLabels=(b.gearAddons||"").split(" — ")[0].split(" + ").map(x=>x.trim()).filter(Boolean);const offeringLabels=(b.offering||"").split(" — ")[0].split(" / ").map(x=>x.trim()).filter(Boolean);return '<article class="build-card" data-build-paid="'+(buildPaid?'true':'false')+'"><div class="build-title"><div><h4>'+detailEsc(b.title)+'</h4><small>'+detailEsc(b.goal)+'</small></div><span>0'+(i+1)+'</span></div><div class="perk-chips">'+b.perks.map(p=>'<button type="button" class="perk-chip'+(perkNeedsAuricCells(p)?' requires-auric':'')+'" data-loadout-type="perk" data-loadout-name="'+detailEsc(p)+'"'+(perkNeedsAuricCells(p)?' title="Персонаж лицензированный: покупка за Auric Cells или DLC. Перк также может появиться в Святилище тайн за радужные осколки."':'')+'>'+(buildPerkIcon(p)?'<img class="build-perk-icon" src="'+detailEsc(buildPerkIcon(p))+'" alt="" loading="lazy" onerror="this.remove()">':'<span class="build-perk-placeholder">✦</span>')+'<span class="build-perk-name">'+detailEsc((typeof buildPerk==='function'&&buildPerk(p)&&typeof buildPerkRussianName==='function'?buildPerkRussianName(buildPerk(p),p):(typeof buildPerk==='function'&&buildPerk(p)?name(buildPerk(p)):p)))+'</span>'+(perkNeedsAuricCells(p)?'<svg class="auric-cell-icon" viewBox="0 0 20 20" aria-label="Лицензированный персонаж"><path d="M10 1.4 17.4 5.7v8.6L10 18.6 2.6 14.3V5.7Z" fill="#e8b84d" stroke="#ffe6a0" stroke-width="1"/><path d="M10 4.5 14.5 7.1v5.8L10 15.5l-4.5-2.6V7.1Z" fill="#8a5b20" stroke="#fff0b8" stroke-width=".8"/></svg>':'')+'</button>').join("")+'</div><div class="build-analysis"><div><b>Почему билд хорош</b><p>'+detailEsc(notes.strength)+'</p></div><div><b>Слабые стороны</b><p>'+detailEsc(notes.weakness)+'</p></div></div><div class="loadout-gear"><div><b>'+(isK?"Аддоны силы":"Предмет")+'</b><p><button type="button" data-loadout-type="'+(isK?"addon":"item")+'" data-loadout-name="'+detailEsc(gearLabel)+'">'+detailEsc(gearLabel||"Не требуется")+'</button><span>'+detailEsc((b.gear||"").includes(" — ")?b.gear.split(" — ").slice(1).join(" — "):"")+'</span></p></div><div><b>'+(isK?"Рекомендация по аддонам":"Аддоны предмета")+'</b><p>'+addonLabels.map(x=>/аддон|пара аддонов|приоритет|выбирай|предпочтительны|один аддон/i.test(x)?'<span>'+detailEsc(x)+'</span>':'<button type="button" data-loadout-type="addon" data-loadout-name="'+detailEsc(x)+'">'+detailEsc(x)+'</button>').join(" + ")+'<span>'+detailEsc((b.gearAddons||"").includes(" — ")?b.gearAddons.split(" — ").slice(1).join(" — "):"")+'</span></p></div><div><b>Подношение</b><p>'+offeringLabels.map(x=>'<button type="button" data-loadout-type="offering" data-loadout-name="'+detailEsc(x)+'">'+detailEsc(x)+'</button>').join(" / ")+'<span>'+detailEsc((b.offering||"").includes(" — ")?b.offering.split(" — ").slice(1).join(" — "):"")+'</span></p></div></div></article>'}).join("")+'</div>'+(isK?'<div class="build-section"><div class="eyebrow">POWER ADD-ONS</div><h3>Аддоны убийцы</h3>'+(Array.isArray(addons)&&addons.length?'<div class="addon-list">'+addons.slice(0,12).map(a=>'<div class="addon-row"><button type="button" data-loadout-type="addon" data-loadout-name="'+detailEsc(a.name||a.title||"Аддон")+'">'+detailEsc(a.name||a.title||"Аддон")+'</button><small>'+detailEsc(a.description||a.effect||"Аддон силы персонажа")+'</small></div>').join("")+'</div>':'<p class="addon-note">Точные названия аддонов этого убийцы пока отсутствуют в подключённой базе. Не буду выдавать случайные предметы за лучшие. Для этого убийцы подбирай пару аддонов, усиливающих его ключевую механику: перезарядку, дальность, скорость, длительность или число зарядов. Когда база аддонов будет доступна, здесь появятся конкретные названия и эффекты.</p>')+'</div>':'<div class="build-section"><div class="eyebrow">SURVIVOR GEAR</div><h3>Предметы под роль</h3><p class="addon-note">В каждом билде выше указаны подходящий предмет, конкретные аддоны к нему и подношение. Это рекомендации по задаче, а не обязательный набор: снаряжение можно менять под карту и стиль команды.</p></div>')+(data.link?'<a class="wiki-link" href="'+detailEsc(data.link)+'" target="_blank" rel="noopener">Открыть полное досье ↗</a>':"")+'</section>';
- modal.classList.add("open");document.body.classList.add("modal-open");
+ const html='<section class="detail-panel"><button class="detail-close" aria-label="Закрыть">×</button><div class="detail-head">'+artTag(img,{className:'detail-portrait-art',alt:'',eager:true,fallback:'./assets/ui/asset-fallback.webp',label:'◈'})+'<div><div class="eyebrow">'+(isK?"KILLER DOSSIER":"SURVIVOR DOSSIER")+'</div><h2>'+detailEsc(displayKey)+'</h2><span class="detail-role">'+(isK?"Убийца":"Выживший")+'</span></div></div><div class="detail-copy"><h3>Описание персонажа</h3><p>'+detailEsc(dossiers[key]||(isK?"Убийца со своей уникальной силой и тактикой. Используй способность, чтобы создавать давление, выбирать выгодные маршруты и не давать выжившим спокойно выполнять генераторы.":"Выживший со своим набором личных перков. Базовые характеристики выживших одинаковы, поэтому выбор персонажа — это прежде всего выбор личных перков и любимого стиля игры."))+'</p>'+(safeText(data.description||data.desc||data.effect)?'<p>'+detailEsc(safeText(data.description||data.desc||data.effect))+'</p>':"")+(detailValue(data.power||data.ability)?'<h3>Особенность</h3><p>'+detailEsc(detailValue(data.power||data.ability))+'</p>':"")+'</div>'+renderCharacterPerks(data,key)+'<div class="build-section"><div class="eyebrow">RECOMMENDED LOADOUTS</div><h3>Подходящие билды</h3><div class="build-filters"><button type="button" class="active" data-build-filter="all">Все билды</button><button type="button" data-build-filter="free">Без доната</button></div>'+builds.map((b,i)=>{const buildPaid=b.perks.some(perkNeedsAuricCells);const notes=b.notes||buildNotes[b.title]||{strength:b.why,weakness:"Эффективность зависит от карты, действий команды и выбранного противника."};const gearLabel=(b.gear||"").split(" — ")[0];const gearType=isK?"addon":"item";const addonLabels=(b.gearAddons||"").split(" — ")[0].split(" + ").map(x=>x.trim()).filter(Boolean);const offeringLabels=(b.offering||"").split(" — ")[0].split(" / ").map(x=>x.trim()).filter(Boolean);return '<article class="build-card" data-build-paid="'+(buildPaid?'true':'false')+'"><div class="build-title"><div><h4>'+detailEsc(b.title)+'</h4><small>'+detailEsc(b.goal)+'</small></div><span>0'+(i+1)+'</span></div><div class="perk-chips">'+b.perks.map(p=>'<button type="button" class="perk-chip'+(perkNeedsAuricCells(p)?' requires-auric':'')+'" data-loadout-type="perk" data-loadout-name="'+detailEsc(p)+'"'+(perkNeedsAuricCells(p)?' title="Персонаж лицензированный: покупка за Auric Cells или DLC. Перк также может появиться в Святилище тайн за радужные осколки."':'')+'>'+artTag(buildPerkIcon(p),{className:'build-perk-icon',alt:'',fallback:'./assets/ui/asset-fallback.webp',label:'✦'})+'<span class="build-perk-name">'+detailEsc((typeof buildPerk==='function'&&buildPerk(p)&&typeof buildPerkRussianName==='function'?buildPerkRussianName(buildPerk(p),p):(typeof buildPerk==='function'&&buildPerk(p)?name(buildPerk(p)):p)))+'</span>'+(perkNeedsAuricCells(p)?'<svg class="auric-cell-icon" viewBox="0 0 20 20" aria-label="Лицензированный персонаж"><path d="M10 1.4 17.4 5.7v8.6L10 18.6 2.6 14.3V5.7Z" fill="#e8b84d" stroke="#ffe6a0" stroke-width="1"/><path d="M10 4.5 14.5 7.1v5.8L10 15.5l-4.5-2.6V7.1Z" fill="#8a5b20" stroke="#fff0b8" stroke-width=".8"/></svg>':'')+'</button>').join("")+'</div><div class="build-analysis"><div><b>Почему билд хорош</b><p>'+detailEsc(notes.strength)+'</p></div><div><b>Слабые стороны</b><p>'+detailEsc(notes.weakness)+'</p></div></div><div class="loadout-gear"><div><b>'+(isK?"Аддоны силы":"Предмет")+'</b><p><button type="button" data-loadout-type="'+(isK?"addon":"item")+'" data-loadout-name="'+detailEsc(detailEnglish(gearLabel,gearType))+'">'+detailEsc(gearLabel?detailDisplayName(gearLabel,gearType,gearLabel):"Не требуется")+'</button><span>'+detailEsc((b.gear||"").includes(" — ")?b.gear.split(" — ").slice(1).join(" — "):"")+'</span></p></div><div><b>'+(isK?"Рекомендация по аддонам":"Аддоны предмета")+'</b><p>'+addonLabels.map(x=>/аддон|пара аддонов|приоритет|выбирай|предпочтительны|один аддон/i.test(x)?'<span>'+detailEsc(x)+'</span>':'<button type="button" data-loadout-type="addon" data-loadout-name="'+detailEsc(detailEnglish(x,"addon"))+'">'+detailEsc(detailDisplayName(x,"addon",x))+'</button>').join(" + ")+'<span>'+detailEsc((b.gearAddons||"").includes(" — ")?b.gearAddons.split(" — ").slice(1).join(" — "):"")+'</span></p></div><div><b>Подношение</b><p>'+offeringLabels.map(x=>'<button type="button" data-loadout-type="offering" data-loadout-name="'+detailEsc(detailEnglish(x,"offering"))+'">'+detailEsc(detailDisplayName(x,"offering",x))+'</button>').join(" / ")+'<span>'+detailEsc((b.offering||"").includes(" — ")?b.offering.split(" — ").slice(1).join(" — "):"")+'</span></p></div></div></article>'}).join("")+'</div>'+(isK?'<div class="build-section"><div class="eyebrow">POWER ADD-ONS</div><h3>Аддоны убийцы</h3>'+(Array.isArray(addons)&&addons.length?'<div class="addon-list">'+addons.slice(0,12).map(a=>'<div class="addon-row"><button type="button" data-loadout-type="addon" data-loadout-name="'+detailEsc(detailEnglish(a.name||a.title||"Аддон","addon"))+'">'+detailEsc(detailDisplayName(a.name||a.title||"Аддон","addon",a.name||a.title||"Аддон"))+'</button><small>'+detailEsc(a.description||a.effect||"Аддон силы персонажа")+'</small></div>').join("")+'</div>':'<p class="addon-note">Точные названия аддонов этого убийцы пока отсутствуют в подключённой базе. Не буду выдавать случайные предметы за лучшие. Для этого убийцы подбирай пару аддонов, усиливающих его ключевую механику: перезарядку, дальность, скорость, длительность или число зарядов. Когда база аддонов будет доступна, здесь появятся конкретные названия и эффекты.</p>')+'</div>':'<div class="build-section"><div class="eyebrow">SURVIVOR GEAR</div><h3>Предметы под роль</h3><p class="addon-note">В каждом билде выше указаны подходящий предмет, конкретные аддоны к нему и подношение. Это рекомендации по задаче, а не обязательный набор: снаряжение можно менять под карту и стиль команды.</p></div>')+(data.link?'<a class="wiki-link" href="'+detailEsc(data.link)+'" target="_blank" rel="noopener">Открыть полное досье ↗</a>':"")+'</section>';
+ openModal("characterModal",html);
  // The perk catalogue may finish loading before this dossier is created.
  // Refresh now, after the actual perk chips exist in the DOM.
  refreshVisiblePerkIcons();
 }
-function closeDbdCharacter(){const m=document.getElementById("characterModal");if(m)m.classList.remove("open");document.body.classList.remove("modal-open")}
+function closeDbdCharacter(){if(typeof closeModal==="function")closeModal("characterModal")}
+window.showDbdCharacter=showDbdCharacter;
 document.addEventListener("click",e=>{
- if(e.target.closest(".detail-close")||e.target.id==="characterModal"){closeDbdCharacter();return}
  const tierButton=e.target.closest("[data-tier-character-open]");
  if(tierButton){
   const en=tierButton.dataset.tierCharacterOpen;
-  const record=typeof all!=="undefined"&&Array.isArray(all)?all.find(x=>normDetail(x.nameEn||x.englishName||x.name_en||x.name||x.displayName||x.title)===normDetail(en)):null;
+  const pool=[...(typeof all!=="undefined"&&Array.isArray(all)?all:[]),...Object.values(window.__dbdCharacterCatalog||{}),...Object.values(characterPortraits||{})];
+  const record=typeof window.dbdCharacterRecord==="function"?window.dbdCharacterRecord(en,pool):pool.find(x=>normDetail(x.nameEn||x.englishName||x.name_en||x.name||x.displayName||x.title)===normDetail(en));
   if(record)showDbdCharacter(record);
   return;
  }
- const card=e.target.closest("#grid .item");if(card&&!e.target.closest("[data-fav]")){showDbdCharacter(card)}
 });
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDbdCharacter()});
 
-fetch("https://dbd-stats.info/api/itemaddons?branch=live",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("HTTP "+r.status);return r.json()}).then(d=>{window.__dbdAddonIndex=Array.isArray(d)?d:(d.data||d.addons||d.itemAddons||[])}).catch(()=>{window.__dbdAddonIndex=[]});
+
+if(typeof localCatalog==="function")localCatalog().then(c=>{window.__dbdAddonIndex=arr(c.addons||[]);}).catch(()=>{window.__dbdAddonIndex=[]});
 
 const buildNotes = {
 "Универсальный / соло":{strength:"Сочетает экстренную мобильность, защиту после спасения и постоянную подсказку по генераторам. Хорош для самостоятельной игры, когда нельзя рассчитывать на голосовую связь.",weakness:"Нет сильного ускорения лечения или командного баффа; Sprint Burst требует контроля усталости, а Decisive Strike полезен только в определённых ситуациях."},
@@ -252,12 +246,34 @@ const perkOwners = {
 const licensedPerkOwners = new Set(["Laurie Strode","Lara Croft","Rebecca Chambers","The Nemesis","The Cannibal","The Ghost Face","The Cenobite"]);
 function perkNeedsAuricCells(perk){return licensedPerkOwners.has(perkOwners[perk]);}
 const characterPortraits = {};
+window.characterPortraits = characterPortraits;
 function normDetail(v){return String(v||"").toLowerCase().replace(/^the /,"").replace(/[^a-z0-9а-яё]/gi,"")}
 function findCharacter(owner){
- if(!owner)return null;
- const pool=typeof all!=="undefined"&&Array.isArray(all)?all:[];
+ if(!owner||(typeof window.dbdIsGeneralOwner==="function"&&window.dbdIsGeneralOwner(owner)))return null;
+ const pool=[...(typeof all!=="undefined"&&Array.isArray(all)?all:[]),...Object.values(window.__dbdCharacterCatalog||{}),...Object.values(characterPortraits||{})];
+ if(typeof window.dbdCharacterRecord==="function")return window.dbdCharacterRecord(owner,pool);
  return pool.find(x=>normDetail(x.displayName||x.display_name||x.name||x.title||x.killerName)===normDetail(owner))||characterPortraits[normDetail(owner)]||null;
 }
+// One owner-navigation path for perk cards, owner chips, detail cards and
+// legacy loadout panels. It resolves short aliases and uses bundled portraits.
+function openCharacterByOwner(owner){
+ if(!owner||(typeof window.dbdIsGeneralOwner==="function"&&window.dbdIsGeneralOwner(owner)))return false;
+ const ch=findCharacter(owner);
+ if(!ch)return false;
+ showDbdCharacter(ch);
+ return true;
+}
+window.openCharacterByOwner=openCharacterByOwner;
+document.addEventListener("click",e=>{
+ const owner=e.target.closest?.("[data-perk-owner-open]");
+ if(!owner)return;
+ if(openCharacterByOwner(owner.dataset.perkOwnerOpen)){e.preventDefault();e.stopImmediatePropagation();}
+},true);
+document.addEventListener("keydown",e=>{
+ if((e.key==="Enter"||e.key===" ")&&e.target.matches?.("[data-perk-owner-open]")){
+  if(openCharacterByOwner(e.target.dataset.perkOwnerOpen)){e.preventDefault();e.stopImmediatePropagation();}
+ }
+},true);
 function itemInfo(type,label){
  const n=String(label||"").toLowerCase();
  if(type==="item"){
@@ -276,7 +292,7 @@ async function ensureCharacterPortraits(){
   try{
    let list=[];
    if(typeof localCatalog==="function"){const catalog=await localCatalog();list=Array.isArray(catalog.characters)?catalog.characters:[];window.__dbdCharacterCatalog=list;}
-   if(!list.length){const r=await fetch("https://dbd.source.gs/api/characters/",{cache:"force-cache"});if(r.ok){const payload=await r.json();list=Array.isArray(payload)?payload:(payload.data||payload.characters||payload.items||[]);}}
+   try{const r=await fetch("https://dbd.source.gs/api/characters/",{cache:"force-cache"});if(r.ok){const payload=await r.json();list=[...list,...(Array.isArray(payload)?payload:(payload.data||payload.characters||payload.items||[]))];}}catch{}
    for(const x of list){
     const names=[x.nameEn,x.englishName,x.name_en,x.english_name,x.displayName,x.display_name,x.name,x.title,x.killerName].filter(Boolean);
     const im=x.image||x.imageUrl||x.image_url||x.icon||x.iconUrl||x.icon_url||x.iconURL||x.portrait||x.portraitURL||x.portraitUrl||x.characterIcon||x.character_icon;
@@ -288,20 +304,20 @@ async function ensureCharacterPortraits(){
 }
 async function openLoadoutInfo(type,label){
  if(type==="perk"&&typeof localCatalog==="function"&&(!Array.isArray(allPerks)||!allPerks.length)){try{const catalog=await localCatalog();allPerks=Array.isArray(catalog.perks)?catalog.perks:[]}catch{}}
- const perkRecord=type==="perk"&&typeof allPerks!=="undefined"?allPerks.find(p=>[p.name,p.displayName,p.display_name,p.nameEn,p.englishName,p.id].some(v=>normDetail(v)===normDetail(label))):null;
- const owner=type==="perk"?(perkOwners[label]||buildPerkOwner(perkRecord)||null):null;
+ const perkRecord=type==="perk"&&typeof allPerks!=="undefined"?allPerks.find(p=>[p.name,p.displayName,p.display_name,p.nameEn,p.englishName,p.id].some(v=>perkKey(v)===perkKey(label))):null;
+ const rawOwner=type==="perk"?(perkOwners[label]||buildPerkOwner(perkRecord)||null):null;
+ const owner=rawOwner&&!(typeof window.dbdIsGeneralOwner==="function"&&window.dbdIsGeneralOwner(rawOwner))?(detailEnglish(rawOwner,"character")||rawOwner):null;
+ const ownerText=owner?detailDisplayName(owner,"character",owner):"";
  const character=owner?findCharacter(owner):null;
  const portrait=character?(character.image||character.imageUrl||character.image_url||character.icon||character.iconUrl||character.icon_url||character.portrait||""):"";
- const info=type==="perk"?(owner?{desc:"Уникальный перк персонажа "+owner+". После открытия его можно использовать на других персонажах той же роли.",obtain:"Повысь "+owner+" до престижа 1, чтобы открыть перк I уровня всем персонажам этой роли; престиж 2 и 3 сразу открывают II и III уровни. Альтернатива — купить перк в Святилище тайн за радужные осколки, когда он там появится."}:{desc:"Общий перк: он не привязан к одному конкретному персонажу.",obtain:"Открывается через Кровавую паутину. Если перк относится к отдельному персонажу, его владелец будет указан в карточке."}):itemInfo(type,label);
- let m=document.getElementById("loadoutInfoModal");
- if(!m){m=document.createElement("div");m.id="loadoutInfoModal";m.className="detail-overlay";document.body.appendChild(m);}
- m.innerHTML='<section class="detail-panel info-panel"><button class="detail-close" aria-label="Закрыть">×</button><div class="detail-head">'+(portrait?'<img src="'+detailEsc(portrait)+'" alt="">': '<div class="detail-placeholder">'+(type==="perk"?"✦":type==="item"?"▣":type==="addon"?"◇":"✧")+'</div>')+'<div><div class="eyebrow">'+({perk:"PERK",item:"SURVIVOR ITEM",addon:"ADD-ON",offering:"OFFERING"}[type]||"DBD")+'</div><h2>'+detailEsc(label)+'</h2>'+(owner?'<span class="detail-role">Персонаж-источник: '+detailEsc(owner)+'</span>':"")+'</div></div><div class="detail-copy"><h3>Что даёт</h3><p>'+detailEsc(info.desc)+'</p><h3>Как получить</h3><p>'+detailEsc(info.obtain)+'</p>'+(owner?'<p class="source-character">'+(portrait?'<img src="'+detailEsc(portrait)+'" alt="">':"")+'<b>'+detailEsc(owner)+'</b><span>Открой его уникальные перки через престиж 1–3.</span></p>':"")+'</div></section>';
- m.classList.add("open");document.body.classList.add("modal-open");
+ const info=type==="perk"?(owner?{desc:"Уникальный перк персонажа "+ownerText+". После открытия его можно использовать на других персонажах той же роли.",obtain:"Повысь "+ownerText+" до престижа 1, чтобы открыть перк I уровня всем персонажам этой роли; престиж 2 и 3 сразу открывают II и III уровни. Альтернатива — купить перк в Святилище тайн за радужные осколки, когда он там появится."}:{desc:"Общий перк: он не привязан к одному конкретному персонажу.",obtain:"Открывается через Кровавую паутину. Если перк относится к отдельному персонажу, его владелец будет указан в карточке."}):itemInfo(type,label);
+ const titleText=detailDisplayName(label,type==="perk"?"perk":type,label);
+ const html='<section class="detail-panel info-panel"><button class="detail-close" aria-label="Закрыть">×</button><div class="detail-head">'+artTag(portrait,{className:'detail-portrait-art',alt:'',eager:true,fallback:'./assets/ui/asset-fallback.webp',label:(type==="perk"?"✦":type==="item"?"▣":type==="addon"?"◇":"✧")})+'<div><div class="eyebrow">'+({perk:"PERK",item:"SURVIVOR ITEM",addon:"ADD-ON",offering:"OFFERING"}[type]||"DBD")+'</div><h2>'+detailEsc(titleText)+'</h2>'+(owner?'<span class="detail-role"><button type="button" class="source-character-link" data-perk-owner-open="'+detailEsc(owner)+'">Персонаж-источник: '+detailEsc(ownerText)+'</button></span>':"")+'</div></div><div class="detail-copy"><h3>Что даёт</h3><p>'+detailEsc(info.desc)+'</p><h3>Как получить</h3><p>'+detailEsc(info.obtain)+'</p>'+(owner?'<p class="source-character" data-perk-owner-open="'+detailEsc(owner)+'" role="button" tabindex="0">'+artTag(portrait,{className:'source-character-art',alt:'',fallback:'./assets/ui/asset-fallback.webp',label:'◈'})+'<b>'+detailEsc(ownerText)+'</b><span>Открой его уникальные перки через престиж 1–3.</span></p>':"")+'</div></section>';
+ openModal("loadoutInfoModal",html);
 }
 document.addEventListener("click",e=>{
  const buildFilter=e.target.closest("[data-build-filter]");
  if(buildFilter){const panel=buildFilter.closest(".build-section");if(panel){panel.querySelectorAll("[data-build-filter]").forEach(b=>b.classList.toggle("active",b===buildFilter));panel.querySelectorAll(".build-card[data-build-paid]").forEach(card=>{card.hidden=buildFilter.dataset.buildFilter==="free"&&card.dataset.buildPaid==="true";});}return;}
  const chip=e.target.closest("[data-loadout-type]");
  if(chip){e.preventDefault();e.stopPropagation();const type=chip.dataset.loadoutType,label=chip.dataset.loadoutName;if(type==="perk")ensureCharacterPortraits().finally(()=>openLoadoutInfo(type,label));else openLoadoutInfo(type,label);return;}
- if(e.target.closest("#loadoutInfoModal .detail-close")||e.target.id==="loadoutInfoModal"){const m=document.getElementById("loadoutInfoModal");if(m)m.classList.remove("open");document.body.classList.remove("modal-open");}
 });

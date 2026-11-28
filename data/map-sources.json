@@ -1,0 +1,573 @@
+[
+  {
+    "en": "Ironworks of Misery",
+    "ru": "Завод Страданий",
+    "realm": "Поместье МакМиллан",
+    "hooks": "8 to 13 hooks",
+    "cover": "map-ind-foundry02-862023-768.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Coal Tower",
+    "ru": "Угольная Башня",
+    "realm": "Поместье МакМиллан",
+    "hooks": "6 to 11 hooks",
+    "cover": "map-ind-coaltower02-c4f809-768.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Suffocation Pit",
+    "ru": "Удушающая Яма",
+    "realm": "Поместье МакМиллан",
+    "hooks": "7 to 12 hooks",
+    "cover": "map-ind-mine02-4ca339-768.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Shelter Woods",
+    "ru": "Лесная Опушка",
+    "realm": "Поместье МакМиллан",
+    "hooks": "8 to 13 hooks",
+    "cover": "map-ind-forest02-718cde-768.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Groaning Storehouse",
+    "ru": "Стонущий Склад",
+    "realm": "Поместье МакМиллан",
+    "hooks": "7 to 12 hooks",
+    "cover": "map-ind-storehouse02-d5a509-768.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "The Thompson House",
+    "ru": "Дом Томпсонов",
+    "realm": "Ферма Колдвинд",
+    "hooks": "7 to 12 hooks",
+    "cover": "map-frm-farmhouse-554dc1-512.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Torment Creek",
+    "ru": "Ручей Страданий",
+    "realm": "Ферма Колдвинд",
+    "hooks": "7 to 12 hooks",
+    "cover": "map-frm-silo-337c95-512.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Rancid Abattoir",
+    "ru": "Заброшенная Скотобойня",
+    "realm": "Ферма Колдвинд",
+    "hooks": "6 to 11 hooks",
+    "cover": "map-frm-slaughterhouse-f8ed06-512.webp",
+    "aliases": [
+      "Rancid Abbatoir"
+    ],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Rotten Fields",
+    "ru": "Сгнившие Поля",
+    "realm": "Ферма Колдвинд",
+    "hooks": "8 to 13 hooks",
+    "cover": "map-frm-cornfield-fced7c-512.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Fractured Cowshed",
+    "ru": "Разрушенный Хлев",
+    "realm": "Ферма Колдвинд",
+    "hooks": "8 to 13 hooks",
+    "cover": "map-frm-barn-03a1e7-512.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Wretched Shop",
+    "ru": "Магазин Барахольщика",
+    "realm": "Свалка Автохевен",
+    "hooks": "8 to 13 hooks",
+    "cover": "map-jnk-garage-88d8c8-512.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Blood Lodge",
+    "ru": "Кровавая Лачуга",
+    "realm": "Свалка Автохевен",
+    "hooks": "6 to 11 hooks",
+    "cover": "map-jnk-lodge-64fefa-512.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Azarov's Resting Place",
+    "ru": "Место Упокоения Азарова",
+    "realm": "Свалка Автохевен",
+    "hooks": "7 to 12 hooks",
+    "cover": "map-jnk-office-c8fd52-512.webp",
+    "aliases": [
+      "Azarov’s Resting Place"
+    ],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Wreckers' Yard",
+    "ru": "Зона Свалки",
+    "realm": "Свалка Автохевен",
+    "hooks": "6 to 11 hooks",
+    "cover": "map-jnk-scrapyard-c5cd9b-512.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Gas Heaven",
+    "ru": "Гэс Хевен",
+    "realm": "Свалка Автохевен",
+    "hooks": "8 to 13 hooks",
+    "cover": "map-jnk-gasstation-a9f914-512.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Father Campbell's Chapel",
+    "ru": "Часовня Отца Кэмпбелла",
+    "realm": "Психлечебница Кротус Пренн",
+    "hooks": "6 to 11 hooks",
+    "cover": "map-asy-chapel-8615cb-512.webp",
+    "aliases": [
+      "Father Cambell's Chapel"
+    ],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Disturbed Ward",
+    "ru": "Отделение для Буйных",
+    "realm": "Психлечебница Кротус Пренн",
+    "hooks": "7 to 12 hooks",
+    "cover": "map-asy-asylum-c78573-512.webp",
+    "aliases": [
+      "Crotus Prenn Asylum"
+    ],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Lampkin Lane",
+    "ru": "Переулок Лэмпкин",
+    "realm": "Хэддонфилд",
+    "hooks": "8 to 13 hooks",
+    "cover": "",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Treatment Theatre",
+    "ru": "Лечебный Зал",
+    "realm": "Мемориальный институт Лэри",
+    "hooks": "8 to 13 hooks",
+    "cover": "map-hos-treatment-65afe7-512.webp",
+    "aliases": [
+      "Treatment Theater"
+    ],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Mother's Dwelling",
+    "ru": "Обитель Матери",
+    "realm": "Красный лес",
+    "hooks": "8 to 13 hooks",
+    "cover": "map-brl-mahouse-0805f1-768.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "The Temple of Purgation",
+    "ru": "Храм Очищения",
+    "realm": "Красный лес",
+    "hooks": "8 to 13 hooks",
+    "cover": "map-brl-temple-c8cbbc-768.webp",
+    "aliases": [
+      "Temple of Purgation",
+      "Temple Of Purgation"
+    ],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "The Pale Rose",
+    "ru": "Бледная Роза",
+    "realm": "Гнилое болото",
+    "hooks": "9 to 14 hooks",
+    "cover": "map-swp-palerose-bfed7a-512.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Grim Pantry",
+    "ru": "Чудовищная Кладовая",
+    "realm": "Гнилое болото",
+    "hooks": "9 to 14 hooks",
+    "cover": "map-swp-grimpantry-582335-512.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Badham Preschool I",
+    "ru": "Детский Сад Бэдхем I",
+    "realm": "Спрингвуд",
+    "hooks": "7 to 12 hooks",
+    "cover": "map-eng-street-01-70b0c7-512.webp",
+    "aliases": [
+      "Badham Preschool"
+    ],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Badham Preschool II",
+    "ru": "Детский Сад Бэдхем II",
+    "realm": "Спрингвуд",
+    "hooks": "7 to 12 hooks",
+    "cover": "map-eng-street-02-5f471e-512.webp",
+    "aliases": [
+      "Badham Preschool"
+    ],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Badham Preschool III",
+    "ru": "Детский Сад Бэдхем III",
+    "realm": "Спрингвуд",
+    "hooks": "7 to 12 hooks",
+    "cover": "map-eng-street-03-d9b5fd-512.webp",
+    "aliases": [
+      "Badham Preschool"
+    ],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Badham Preschool IV",
+    "ru": "Детский Сад Бэдхем IV",
+    "realm": "Спрингвуд",
+    "hooks": "7 to 12 hooks",
+    "cover": "map-eng-street-04-fab686-512.webp",
+    "aliases": [
+      "Badham Preschool"
+    ],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Badham Preschool V",
+    "ru": "Детский Сад Бэдхем V",
+    "realm": "Спрингвуд",
+    "hooks": "7 to 12 hooks",
+    "cover": "map-eng-street-05-949e47-512.webp",
+    "aliases": [
+      "Badham Preschool"
+    ],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "The Game",
+    "ru": "Игра",
+    "realm": "Мясокомбинат «Гидеон»",
+    "hooks": "10 to 15 hooks",
+    "cover": "map-fin-hideout-3ec270-512.webp",
+    "aliases": [],
+    "tactical": [
+      [
+        "3D-схема",
+        "SamoelColt/Gideon Meat Plant/The Game.jpg"
+      ],
+      [
+        "3D-схема · второй уровень",
+        "SamoelColt/Gideon Meat Plant/The Game (2).jpg"
+      ]
+    ],
+    "plan": null
+  },
+  {
+    "en": "Family Residence",
+    "ru": "Семейная Резиденция",
+    "realm": "Поместье Ямаоки",
+    "hooks": "8 to 12 hooks",
+    "cover": "map-hti-manor02-95f630-768.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Sanctum of Wrath",
+    "ru": "Прибежище Гнева",
+    "realm": "Поместье Ямаоки",
+    "hooks": "6 to 11 hooks",
+    "cover": "map-hti-shrine02-d15e0d-768.webp",
+    "aliases": [
+      "Sanctum Of Wrath"
+    ],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Mount Ormond Resort",
+    "ru": "Курорт «Гора Ормонд»",
+    "realm": "Ормонд",
+    "hooks": "8 to 12 hooks",
+    "cover": "map-kny-cottage03-040228-768.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Ormond Lake Mine",
+    "ru": "Шахта Озера Ормонд",
+    "realm": "Ормонд",
+    "hooks": "9 to 13 hooks",
+    "cover": "map-glo-level-01-f4a1d2-768.webp",
+    "aliases": [
+      "Lake Mine"
+    ],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "The Underground Complex",
+    "ru": "Подземный Комплекс",
+    "realm": "Национальная лаборатория Хоукинса",
+    "hooks": "7 to 14 hooks",
+    "cover": "map-qat-lab-82dced-512.webp",
+    "aliases": [
+      "The Undrground Complex"
+    ],
+    "tactical": null,
+    "plan": [
+      [
+        "План",
+        "EagerFace/Hawkins National Laboratory/The Undrground Complex.jpg"
+      ]
+    ]
+  },
+  {
+    "en": "Dead Dawg Saloon",
+    "ru": "Салун «Мертвяк Вусмерть»",
+    "realm": "Могила в Гленвейле",
+    "hooks": "6 to 11 hooks",
+    "cover": "map-ukr-saloon-aa8da6-512.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Midwich Elementary School",
+    "ru": "Начальная Школа Мидвича",
+    "realm": "Сайлент Хилл",
+    "hooks": "14 to 18 hooks",
+    "cover": "map-wal-level-01-20fa84-512.webp",
+    "aliases": [],
+    "tactical": [
+      [
+        "3D-схема · верхний этаж",
+        "SamoelColt/Silent Hill/Midwich  Elementary  School (Upper Floor).jpg"
+      ],
+      [
+        "3D-схема · нижний этаж",
+        "SamoelColt/Silent Hill/Midwich  Elementary  School (Lower Floor).jpg"
+      ]
+    ],
+    "plan": null
+  },
+  {
+    "en": "Raccoon City Police Station East Wing",
+    "ru": "Полицейский Участок Раккун-Сити: Восточное Крыло",
+    "realm": "Раккун-Сити",
+    "hooks": "14 to 19 hooks",
+    "cover": "map-ecl-level-01-1c0aeb-512.webp",
+    "aliases": [],
+    "tactical": [
+      [
+        "3D-схема · верхний этаж",
+        "SamoelColt/Raccoon City/Raccoon City Police Station (Upper Floor).jpg"
+      ],
+      [
+        "3D-схема · нижний этаж",
+        "SamoelColt/Raccoon City/Raccoon City Police Station (Lower Floor).jpg"
+      ]
+    ],
+    "plan": null
+  },
+  {
+    "en": "Raccoon City Police Station West Wing",
+    "ru": "Полицейский Участок Раккун-Сити: Западное Крыло",
+    "realm": "Раккун-Сити",
+    "hooks": "14 to 18 hooks",
+    "cover": "map-ecl-level-westside-a6584e-512.webp",
+    "aliases": [],
+    "tactical": [
+      [
+        "3D-схема · верхний этаж",
+        "SamoelColt/Raccoon City/Raccoon City Police Station (Upper Floor).jpg"
+      ],
+      [
+        "3D-схема · нижний этаж",
+        "SamoelColt/Raccoon City/Raccoon City Police Station (Lower Floor).jpg"
+      ]
+    ],
+    "plan": null
+  },
+  {
+    "en": "Eyrie of Crows",
+    "ru": "Воронье Гнездовье",
+    "realm": "Заброшенное кладбище",
+    "hooks": "10 to 13 hooks",
+    "cover": "map-ion-level-01-cc39bf-512.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Dead Sands",
+    "ru": "Мёртвые Пески",
+    "realm": "Заброшенное кладбище",
+    "hooks": "10 to 15 hooks",
+    "cover": "map-ion-shack-a7c8de-768.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Garden of Joy",
+    "ru": "Сад Счастья",
+    "realm": "Зачахший остров",
+    "hooks": "8 to 13 hooks",
+    "cover": "map-mtr-level-1-5a67fe-768.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Fallen Refuge",
+    "ru": "Убежище Павших",
+    "realm": "Зачахший остров",
+    "hooks": "10 to 15 hooks",
+    "cover": "map-apl-shack-b0ebf3-768.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Freddy Fazbear's Pizza",
+    "ru": "Пиццерия Фредди Фазбера",
+    "realm": "Зачахший остров",
+    "hooks": "13 to 15 hooks",
+    "cover": "map-apl-level-02-911e4e-768.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Greenville Square",
+    "ru": "Площадь Гринвилла",
+    "realm": "Зачахший остров",
+    "hooks": "13 to 15 hooks",
+    "cover": "map-apl-level-01-7d94a8-768.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "The Shattered Square",
+    "ru": "Разрушенная Площадь",
+    "realm": "Разорённая деревня Борго",
+    "hooks": "9 to 13 hooks",
+    "cover": "map-qtm-level-01-15b227-768.webp",
+    "aliases": [
+      "The Shattered square"
+    ],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Forgotten Ruins",
+    "ru": "Забытые Руины",
+    "realm": "Разорённая деревня Борго",
+    "hooks": "9 to 14 hooks",
+    "cover": "",
+    "aliases": [],
+    "tactical": [
+      [
+        "3D-схема · верхний этаж",
+        "SamoelColt/The Decimated Borgo/Forgotten Ruins (Upper Floor).jpg"
+      ],
+      [
+        "3D-схема · нижний этаж",
+        "SamoelColt/The Decimated Borgo/Forgotten Ruins (Lower Floor).jpg"
+      ]
+    ],
+    "plan": null
+  },
+  {
+    "en": "Toba Landing",
+    "ru": "Площадка Тоба",
+    "realm": "Заросли Дварки",
+    "hooks": "11 to 15 hooks",
+    "cover": "map-uba-level-01-81ec3a-768.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Nostromo Wreckage",
+    "ru": "Крушение «Ностромо»",
+    "realm": "Заросли Дварки",
+    "hooks": "11 to 15 hooks",
+    "cover": "map-wrm-level-01-231e80-768.webp",
+    "aliases": [],
+    "tactical": null,
+    "plan": null
+  },
+  {
+    "en": "Trickster's Delusion",
+    "ru": "Заблуждение Трикстера",
+    "realm": "Бессонный район",
+    "hooks": "10 to 15 hooks",
+    "cover": "map-qui-level-01-6a308b-768.webp",
+    "aliases": [],
+    "tactical": [],
+    "plan": []
+  }
+]

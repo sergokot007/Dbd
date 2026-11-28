@@ -58,13 +58,13 @@ function tierCharacterSide(ch){
 function tierEnsureCompleteRoster(){
  const roster=Array.isArray(all)?all:[];
  for(const ch of roster){
-  const en=String(ch.nameEn||ch.englishName||ch.name_en||ch.english_name||ch.name||ch.displayName||ch.title||"").trim();
+  const en=String((typeof window.dbdRecordEnglish==="function"?window.dbdRecordEnglish(ch,"character"):"")||ch.nameEn||ch.englishName||ch.name_en||ch.english_name||ch.name||ch.displayName||ch.title||"").trim();
   if(!en)continue;
   const side=tierCharacterSide(ch),list=DBD_TIER_DATA[side];
   if(list.some(x=>tierNorm(x.en)===tierNorm(en)))continue;
   const owned=(Array.isArray(allPerks)?allPerks:[]).filter(p=>{
    const owner=String(p.characterName||p.character_name||p.character||p.owner||p.survivor||p.killer||"");
-   return owner&&tierNorm(owner)===tierNorm(en);
+   return owner&&(typeof window.dbdCharacterKey==="function"?window.dbdCharacterKey(owner)===window.dbdCharacterKey(en):tierNorm(owner)===tierNorm(en));
   }).slice(0,3).map(p=>p.nameEn||p.englishName||p.name_en||p.name||p.displayName).filter(Boolean);
   list.push({
    en,tier:"C",perks:owned,
@@ -72,8 +72,9 @@ function tierEnsureCompleteRoster(){
   });
  }
 }
-function loadTierList(){
+function loadTierList(force){
  renderTierList();
+ if(force)tierCatalogPromise=null;
  if(!tierCatalogPromise)tierCatalogPromise=localCatalog().then(c=>{
   allPerks=arr(c.perks);
   all=arr(c.characters);
@@ -83,11 +84,12 @@ function loadTierList(){
 }
 function tierNorm(v){return String(v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]/g,"")}
 function tierFindCharacter(en){
- const keys=[en,DBD_TIER_RU_NAMES[en]].filter(Boolean).map(tierNorm);
  const pool=[...(Array.isArray(all)?all:[]),...Object.values(window.__dbdCharacterCatalog||{}),...Object.values(typeof characterPortraits!=="undefined"?characterPortraits:{})];
+ if(typeof window.dbdCharacterRecord==="function")return window.dbdCharacterRecord(en,pool);
+ const keys=[en,DBD_TIER_RU_NAMES[en]].filter(Boolean).map(tierNorm);
  return pool.find(x=>[x.nameEn,x.englishName,x.name_en,x.english_name,x.name,x.displayName,x.display_name,x.title,x.killerName].filter(Boolean).some(v=>keys.includes(tierNorm(v))))||null;
 }
-function tierFindPerk(en){return (Array.isArray(allPerks)?allPerks:[]).find(x=>tierNorm(x.nameEn||x.name||x.displayName||x.title)===tierNorm(en))}
+function tierFindPerk(en){const wanted=tierNorm(typeof window.dbdRecordEnglish==="function"?window.dbdRecordEnglish(en,"perk"):en);return (Array.isArray(allPerks)?allPerks:[]).find(x=>tierNorm(typeof window.dbdRecordEnglish==="function"?window.dbdRecordEnglish(x,"perk"):(x.nameEn||x.name||x.displayName||x.title))===wanted)}
 function renderTierList(){
  tierEnsureCompleteRoster();
  const query=norm($("#search").value.trim()),side=DBD_TIER_DATA[dbdTierSide];
@@ -95,11 +97,11 @@ function renderTierList(){
  $("#sectionTitle").textContent="Тир-лист персонажей";$("#sectionLabel").textContent="ПОЛНЫЙ СОСТАВ • ПРЕДВАРИТЕЛЬНЫЕ ОЦЕНКИ ДЛЯ НОВЫХ ПЕРСОНАЖЕЙ";
  $("#filters").innerHTML='<div class="tier-side-tabs"><button data-tier-side="survivors" class="'+(dbdTierSide==="survivors"?"active":"")+'">Выжившие</button><button data-tier-side="killers" class="'+(dbdTierSide==="killers"?"active":"")+'">Убийцы</button></div><div class="tier-rank-filters">'+["Все",...DBD_TIER_ORDER].map(t=>'<button data-tier-rank="'+t+'" class="'+(dbdTierFilter===t?"active":"")+'">'+(t==="Все"?"Все ранги":t)+'</button>').join("")+'</div>';
  $("#notice").textContent="Основные покупки • выжившие оцениваются по перкам (базовые характеристики одинаковы), убийцы — по силе и перкам. E означает низкий приоритет покупки ради навыков, а не бесполезность персонажа. • "+visible.length+" рекомендаций";
- $("#grid").classList.add("tier-grid");
+ setGridLayout("tier-grid");
  $("#grid").innerHTML=visible.map(x=>{
-  const ch=tierFindCharacter(x.en),portrait=ch?(image(ch)||ch.portraitURL||ch.portraitUrl||ch.iconURL||ch.iconUrl||ch.characterIcon||ch.character_icon||""):"",ruName=(DBD_TIER_RU_NAMES[x.en]||ch?.name||x.en)+" ("+x.en+")";
-  const perks=x.perks.map(p=>{const found=tierFindPerk(p);return '<button type="button" class="tier-perk" data-loadout-type="perk" data-loadout-name="'+esc(found?(found.nameEn||found.englishName||name(found)):p)+'">'+esc(found?name(found):p)+'</button>'}).join("");
-  return '<article class="tier-card tier-'+x.tier.toLowerCase()+'" data-tier-character="'+esc(x.en)+'"><div class="tier-card-top"><span class="tier-grade">'+x.tier+'</span>'+(portrait?'<img src="'+esc(portrait)+'" alt="" loading="lazy" onerror="this.outerHTML=\'<span class=&quot;tier-portrait-fallback&quot;>✣</span>\'">':'<span class="tier-portrait-fallback">✣</span>')+'<div class="tier-title"><h3><button type="button" class="tier-character-link" data-tier-character-open="'+esc(x.en)+'">'+esc(ruName)+'</button></h3><small>'+esc(x.en)+'</small><span>'+esc(DBD_TIER_LABELS[x.tier])+'</span></div></div><p class="tier-reason">'+esc(x.reason)+'</p><div class="tier-perks-label">УНИКАЛЬНЫЕ ПЕРКИ</div><div class="tier-perks">'+perks+'</div></article>';
+  const ch=tierFindCharacter(x.en),portrait=ch?(image(ch)||ch.portraitURL||ch.portraitUrl||ch.iconURL||ch.iconUrl||ch.characterIcon||ch.character_icon||""):"",ruName=(typeof window.dbdDisplayName==="function"?window.dbdDisplayName(x.en,"character"):"")||(DBD_TIER_RU_NAMES[x.en]||ch?.name||x.en)+" ("+x.en+")";
+  const perks=x.perks.map(p=>{const found=tierFindPerk(p),source=found||p,english=typeof window.dbdRecordEnglish==="function"?window.dbdRecordEnglish(source,"perk"):(found?(found.nameEn||found.englishName||name(found)):p),label=(typeof window.dbdDisplayName==="function"?window.dbdDisplayName(p,"perk"):"")||(found?name(found):p);return '<button type="button" class="tier-perk" data-loadout-type="perk" data-loadout-name="'+esc(english||p)+'">'+esc(label)+'</button>'}).join("");
+  return '<article class="tier-card tier-'+x.tier.toLowerCase()+'" data-tier-character="'+esc(x.en)+'"><div class="tier-card-top"><span class="tier-grade">'+x.tier+'</span>'+picture(portrait,{className:'tier-card-art',alt:'',fallback:'./assets/ui/asset-fallback.webp',label:'✣'})+'<div class="tier-title"><h3><button type="button" class="tier-character-link" data-tier-character-open="'+esc(x.en)+'">'+esc(ruName)+'</button></h3><small>'+esc(x.en)+'</small><span>'+esc(DBD_TIER_LABELS[x.tier])+'</span></div></div><p class="tier-reason">'+esc(x.reason)+'</p><div class="tier-perks-label">УНИКАЛЬНЫЕ ПЕРКИ</div><div class="tier-perks">'+perks+'</div></article>';
  }).join("")||'<div class="empty">По запросу персонажи не найдены.</div>';
 }
 document.addEventListener("click",e=>{const s=e.target.closest("[data-tier-side]");if(s){dbdTierSide=s.dataset.tierSide;dbdTierFilter="Все";renderTierList();return;}const r=e.target.closest("[data-tier-rank]");if(r){dbdTierFilter=r.dataset.tierRank;renderTierList();}});

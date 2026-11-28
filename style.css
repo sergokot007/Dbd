@@ -208,7 +208,7 @@
 @media(max-width:420px){.character-perk-grid{gap:6px}.character-perk-card img,.character-perk-card .build-perk-placeholder{width:54px;height:54px}.perk-chip .build-perk-icon{width:50px;height:50px;flex-basis:50px}}
 
 /* Personal owned-character loadout builder */
-.mybuild-layout{display:block!important}
+.grid.mybuild-layout{display:block}
 .mybuild-main{display:grid;grid-template-columns:minmax(280px,.9fr) minmax(320px,1.1fr);gap:18px;align-items:start}
 .mybuild-roster,.mybuild-result{background:linear-gradient(145deg,#24232b,#17171d);border:1px solid #39343b;border-radius:6px;padding:16px;min-width:0}
 .mybuild-roster-head,.mybuild-result-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -260,3 +260,109 @@
 .perk-owner-card button{display:block;border:0;background:none;padding:0;color:#f0dfe0;font:600 19px 'Barlow Condensed';text-align:left}
 .perk-owner-card small{display:block;color:#aaa;font-size:10px;margin-top:4px}
 @media(max-width:600px){.perk-detail-art{width:82px;height:82px;flex-basis:82px}.perk-detail-copy p{font-size:11px}.perk-owner-card img{width:54px;height:54px}}
+
+/* Bundled atmospheric artwork and PWA presentation */
+.brand{color:inherit;text-decoration:none}
+.brand span{display:block}
+.hero{position:relative;isolation:isolate;overflow:hidden;min-height:clamp(430px,48vw,620px);display:flex;align-items:center}
+.hero-art{position:absolute;inset:0;z-index:-2;background-image:linear-gradient(90deg,#101014 0%,#101014f0 24%,#1010148a 54%,#10101436 100%),linear-gradient(0deg,#101014 0%,transparent 45%,#10101455 100%),url('./assets/ui/hero-fog.webp');background-size:cover;background-position:center 42%;filter:saturate(.82) contrast(1.05);transform:scale(1.02)}
+.hero:after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 78% 15%,#591e2540,transparent 45%),linear-gradient(180deg,transparent 65%,#101014 100%)}
+.hero-content{position:relative;width:100%;max-width:680px;padding-right:20px}
+.hero p{color:#c4c0c6;text-shadow:0 2px 12px #000a}
+.hero-actions .ghost{background:#1010148c;backdrop-filter:blur(6px)}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.search-box{display:block;width:min(100%,300px)}
+:where(button,a,input,[tabindex]):focus-visible{outline:2px solid #e07076;outline-offset:3px}
+footer a{color:#c78b8d;text-decoration:none}footer a:hover{color:#f0a0a4;text-decoration:underline}
+.tabs button[aria-current="page"]{color:#fff;border-color:#c43c44}
+
+/* Resilient artwork: the bundled fallback is a real image, the glyph is the last resort. */
+.picture-fallback{display:grid;place-items:center;background:radial-gradient(ellipse at 50% 40%,#563239,#1a191f 72%);color:#d0b8ac;font:700 42px 'Barlow Condensed',system-ui,sans-serif;text-align:center;overflow:hidden}
+.item-art-button>.picture-fallback{width:100%;height:150px;font-size:45px}
+.item-art-button>.picture-fallback:before{content:"";position:absolute;opacity:.25;letter-spacing:8px}
+.item-detail-icon.picture-fallback,.detail-portrait-art.picture-fallback,.perk-detail-art.picture-fallback{width:112px;height:112px;flex:0 0 112px;border-radius:5px;background:#30252b;border:1px solid #554047;font-size:38px}
+.source-character-art,.source-character-art.picture-fallback{width:48px;height:48px;flex:0 0 48px;object-fit:contain;border-radius:3px;background:#101015;font-size:20px}
+.perk-owner-mini-art,.perk-owner-mini-art.picture-fallback{width:25px;height:25px;flex:0 0 25px;object-fit:cover;border-radius:2px;background:#101015;font-size:12px}
+.perk-owner-art,.perk-owner-art.picture-fallback{width:66px;height:66px;flex:0 0 66px;object-fit:cover;border-radius:3px;background:#101015;font-size:24px}
+.tier-card-art,.tier-card-art.picture-fallback{width:60px;height:60px;flex:0 0 60px;object-fit:contain;background:#101015;border:1px solid #49404a;border-radius:3px;font-size:25px}
+.mybuild-character-art,.mybuild-character-art.picture-fallback{width:42px;height:42px;flex:0 0 42px;object-fit:contain;background:#27232a;border-radius:3px;font-size:20px}
+.mybuild-perk-art,.mybuild-perk-art.picture-fallback{width:100%;height:100%;object-fit:contain;font-size:22px}
+.character-perk-art,.character-perk-art.picture-fallback{width:64px;height:64px;object-fit:contain;border-radius:4px;background:#17171d;font-size:24px}
+img.build-perk-icon,.build-perk-icon.picture-fallback{display:block;width:100%;height:100%;object-fit:contain;border:0;background:transparent;font-size:20px}
+.perk-chip .build-perk-icon.picture-fallback{width:58px;height:58px;flex:0 0 58px}
+.item-art-img{width:100%;height:100%;object-fit:contain;display:block}
+.item-art-button>.picture-fallback.item-art-img{font-size:45px}
+
+/* Realm atlas: grouped location cards and bundled detailed map views */
+.map-grid{grid-template-columns:repeat(auto-fill,minmax(min(100%,280px),1fr));gap:18px;align-items:start}
+.map-realm{grid-column:1/-1;min-width:0}
+.map-realm-head{display:flex;justify-content:space-between;align-items:end;gap:16px;margin:8px 0 12px;padding-bottom:10px;border-bottom:1px solid #393039}
+.map-realm-head h3{font:700 28px 'Barlow Condensed';margin:3px 0 0}
+.map-realm-head>span{font-size:10px;color:#a7a0a6;letter-spacing:1px;text-transform:uppercase}
+.map-realm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,270px),1fr));gap:14px}
+.map-card{background:linear-gradient(145deg,#232229,#15151b);border:1px solid #353039;border-radius:6px;overflow:hidden;transition:transform .18s,border-color .18s,box-shadow .18s}
+.map-card:hover{transform:translateY(-3px);border-color:#9d4148;box-shadow:0 12px 32px #0006}
+.map-card-art{position:relative;display:block;width:100%;aspect-ratio:16/10;padding:0;border:0;overflow:hidden;background:#17171d;cursor:pointer}
+.map-card-cover{display:block;width:100%;height:100%;object-fit:cover;transition:transform .45s ease}
+.map-card:hover .map-card-cover{transform:scale(1.045)}
+.map-card-cover.picture-fallback{font-size:55px;background:radial-gradient(ellipse at 50% 40%,#49313a,#111116 72%)}
+.map-card-shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(0deg,#101014dd 0%,transparent 48%,#10101455 100%)}
+.map-card-realm{position:absolute;top:10px;left:10px;max-width:calc(100% - 110px);padding:5px 8px;border:1px solid #ffffff28;border-radius:3px;background:#101014b8;color:#eee;font-size:9px;letter-spacing:1px;text-transform:uppercase;backdrop-filter:blur(5px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.map-card-mini-wrap{position:absolute;right:10px;bottom:10px;width:86px;height:60px;border:1px solid #ffffff45;border-radius:3px;overflow:hidden;background:#101014;box-shadow:0 4px 14px #0009}
+.map-card-mini{display:block;width:100%;height:100%;object-fit:cover}
+.map-card-mini.picture-fallback{font-size:18px;background:#232027}
+.map-card-mini-wrap small{position:absolute;right:0;bottom:0;left:0;padding:2px 4px;background:#101014d8;color:#e4c5c5;text-align:center;font-size:8px;letter-spacing:1.3px}
+.map-card-body{padding:13px 14px 14px}
+.map-card-kicker{color:#d58b8f;font-size:9px;letter-spacing:1.4px;text-transform:uppercase;font-weight:800}
+.map-card h4{font:700 22px 'Barlow Condensed';margin:6px 0 2px;line-height:1.15}
+.map-card h4 button{border:0;padding:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer}
+.map-card h4 button:hover{color:#f0a0a4}
+.map-card>p{color:#9998a0;font-size:10px;letter-spacing:.5px;margin:0;min-height:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.map-card-desc{font-size:11px;line-height:1.55;color:#aaa5ad;margin-top:10px;min-height:34px}
+.map-card-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:13px;padding-top:11px;border-top:1px solid #ffffff12}
+.map-card-open{border:0;padding:0;background:none;color:#e58b8e;font:700 10px Inter,system-ui;letter-spacing:1px;text-transform:uppercase;cursor:pointer}
+.map-card-open:hover{color:#fff}
+.map-card-foot .fav{padding:5px 9px}
+.map-realm-filters{display:flex;gap:7px;flex-wrap:wrap;width:100%;margin-bottom:8px}
+.map-realm-filters button{border:1px solid #49404a;border-radius:3px;background:#1c1b22;color:#c9c1c6;padding:8px 11px;font-size:10px}
+.map-realm-filters button.active{background:#642a31;border-color:#c64a50;color:#fff}
+.map-realm-filters button span{color:#d8a0a3;margin-left:3px;font-size:9px}
+@media(max-width:600px){.hero{min-height:470px;align-items:flex-start;padding-top:55px}.hero-art{background-position:62% center}.hero-content{padding-right:0}.hero h1{font-size:58px}.map-realm-head h3{font-size:23px}.map-grid,.map-realm-grid{gap:11px}.map-card-art{aspect-ratio:1.5/1}.map-card-desc{display:none}}
+
+/* Map detail dialog: tabs, wheel/button zoom, drag-to-pan and related maps */
+.map-detail-panel{width:min(1180px,100%);max-height:92vh;overflow:auto}
+.map-detail-panel>h2{font:700 clamp(28px,5vw,44px) 'Barlow Condensed';margin:7px 0 0;line-height:1.05}
+.map-detail-en{margin:5px 0 14px;color:#999;font-size:13px}
+.map-facts{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0 15px;border-block:1px solid #393039;color:#c7bfc4;font-size:11px}
+.map-facts>span{padding:5px 9px;border:1px solid #514047;border-radius:3px;background:#211d23}
+.map-facts .fav{margin-left:auto}
+.map-view-tabs,.map-viewer-toolbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:14px 0}
+.map-view-tabs button,.map-zoom-controls button{border:1px solid #55404a;background:#211d23;color:#c9bfc2;border-radius:3px;padding:8px 11px;font:600 11px Inter,system-ui;cursor:pointer}
+.map-view-tabs button.active{background:#642a31;border-color:#c64a50;color:#fff}
+.map-viewer-toolbar{justify-content:space-between;color:#9f989e;font-size:10px}
+.map-zoom-controls{display:flex;align-items:center;gap:6px}
+.map-zoom-controls span{min-width:45px;text-align:center;color:#eee;font-weight:700}
+.map-zoom-controls button{min-width:34px}
+.map-viewer-stage{position:relative;width:100%;aspect-ratio:16/9;min-height:42vh;max-height:70vh;overflow:hidden;border:1px solid #514047;border-radius:4px;background:#0b0b0f;cursor:grab;touch-action:none;user-select:none}
+.map-viewer-stage.dragging{cursor:grabbing}
+.map-viewer-img{display:block;width:100%;height:100%;object-fit:contain;transform-origin:center center;transition:transform .16s ease-out;pointer-events:none}
+.map-viewer-img.picture-fallback{font-size:64px;background:radial-gradient(ellipse at 50% 50%,#34232a,#0b0b0f 72%)}
+.map-viewer-help{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:9px 0 16px;color:#8f898f;font-size:10px}
+.map-detail-copy{padding:16px 0;border-top:1px solid #393039}
+.map-detail-copy h3{font:700 22px 'Barlow Condensed';margin:0 0 8px}
+.map-detail-copy p{font-size:13px;line-height:1.7;color:#c7bec4;margin:0}
+.map-related{padding-top:17px;border-top:1px solid #393039}
+.map-related h3{font:700 22px 'Barlow Condensed';margin:0 0 12px}
+.map-related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.map-related-grid button{min-width:0;display:grid;gap:6px;padding:5px;border:1px solid #40343a;border-radius:4px;background:#1a191f;color:#ddd8dc;font-size:10px;cursor:pointer}
+.map-related-grid button:hover{border-color:#c64a50;color:#fff}
+.map-related-img{display:block;width:100%;height:70px;object-fit:cover;border-radius:2px;background:#0f0f14}
+.map-related-img.picture-fallback{font-size:22px}
+.map-art-credit{font-size:10px;line-height:1.6;color:#8b858c;margin-top:16px;padding-top:12px;border-top:1px solid #393039}
+@media(max-width:600px){.map-detail-panel{padding:15px;max-height:94vh}.map-viewer-stage{aspect-ratio:4/3;min-height:46vh;max-height:62vh}.map-viewer-toolbar{align-items:flex-start}.map-related-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.map-facts .fav{margin-left:0}}
+
+/* Perk owner chips and cards are real navigation to the character dossier. */
+.perk-owner-card[data-perk-owner-open],.perk-owner-card[data-perk-owner-open] img,.source-character[data-perk-owner-open]{cursor:pointer}
+.source-character-link{border:0;background:none;padding:0;color:#d58b8f;font:inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
+.source-character-link:hover,.perk-owner-card[data-perk-owner-open]:hover button{color:#fff}
+.perk-owner-card[data-perk-owner-open]:focus-visible,.source-character[data-perk-owner-open]:focus-visible,.source-character-link:focus-visible{outline:2px solid #d58b8f;outline-offset:3px}
