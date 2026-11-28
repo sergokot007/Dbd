@@ -329,7 +329,23 @@ for (const entry of curatedRecords) {
 }
 for (const entry of curatedRecords) indexName(entry.value, entry.keys, entry.kind);
 
+// Role is independent of whether a perk has a character owner: general perks
+// still belong to exactly one side. Keep unknown perks explicitly unclassified.
+const perkRoles = {};
+for (const perk of sourcePerks) {
+  if (!['killer', 'survivor'].includes(perk.role)) continue;
+  for (const alias of [perk.slug, perk.name?.en, perk.name?.ru]) {
+    const key = norm(alias);
+    if (key) perkRoles[key] = perk.role;
+  }
+}
+// Licensed and legacy aliases not present in the upstream list.
+for (const [role, names] of Object.entries({
+  survivor: ['Decisive Strike'],
+  killer: ['Hex: Blood Favor','Deadlock','Hex: Plaything','Gift of Pain','Face the Darkness','Haunted Ground','Crowd Control','Save the Best for Last','Play with Your Food','Dying Light']
+})) for (const name of names) perkRoles[norm(name)] = role;
 const result = {
+  perkRoles,
   generatedAt: new Date().toISOString(),
   source: 'https://github.com/flexeykinDev/dbd-perk-randomizer',
   license: 'MIT',

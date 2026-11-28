@@ -1,5 +1,5 @@
 /* Offline-first shell for the static DBD Fog Companion. */
-const CACHE='dbd-fog-v66';
+const CACHE='dbd-fog-v67';
 const CORE=[
  './','./index.html','./style.css','./manifest.webmanifest',
  './ui.js','./maps-data.js','./fallback-data.js','./names-data.js','./name-utils.js','./maps.js',

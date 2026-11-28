@@ -9,7 +9,7 @@ const TYPES={
 };
 const ALL_TABS=[...Object.keys(TYPES),'builds','mybuilds','tiers','favorites'];
 function tabFromHash(){const value=decodeURIComponent(location.hash.replace(/^#/,'')).trim();return ALL_TABS.includes(value)?value:'characters'}
-let tab=tabFromHash(),all=[],filter='Все',favorites=[];
+let tab=tabFromHash(),all=[],filter='Все',favorites=[],perkSide='all',buildSide='all';
 window.__dbdCurrentTab=tab;
 try{
  const saved=JSON.parse(localStorage.getItem('dbd-favorites')||'[]');
@@ -129,6 +129,7 @@ async function load(){
   const data=local?arr(local[tab]):[];
   if(data.length){
    all=applyCatalogNames(data,local,tab);
+   if(tab==='perks')window.__dbdPerkOwners=local.translations?.perkOwners||window.__dbdPerkOwners||{};
    $('#connection').textContent=tab==='maps'?'Атлас карт готов':(local.fallback?'Локальный мини-каталог':(tab==='addons'?'Улучшения загружены: '+all.length:'Локальная база загружена'));
    $('#connection').classList.add('ok');
    try{render()}catch(error){console.error('DBD catalog render error:',tab,error);$('#notice').textContent='Данные загружены, но произошла ошибка отображения: '+(error?.message||'ошибка')}
@@ -167,13 +168,18 @@ async function load(){
 
 
 const UNIVERSAL_BUILDS = [
-{id:"genrush",title:"Генераторный раш",tag:"GEN RUSH",desc:"Быстрый ремонт: поиск генераторов и ускорение совместной починки.",perks:["Déjà Vu","Prove Thyself","Stake Out","Hyperfocus"]},
-{id:"chase",title:"Побег от убийцы",tag:"CHASE",desc:"Для долгих погонь: информация о петлях, быстрые переходы и дополнительное время.",perks:["Windows of Opportunity","Lithe","Resilience","Off the Record"]},
-{id:"stealth",title:"Скрытность",tag:"STEALTH",desc:"Меньше шума и следов, проще скрыться и не выдать своё местоположение.",perks:["Distortion","Lightweight","Calm Spirit","Urban Evasion"]},
-{id:"healing",title:"Лечение и отхил",tag:"HEALING",desc:"Поиск раненых союзников, ускоренное лечение и возможность лечить себя.",perks:["Botany Knowledge","We'll Make It","Empathy","Self-Care"]},
-{id:"support",title:"Поддержка команды",tag:"TEAM SUPPORT",desc:"Безопасные спасения с крюка и помощь союзникам после спасения.",perks:["Kindred","We'll Make It","Borrowed Time","We're Gonna Live Forever"]},
-{id:"solo",title:"Универсальный соло-билд",tag:"SOLO QUEUE",desc:"Сборка для игры без связи: информация, генераторы и надёжный инструмент для погони.",perks:["Windows of Opportunity","Déjà Vu","Bond","Lithe"]},
-{id:"escape",title:"Выживание любой ценой",tag:"LAST SURVIVOR",desc:"Больше шансов пережить опасную ситуацию, скрыться после удара и дотянуть до выхода.",perks:["Adrenaline","Decisive Strike","Off the Record","Unbreakable"]}
+{id:"genrush",side:"survivor",rating:5,title:"Генераторный раш",tag:"GEN RUSH",desc:"Быстрый ремонт: поиск генераторов и ускорение совместной починки.",perks:["Déjà Vu","Prove Thyself","Stake Out","Hyperfocus"]},
+{id:"chase",side:"survivor",rating:5,title:"Побег от убийцы",tag:"CHASE",desc:"Для долгих погонь: информация о петлях, быстрые переходы и дополнительное время.",perks:["Windows of Opportunity","Lithe","Resilience","Off the Record"]},
+{id:"stealth",side:"survivor",rating:3,title:"Скрытность",tag:"STEALTH",desc:"Меньше шума и следов, проще скрыться и не выдать своё местоположение.",perks:["Distortion","Lightweight","Calm Spirit","Urban Evasion"]},
+{id:"healing",side:"survivor",rating:3,title:"Лечение и отхил",tag:"HEALING",desc:"Поиск раненых союзников, ускоренное лечение и возможность лечить себя.",perks:["Botany Knowledge","We'll Make It","Empathy","Self-Care"]},
+{id:"support",side:"survivor",rating:4,title:"Поддержка команды",tag:"TEAM SUPPORT",desc:"Безопасные спасения с крюка и помощь союзникам после спасения.",perks:["Kindred","We'll Make It","Borrowed Time","We're Gonna Live Forever"]},
+{id:"solo",side:"survivor",rating:5,title:"Универсальный соло-билд",tag:"SOLO QUEUE",desc:"Сборка для игры без связи: информация, генераторы и надёжный инструмент для погони.",perks:["Windows of Opportunity","Déjà Vu","Bond","Lithe"]},
+{id:"escape",side:"survivor",rating:4,title:"Выживание любой ценой",tag:"LAST SURVIVOR",desc:"Больше шансов пережить опасную ситуацию, скрыться после удара и дотянуть до выхода.",perks:["Adrenaline","Decisive Strike","Off the Record","Unbreakable"]},
+{id:"killer-slow",side:"killer",rating:5,title:"Контроль генераторов",tag:"GEN CONTROL",desc:"Замедление ремонта в начале матча и давление после повешений.",perks:["Corrupt Intervention","Pop Goes the Weasel","Grim Embrace","Scourge Hook: Pain Resonance"]},
+{id:"killer-info",side:"killer",rating:4,title:"Поиск выживших",tag:"INFORMATION",desc:"Информация в начале матча, после повешений и при проверке генераторов.",perks:["Lethal Pursuer","Barbecue & Chilli","Nowhere to Hide","I'm All Ears"]},
+{id:"killer-chase",side:"killer",rating:4,title:"Погоня и препятствия",tag:"CHASE",desc:"Работа с окнами и палетами для убийц, которым важны обычные атаки.",perks:["Bamboozle","Brutal Strength","Enduring","Spirit Fury"]},
+{id:"killer-pressure",side:"killer",rating:4,title:"Давление на команду",tag:"PRESSURE",desc:"Обнаружение ближайших выживших и контроль темпа ремонта.",perks:["Infectious Fright","Deadlock","Scourge Hook: Pain Resonance","Hex: No One Escapes Death"]},
+{id:"killer-free",side:"killer",rating:3,title:"Доступный старт",tag:"STARTER",desc:"Сборка из общих перков для начала игры без уникальных перков персонажей.",perks:["Bitter Murmur","Sloppy Butcher","Whispers","Spies from the Shadows"]}
 ];
 let allPerks = [];
 const BUILD_PERK_RU={
@@ -207,7 +213,9 @@ const BUILD_PERK_RU={
  "Mad Grit":"Безумная хватка","Iron Maiden":"Железная дева","Save the Best for Last":"Приберечь лучшее напоследок",
  "Play with Your Food":"Игра с едой","Dying Light":"Угасающий свет","Agitation":"Возбуждение",
  "Unnerving Presence":"Тревожное присутствие","Brutal Strength":"Жестокая сила","Fire Up":"Разгорается",
- "Remember Me":"Помни меня","Blood Warden":"Страж крови"
+ "Remember Me":"Помни меня","Blood Warden":"Страж крови",
+ "Enduring":"Стойкий","Hex: No One Escapes Death":"Проклятие: Никто не спасётся",
+ "Bitter Murmur":"Горький ропот","Sloppy Butcher":"Небрежный мясник","Whispers":"Шёпот","Spies from the Shadows":"Шпионы из тени"
 };
 function buildPerkKey(v){return String(v||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9]/g,"")}
 function buildPerk(wanted) {
@@ -254,21 +262,37 @@ async function loadBuilds(){
  renderBuilds();
  if(!allPerks.length&&tab==='builds')$('#notice').textContent='Локальный мини-каталог: иконки появятся после публикации полной базы.';
 }
+// Editorial estimates, not player votes or a guarantee of match results.
+function buildRating(rating){const n=Math.max(1,Math.min(5,Math.round(Number(rating)||1)));return '<span class="build-rating" role="img" aria-label="Оценка сборки: '+n+' из 5 звёзд" title="Ориентировочная оценка сборки">'+('★'.repeat(n))+('☆'.repeat(5-n))+' <small>'+n+'/5</small></span>'}
+function perkRole(item){
+ const fields=[item?.role,item?.side,item?.characterRole,item?.character_role,item?.faction,item?.type,item?.category];
+ for(const value of fields){const text=norm(value);if(/killer|убийц/.test(text))return 'killer';if(/survivor|выживш/.test(text))return 'survivor'}
+ const index=window.DBD_NAME_DATA?.perkRoles||{},normalize=window.dbdNormalizeName;
+ if(typeof normalize==='function')for(const value of [item?.id,item?.slug,item?.nameEn,item?.englishName,item?.name,item?.displayName]){const role=index[normalize(value)];if(role)return role}
+ let owner=item?.characterName||item?.character_name||item?.owner||item?.character;
+ if(!owner&&typeof normalize==='function'){
+  const ids=[item?.id,item?.slug,item?.nameEn,item?.englishName,item?.name,item?.displayName].filter(Boolean).map(normalize);
+  const owners=window.__dbdPerkOwners||{};
+  for(const [key,value] of Object.entries(owners))if(value&&ids.includes(normalize(key))){owner=value;break}
+ }
+ const character=owner&&typeof window.dbdCharacterRecord==='function'?window.dbdCharacterRecord(owner):null;
+ return ['killer','survivor'].includes(character?.role)?character.role:'unknown';
+}
 function renderBuilds() {
  setGridLayout('build-grid');
  const q=norm($('#search').value.trim());
- const groups=UNIVERSAL_BUILDS.filter(b=>norm(b.title+' '+b.tag+' '+b.desc+' '+b.perks.join(' ')).includes(q));
+ const groups=UNIVERSAL_BUILDS.filter(b=>(buildSide==='all'||b.side===buildSide)&&norm(b.title+' '+b.tag+' '+b.desc+' '+b.perks.join(' ')).includes(q));
  $('#sectionTitle').textContent='Готовые билды';
- $('#sectionLabel').textContent='UNIVERSAL SURVIVOR BUILDS';
- $('#filters').innerHTML='<span class="builds-hint">Выбери стиль игры — в каждой сборке четыре перка</span>';
- $('#notice').textContent='Подборки для выжившего • '+groups.length+' сборок';
+ $('#sectionLabel').textContent='SURVIVOR & KILLER BUILDS';
+ $('#filters').innerHTML=[['all','Все билды'],['survivor','Выжившие'],['killer','Убийцы']].map(([value,label])=>'<button type="button" data-build-side="'+value+'" class="'+(buildSide===value?'active':'')+'" aria-pressed="'+(buildSide===value)+'">'+label+'</button>').join('')+'<span class="builds-hint">Оценки ориентировочные: сила зависит от ситуации и обновлений игры.</span>';
+ $('#notice').textContent='Готовые сборки • '+groups.length;
  $('#grid').innerHTML=groups.map(b=>{
   const perks=b.perks.map(wanted=>{
    const p=buildPerk(wanted),src=p?image(p):'',perkTitle=buildPerkRussianName(p,wanted),ownerLabel=p?(ownerDisplayName(buildPerkOwner(p))||'Игровой перк'):'Перк не найден в базе';
    const icon=artTag(src,{className:'build-perk-icon',alt:'',fallback:'./assets/ui/asset-fallback.webp',label:'✦'});
    return '<div class="build-perk"><div class="build-perk-icon">'+icon+'</div><div class="build-perk-info"><b><button type="button" class="build-perk-link" data-loadout-type="perk" data-loadout-name="'+esc(p?(p.nameEn||p.englishName||p.name_en||p.english_name||p.id||wanted):wanted)+'">'+esc(perkTitle)+'</button></b><small>'+esc(ownerLabel)+'</small></div>'+(p&&buildPerkIsPaid(p)?'<span class="auric-cell" title="Платный персонаж / лицензированный контент">◈</span>':'')+'</div>';
   }).join('');
-  return '<article class="build-card"><div class="build-head"><span class="build-tag">'+esc(b.tag)+'</span><h3>'+esc(b.title)+'</h3><p>'+esc(b.desc)+'</p></div><div class="build-perks">'+perks+'</div><div class="build-foot"><span>4 ПЕРКА • ВЫЖИВШИЙ</span><button class="build-copy" data-copy-build="'+b.id+'">Скопировать названия</button></div></article>';
+  return '<article class="build-card" data-build-role="'+b.side+'"><div class="build-head"><span class="build-tag">'+esc(b.tag)+'</span><h3>'+esc(b.title)+'</h3>'+buildRating(b.rating)+'<p>'+esc(b.desc)+'</p></div><div class="build-perks">'+perks+'</div><div class="build-foot"><span>4 ПЕРКА • '+(b.side==='killer'?'УБИЙЦА':'ВЫЖИВШИЙ')+'</span><button class="build-copy" data-copy-build="'+b.id+'">Скопировать названия</button></div></article>';
  }).join('') || '<div class="empty">По этому запросу сборок не найдено.</div>';
 }
 function render(){
@@ -282,15 +306,19 @@ function render(){
  $('#sectionLabel').textContent=tab==='favorites'?'YOUR COLLECTION':cfg.label;
  const data=currentRecords(),q=norm($('#search').value.trim()),cats=['Все',...new Set(data.filter(usableGear).map(category).filter(Boolean))].slice(0,16);
  if(!cats.includes(filter))filter='Все';
- $('#filters').innerHTML=cats.length>2?cats.map(c=>'<button class="'+(filter===c?'active':'')+'" data-filter="'+esc(c)+'">'+esc(c)+'</button>').join(''):'';
- const shown=data.filter(x=>(filter==='Все'||category(x)===filter||norm(category(x)).includes(norm(filter)))&&(!q||norm([name(x),x.nameEn,x.englishName,desc(x),category(x),x.realm].join(' ')).includes(q)));
+ if(tab==='perks'){
+  const sides=[['all','Все перки'],['survivor','Перки выживших'],['killer','Перки убийц']];
+  if(data.some(x=>perkRole(x)==='unknown'))sides.push(['unknown','Не определено']);
+  $('#filters').innerHTML=sides.map(([value,label])=>'<button type="button" data-perk-side="'+value+'" class="'+(perkSide===value?'active':'')+'" aria-pressed="'+(perkSide===value)+'">'+label+'</button>').join('');
+ }else $('#filters').innerHTML=cats.length>2?cats.map(c=>'<button class="'+(filter===c?'active':'')+'" data-filter="'+esc(c)+'">'+esc(c)+'</button>').join(''):'';
+ const shown=data.filter(x=>(tab==='perks'?(perkSide==='all'||perkRole(x)===perkSide):(filter==='Все'||category(x)===filter||norm(category(x)).includes(norm(filter))))&&(!q||norm([name(x),x.nameEn,x.englishName,desc(x),category(x),x.realm].join(' ')).includes(q)));
  $('#notice').textContent=shown.length?'Найдено: '+shown.length+(tab==='items'?' • скины и косметика исключены':''):'Ничего не найдено';
  $('#grid').innerHTML=shown.map(x=>{
   const key=recordKey(x),src=image(x),saved=favorites.some(f=>f&&f.key===key),sourceTab=x.__sourceTab||tab;
   const art=artTag(src,{className:'item-art-img',alt:'',fallback:fallbackArt(sourceTab),label:sourceTab==='characters'?'◈':'✣'});
   const perkLink=sourceTab==='perks'||tab==='perks';
   const title=perkLink?'<button class="catalog-perk-link" type="button" data-loadout-type="perk" data-loadout-name="'+esc(sharedEnglish(x,'perk')||x.nameEn||x.englishName||x.name_en||x.id||name(x))+'">'+esc(name(x))+'</button>':'<button class="item-name-link" type="button" data-item-detail="'+esc(key)+'">'+esc(name(x))+'</button>';
-  return '<article class="item'+(sourceTab==='characters'?' character-card':'')+'" data-item-detail="'+esc(key)+'" data-source-tab="'+esc(sourceTab)+'" tabindex="0"><button class="art item-art-button" type="button" data-item-detail="'+esc(key)+'" aria-label="Подробнее: '+esc(name(x))+'">'+art+'</button><div class="itembody"><div class="kind">'+esc(category(x)||cfg.title||'DBD')+'</div><h3>'+title+'</h3><div class="cardbottom"><small>'+esc(x.realm||ownerDisplayName(x.characterName||x.character||x.owner)||x.nameEn||'DEAD BY DAYLIGHT')+'</small><button class="fav '+(saved?'saved':'')+'" data-fav="'+esc(key)+'" aria-pressed="'+(saved?'true':'false')+'" aria-label="'+(saved?'Убрать из избранного':'Добавить в избранное')+'">'+(saved?'♥':'♡')+'</button></div><button class="item-more" type="button" data-item-detail="'+esc(key)+'">Открыть описание и эффект ↗</button></div></article>';
+  return '<article class="item'+(sourceTab==='characters'?' character-card':'')+'" data-item-detail="'+esc(key)+'" data-source-tab="'+esc(sourceTab)+'"'+(perkLink?' data-perk-role="'+perkRole(x)+'"':'')+' tabindex="0"><button class="art item-art-button" type="button" data-item-detail="'+esc(key)+'" aria-label="Подробнее: '+esc(name(x))+'">'+art+'</button><div class="itembody"><div class="kind">'+esc(category(x)||cfg.title||'DBD')+'</div><h3>'+title+'</h3><div class="cardbottom"><small>'+esc(x.realm||ownerDisplayName(x.characterName||x.character||x.owner)||x.nameEn||'DEAD BY DAYLIGHT')+'</small><button class="fav '+(saved?'saved':'')+'" data-fav="'+esc(key)+'" aria-pressed="'+(saved?'true':'false')+'" aria-label="'+(saved?'Убрать из избранного':'Добавить в избранное')+'">'+(saved?'♥':'♡')+'</button></div><button class="item-more" type="button" data-item-detail="'+esc(key)+'">Открыть описание и эффект ↗</button></div></article>';
  }).join('')||'<div class="empty">В этой части Тумана пока пусто.</div>';
  document.querySelectorAll('.item[data-item-detail]').forEach(card=>card.addEventListener('keydown',event=>{if(event.key==='Enter'||event.key===' '){event.preventDefault();card.click()}}));
 }
@@ -372,6 +400,10 @@ window.navigateToTab=value=>{switchTab(value);window.scrollTo({top:0,behavior:'s
 // detailed top-down plans, realm grouping, zoom/pan and artist credits.
 function openMapTactics(map){if(typeof window.openMapDetail==='function')window.openMapDetail(window.mapRecordKey?window.mapRecordKey(map):String(map?.mapKey||map?.id||''))}
 function handleGlobalClick(event){
+ const perkSideButton=event.target.closest('[data-perk-side]');
+ if(perkSideButton&&tab==='perks'){perkSide=perkSideButton.dataset.perkSide;render();return}
+ const buildSideButton=event.target.closest('[data-build-side]');
+ if(buildSideButton&&tab==='builds'){buildSide=buildSideButton.dataset.buildSide;renderBuilds();return}
  const fav=event.target.closest('[data-fav]');
  if(fav){
   event.preventDefault();event.stopPropagation();

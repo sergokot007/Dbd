@@ -366,3 +366,6 @@ img.build-perk-icon,.build-perk-icon.picture-fallback{display:block;width:100%;h
 .source-character-link{border:0;background:none;padding:0;color:#d58b8f;font:inherit;text-decoration:underline;text-underline-offset:3px;cursor:pointer}
 .source-character-link:hover,.perk-owner-card[data-perk-owner-open]:hover button{color:#fff}
 .perk-owner-card[data-perk-owner-open]:focus-visible,.source-character[data-perk-owner-open]:focus-visible,.source-character-link:focus-visible{outline:2px solid #d58b8f;outline-offset:3px}
+
+.build-rating{display:inline-block;color:#f1c46a;letter-spacing:.12em;font-weight:700;white-space:nowrap;margin:.35rem 0}
+.build-rating small{color:#d5c6ad;letter-spacing:normal;font-size:.8rem}
