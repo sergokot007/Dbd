@@ -133,8 +133,24 @@ click(el('.detail-overlay.open .detail-close'), 'favorite close');
 await tick(40);
 assert.equal(window.__dbdModalStack().length, 0);
 
-// Perk cards expose a real owner portrait that opens the character dossier.
+// Role separation includes general perks without owners, and does not mix sides.
 await openTab('perks');
+click(el('[data-perk-side="survivor"]'), 'survivor perks');
+assert.ok(document.querySelectorAll('#grid .item').length > 0, 'survivor perks exist');
+assert.equal(document.querySelectorAll('#grid .item:not([data-perk-role="survivor"])').length, 0, 'survivor filter excludes other sides');
+input('#search', 'Déjà Vu');
+assert.ok(document.querySelector('#grid .item[data-perk-role="survivor"]'), 'general survivor perk is classified');
+input('#search', '');
+click(el('[data-perk-side="killer"]'), 'killer perks');
+assert.ok(document.querySelectorAll('#grid .item').length > 0, 'killer perks exist');
+assert.equal(document.querySelectorAll('#grid .item:not([data-perk-role="killer"])').length, 0, 'killer filter excludes other sides');
+input('#search', 'Hex: No One Escapes Death');
+assert.ok(document.querySelector('#grid .item[data-perk-role="killer"]'), 'general killer perk is classified');
+input('#search', '');
+click(el('[data-perk-side="all"]'), 'all perks');
+
+// Perk cards expose a real owner portrait that opens the character dossier.
+
 await waitFor(() => document.querySelector('#grid .perk-owner-mini'), 'perk card owner chip');
 const perkOwnerMini = el('#grid .perk-owner-mini');
 assertRuEn(perkOwnerMini.textContent, 'perk card owner chip');
@@ -208,6 +224,7 @@ await openTab('characters');
 click(el('#grid .item[data-item-detail]'), 'character card');
 await waitFor(() => document.querySelector('#characterModal.open'), 'character dossier');
 assertRuEn(el('#characterModal h2').textContent, 'character dossier title');
+assert.ok(document.querySelector('#characterModal .build-card .build-rating'), 'character recommended build has a rating');
 assertRuEn(el('#characterModal .build-perk-name').textContent, 'character dossier perk chip');
 const perkChip = document.querySelector('#characterModal [data-loadout-type="perk"]');
 click(perkChip, 'character perk');
@@ -258,9 +275,22 @@ assert.equal(window.__dbdModalStack().length, 0);
 
 // Builds, tier list and personal builder controls.
 await openTab('builds');
-assert.ok(document.querySelectorAll('.build-card').length >= 5, 'build cards');
+assert.ok(document.querySelectorAll('#grid .build-card').length >= 5, 'build cards');
+assert.ok(document.querySelectorAll('#grid .build-card[data-build-role="survivor"]').length > 0, 'survivor builds');
+assert.ok(document.querySelectorAll('#grid .build-card[data-build-role="killer"]').length >= 4, 'killer builds');
+assert.equal(document.querySelectorAll('#grid .build-card:not(:has(.build-rating))').length, 0, 'every ready build has a rating');
+for (const rating of document.querySelectorAll('#grid .build-card .build-rating')) assert.match(rating.getAttribute('aria-label'), /[1-5] из 5/, 'accessible star rating');
+click(el('[data-build-side="killer"]'), 'killer build filter');
+assert.ok(document.querySelectorAll('#grid .build-card').length >= 4, 'killer build filter shows builds');
+assert.equal(document.querySelectorAll('#grid .build-card:not([data-build-role="killer"])').length, 0, 'killer filter excludes survivor builds');
+assert.equal(document.querySelectorAll('#grid .build-card .build-perks').length, document.querySelectorAll('#grid .build-card').length, 'killer builds contain perk sections');
+for (const card of document.querySelectorAll('#grid .build-card')) assert.equal(card.querySelectorAll('.build-perk-link').length, 4, 'killer build has four clickable perks');
+click(el('[data-build-side="survivor"]'), 'survivor build filter');
+assert.equal(document.querySelectorAll('#grid .build-card:not([data-build-role="survivor"])').length, 0, 'survivor build filter excludes killers');
+click(el('[data-build-side="all"]'), 'all builds');
 assertRuEn(el('.build-perk-link').textContent, 'build perk name');
-const ownerMini = el('.perk-owner-mini');
+await waitFor(() => document.querySelector('#grid .perk-owner-mini'), 'build owner mini');
+const ownerMini = el('#grid .perk-owner-mini');
 assertRuEn(ownerMini.textContent, 'build owner mini chip');
 assert.match(ownerMini.querySelector('img')?.getAttribute('src') || '', /^\.\/assets\/characters\//, 'bundled build owner portrait');
 click(ownerMini, 'build owner mini chip');
